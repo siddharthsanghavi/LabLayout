@@ -107,4 +107,6 @@ Good practice, not enforced: keep items inside the room, leave about 3 ft of ais
 | `trash` | Trash can | 1.25 × 1.25 | fixture |
 | `door` | Door | 3 × 0.4 | map only |
 
-The live list, including the user's own saved pieces, comes from `LabLayout.catalog()` or the copied prompt.
+**Equipment library:** there are also 108 more machine and fixture kinds in [library/equipment.json](../library/equipment.json): 3D printers, paper printers, desk and computer gear, electronics bench instruments, shop tools, and lab equipment (e.g. `bambup1s`, `laserjet`, `monitor27`, `scope4ch`, `psu3`, `drillpress`, `centrifuge`). Use them as `kind` or in `on_top`.
+
+The live list, including the user's own saved pieces and added library files, comes from `LabLayout.catalog()` or the copied prompt.

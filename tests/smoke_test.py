@@ -122,6 +122,8 @@ def main():
             snapped = b.evaluate("snapWall({w:2,d:2},0.3,5)")
             check(snapped["x"] == 0, "snaps to a nearby wall")
 
+            check(b.evaluate("LIB.filter(c=>c.grp==='Equipment').reduce((a,c)=>a+c.items.length,0)") >= 100 and b.evaluate("!!libItem('scope4ch')&&!!libItem('laserjet')"), "equipment library pack is bundled")
+            check(b.evaluate("addPack({name:'Test pack',categories:[{name:'X',items:[{k:'tp1',n:'Thing',w:5,h:5,fp:[.5,.5]},{k:'scope4ch',n:'dup',w:1,h:1,fp:[1,1]}]}]}).added") == 1, "library packs append and skip duplicate keys")
             print("AI layout spec")
             before = b.evaluate("JSON.stringify(P.units)")
             rt = b.evaluate("(()=>{const s=LabLayout.exportSpec(),a=JSON.stringify(P.units.map(u=>[u.id,u.x,u.y,u.w,u.d,(u.grid||{cells:[]}).cells.map(c=>c.id+c.name)]));const r=LabLayout.importSpec(JSON.parse(JSON.stringify(s)));return [r.ok, a===JSON.stringify(P.units.map(u=>[u.id,u.x,u.y,u.w,u.d,(u.grid||{cells:[]}).cells.map(c=>c.id+c.name)]))]})()")

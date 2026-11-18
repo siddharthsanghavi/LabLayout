@@ -60,6 +60,13 @@ The builder warns you if anything sits outside the walls or overlaps.
 - **🖨 Print plan**: prints the floor plan with the room name and date.
 - **★ Save as piece**: in a unit's panel, saves it (drawers, drawer names and machines on top) to *My pieces* in the library so you can reuse it. Your pieces are kept in this browser and inside saved project files. Click ✕ twice to remove one.
 
+### Equipment library (separate and appendable)
+
+The library has two tabs. **Furniture** holds benches, cabinets and office pieces. **Equipment** has 108 items drawn to scale: 3D printers, paper printers, desk and computer gear, electronics bench instruments, shop tools, and lab equipment. A search box looks across both tabs.
+
+- Equipment lives in [library/equipment.json](library/equipment.json). To add something, add an item `{"k", "n", "w", "h", "fp"}` (front width/height in inches, footprint in feet) and run `python build.py`. Every `library/*.json` file is bundled, and each file gets its own tab.
+- Without rebuilding, click **📚 Add a library file** in the builder. The file is kept in that browser.
+
 ### Let an AI lay out the room
 
 Click **🤖 AI layout → Copy prompt** and paste it into Claude, ChatGPT or another chatbot along with a description of your room. Then paste the reply back and click **Build it**. If the reply has mistakes, **Copy fix-up request** writes a message listing the errors for you to send back to the bot.

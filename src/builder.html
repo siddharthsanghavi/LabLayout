@@ -66,7 +66,10 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
   <details><summary>☁ Shared inventory (optional)</summary><div style="padding:0 8px 8px"><p class="hint">Bake a Supabase connection into exported trackers so every device shares one inventory. See README for setup. The anon key ends up inside the HTML file — only share the file with people who should edit the inventory.</p><label class="f">Supabase URL<input id="syu" placeholder="https://xxxx.supabase.co"></label><label class="f">Anon key<input id="syk" placeholder="eyJ…"></label></div></details>
   <h2>Library — drag onto the plan</h2>
   <button class="ghost" id="bDesign" style="width:100%;margin-bottom:6px">🪚 Design a piece (or import SVG)</button>
+  <input id="libq" placeholder="Search library…" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;font:inherit;font-size:13px;margin-bottom:6px">
+  <div id="libtabs" class="row" style="flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
   <div id="lib"></div>
+  <button class="ghost" id="bPack" style="width:100%;margin-top:6px">📚 Add a library file (.json)</button><input type="file" id="fPack" accept=".json,application/json" hidden>
   <p class="hint">Machines and fixtures dropped <b>on</b> a bench or wall group sit on it; dropped on the floor they get their own spot. On a phone, tap an item to add it to the middle of the room.</p>
  </aside>
  <section id="stage"><svg id="plan"></svg><input id="dimin" autocomplete="off">
@@ -137,7 +140,16 @@ const LIB=[
   F('aid','First aid kit + towels',16,26,[1.3,.3],{up:24}),
   F('trash','Trash can',15,28,[1.25,1.25]),
   {kind:'door',a:'door',n:'Door',fp:[3,.4]}]}];
-LIB.forEach(c=>c.items.forEach(it=>{if(!it.k)it.k=it.a;it.cat=c.cat}));
+LIB.forEach(c=>{c.grp='Furniture';c.items.forEach(it=>{if(!it.k)it.k=it.a;it.cat=c.cat})});
+/* ---------- library packs: library/*.json is bundled at build time; more can be added in the app ---------- */
+const BUILTIN_PACKS=/*LIBRARY_PACKS*/[];
+let EXTRA_PACKS=(()=>{try{return JSON.parse(localStorage.getItem('lablayout-lib-packs'))||[]}catch(e){return[]}})();
+function addPack(p){if(!p||!Array.isArray(p.categories))throw Error('Not a LabLayout library file (needs "categories")');const g=String(p.name||'Library');const keys=new Set(LIB.flatMap(c=>c.items).map(i=>i.k));let n=0,skip=0;
+ p.categories.forEach(pc=>{const cn=String(pc.name||'Other');let c=LIB.find(x=>x.cat===cn&&x.grp===g);if(!c){c={cat:cn,grp:g,items:[]};LIB.push(c)}
+  (pc.items||[]).forEach(it=>{if(!it||!it.k||keys.has(it.k)||!Array.isArray(it.fp)||!(it.w>0)||!(it.h>0)){skip++;return}keys.add(it.k);const sl=(it.slots||[]).map(x=>({l:String(x.l||x),cat:x.cat||''}));
+   const o=it.type==='fixture'?F(it.k,it.n||it.k,+it.w,+it.h,it.fp.map(Number),sl.length?{slots:sl}:undefined):M(it.k,it.n||it.k,+it.w,+it.h,it.fp.map(Number),sl.length?sl:undefined);o.k=it.k;o.cat=cn;o.pack=g;c.items.push(o);n++})});
+ return{added:n,skipped:skip,group:g}}
+BUILTIN_PACKS.forEach(p=>{try{addPack(p)}catch(e){console.warn(e)}});EXTRA_PACKS.forEach(p=>{try{addPack(p)}catch(e){console.warn(e)}});
 
 /* ---------- custom library pieces ---------- */
 let CUSTOM=(()=>{try{return JSON.parse(localStorage.getItem('lablayout-custom-lib'))||[]}catch(e){return[]}})();
@@ -404,7 +416,12 @@ $('bPrint').onclick=()=>{select(null);fit();$('printhead').textContent=(P.title|
 $('bFit').onclick=fit;
 
 /* library drag */
-function renderLib(){$('lib').innerHTML=allLib().map((c,ci)=>`<details ${ci<2?'open':''}><summary>${esc(c.cat)}</summary><div class="lib">${c.items.map(it=>`<div class="li" data-k="${it.k}"><span class="sw" style="background:${it.color||(it.kind==='machine'?'#d8c3a5':it.kind==='door'?'#fff':'#cfe8f5')}"></span>${esc(it.n)}<small>${+(+it.fp[0]).toFixed(2)}×${+(+it.fp[1]).toFixed(2)}'</small>${it.custom?`<span class="rmx" data-rmk="${it.k}" title="Remove from library">✕</span>`:''}</div>`).join('')}</div></details>`).join('');
+let LIBG=(()=>{try{return localStorage.getItem('lablayout-lib-tab')||'Furniture'}catch(e){return'Furniture'}})(),LIBQ='';
+function renderLib(){const groups=[...new Set(LIB.map(c=>c.grp))];if(!groups.includes(LIBG))LIBG=groups[0];const q=LIBQ.trim().toLowerCase();
+ const cats=allLib().filter(c=>q||!c.grp||c.grp===LIBG).map(c=>q?{...c,items:c.items.filter(i=>(i.n+' '+i.k+' '+c.cat).toLowerCase().includes(q))}:c).filter(c=>c.items.length);
+ $('libtabs').innerHTML=groups.map(g=>`<button class="${g===LIBG&&!q?'':'ghost'}" style="flex:none;padding:4px 10px" data-g="${esc(g)}">${esc(g)} <small>${LIB.filter(c=>c.grp===g).reduce((a,c)=>a+c.items.length,0)}</small></button>`).join('');
+ $('libtabs').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{LIBG=b.dataset.g;LIBQ='';$('libq').value='';try{localStorage.setItem('lablayout-lib-tab',LIBG)}catch(e){}renderLib()});
+ $('lib').innerHTML=(cats.length?'':'<p class="hint">No matches.</p>')+cats.map((c,ci)=>`<details ${ci<2||q?'open':''}><summary>${esc(c.cat)}</summary><div class="lib">${c.items.map(it=>`<div class="li" data-k="${it.k}"><span class="sw" style="background:${it.color||(it.kind==='machine'?'#d8c3a5':it.kind==='door'?'#fff':'#cfe8f5')}"></span>${esc(it.n)}<small>${+(+it.fp[0]).toFixed(2)}×${+(+it.fp[1]).toFixed(2)}'</small>${it.custom?`<span class="rmx" data-rmk="${it.k}" title="Remove from library">✕</span>`:''}</div>`).join('')}</div></details>`).join('');
  $('lib').querySelectorAll('[data-rmk]').forEach(x=>x.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();if(!confirmBtn(x))return;CUSTOM=CUSTOM.filter(c=>c.k!==x.dataset.rmk);P.customLib=(P.customLib||[]).filter(c=>c.k!==x.dataset.rmk);saveCustom();save();renderLib();toast('Removed from library')}));
  $('lib').querySelectorAll('.li').forEach(el=>el.addEventListener('pointerdown',e=>{e.preventDefault();const it=allLib().flatMap(c=>c.items).find(i=>i.k===el.dataset.k);
   const gh=document.createElement('div');gh.className='dragghost';gh.textContent=it.n;document.body.appendChild(gh);let moved=false;const x0=e.clientX,y0=e.clientY;
@@ -476,6 +493,10 @@ $('bNew').onclick=()=>{if(!confirmBtn($('bNew')))return;P=blank();init();toast('
 $('bEx').onclick=()=>{const c=exampleConfig();if(!c){toast('Example unavailable');return}if(P.units.length&&!confirmBtn($('bEx')))return;P={v:1,title:c.title,room:c.room,units:c.units,sample:true,exampleKey:c.storageKey};init();toast('Loaded HatchBridge example')};
 $('title').oninput=e=>{P.title=e.target.value;save()};
 ['syu','syk'].forEach(k=>$(k).oninput=()=>{P.sync={url:$('syu').value.trim(),key:$('syk').value.trim()};if(!P.sync.url&&!P.sync.key)delete P.sync;save()});
+$('libq').addEventListener('input',e=>{LIBQ=e.target.value;renderLib()});
+$('bPack').onclick=()=>$('fPack').click();
+$('fPack').onchange=e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;fl.text().then(t=>{const p=JSON.parse(t);const r=addPack(p);if(!r.added)throw Error('No new items (keys already exist or items are missing w/h/fp)');
+ EXTRA_PACKS.push(p);try{localStorage.setItem('lablayout-lib-packs',JSON.stringify(EXTRA_PACKS))}catch(_){}LIBG=r.group;renderLib();toast(`Added ${r.added} item${r.added>1?'s':''} to “${r.group}”${r.skipped?` (${r.skipped} skipped)`:''}`)}).catch(err=>toast('Couldn’t add library: '+err.message))};
 function init(keep){$('title').value=P.title||'';$('syu').value=(P.sync&&P.sync.url)||'';$('syk').value=(P.sync&&P.sync.key)||'';mergeCustom();renderLib();if(!keep)resetHist();selId=null;drawMode=false;SK=null;editMode=false;dimBox(null);$('bDraw').textContent='✏️ Draw walls';$('bEdit').textContent='📐 Edit walls';syncPoly();fit();select(null)}
 /* ---------- furniture designer ---------- */
 const DCOL={uline:['#7d8288','#9aa0a6','#111'],husky:['#151515','#262626','#ddd'],chem:['#f2c811','#e0b800','#222'],cabinet:['#7f868d','#a6adb4','#111'],shelf:['#d5d8db','#f4f5f6','#333'],cart:['#a93226','#c0392b','#fff'],bins:['#2c5aa0','#3b6fb6','#fff'],maple:['#c9a874','#dcc193','#2a2010'],oak:['#b89c74','#d4bf9c','#2a2010'],black:['#111','#1e1e1e','#ddd']};

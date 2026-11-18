@@ -19,6 +19,22 @@ assert "/*TRACKER_TEMPLATE*/null" in builder, "builder is missing the template p
 embedded = json.dumps(tracker).replace("</", "<\\/")
 out = builder.replace("/*TRACKER_TEMPLATE*/null", "/*TRACKER_TEMPLATE*/" + embedded, 1)
 
+# Bundle every library pack in library/*.json (add a file or append items to add equipment)
+assert "/*LIBRARY_PACKS*/[]" in out, "builder is missing the library placeholder"
+packs = []
+for p in sorted((root / "library").glob("*.json")):
+    pack = json.loads(p.read_text(encoding="utf-8"))
+    keys = [it["k"] for c in pack["categories"] for it in c["items"]]
+    dup = {k for k in keys if keys.count(k) > 1}
+    assert not dup, f"{p.name}: duplicate keys {sorted(dup)}"
+    for c in pack["categories"]:
+        for it in c["items"]:
+            assert it.get("w", 0) > 0 and it.get("h", 0) > 0 and len(it.get("fp", [])) == 2, f"{p.name}: {it.get('k')} needs w, h and fp"
+    packs.append(pack)
+out = out.replace("/*LIBRARY_PACKS*/[]", "/*LIBRARY_PACKS*/" + json.dumps(packs, ensure_ascii=False).replace("</", "<\\/"), 1)
+n_items = sum(len(c["items"]) for p in packs for c in p["categories"])
+print(f"bundled {len(packs)} library pack(s), {n_items} items")
+
 dist = root / "dist"
 dist.mkdir(exist_ok=True)
 (dist / "builder.html").write_text(out, encoding="utf-8")
