@@ -1,0 +1,15 @@
+# LabLayout
+
+> Offline, single-file room builder for labs, shops and tool cribs. You sketch the room, place benches, cabinets and machines, then export a self-contained HTML inventory tracker.
+
+AI agents can generate layouts as JSON specs:
+
+- Spec format, rules and library kinds: [docs/AI_LAYOUT_GUIDE.md](AI_LAYOUT_GUIDE.md)
+- Load a spec: open `builder.html#layout=<base64url JSON>`, or call `window.LabLayout.importSpec(spec)` on the builder page
+- Check before loading: `window.LabLayout.validate(spec)`; read the current room: `window.LabLayout.exportSpec()`
+- Units: feet for the room and positions, inches for furniture fronts and cells; origin at the top-left
+
+## Files
+
+- [builder.html](builder.html): the ready-to-open builder
+- [README.md](README.md): features and setup

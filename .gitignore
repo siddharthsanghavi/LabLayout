@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Playwright / test output
+test-results/
+playwright-report/
+.pytest_cache/
+
+# Exported trackers, project files and backups made while testing locally
+# (dist/ is committed on purpose — it's the ready-to-open builder)
+*-tracker.html
+!dist/*-tracker.html
+*.lablayout.json
+*.cribops.json
+*-backup-*.json
+*-reorder-*.csv
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code local state (worktrees, per-machine settings)
+.claude/
