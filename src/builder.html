@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CribOps Room Builder</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#e7ecea;color:#1a1a1a;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:#111;color:#fff;display:flex;gap:8px;align-items:center;padding:8px 12px;flex-wrap:wrap}
+header h1{font-size:16px;margin:0 8px 0 0}header input{background:#222;border:1px solid #444;color:#fff;border-radius:6px;padding:6px 8px;font:inherit;width:220px}
+button{font:inherit;border:0;border-radius:6px;padding:7px 11px;background:#f26b1d;color:#fff;cursor:pointer}button.alt{background:#444}button.ghost{background:#fff;color:#222;border:1px solid #bbb}button.bad{background:#c62828}button:disabled{opacity:.5}
+.grow{flex:1}
+main{flex:1;display:grid;grid-template-columns:260px 1fr 300px;min-height:0}
+aside{background:#fff;overflow:auto;padding:10px;border-right:1px solid #d5dad8}aside.right{border-right:0;border-left:1px solid #d5dad8}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#666;margin:12px 0 6px}h2:first-child{margin-top:0}
+details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{padding:7px 9px;font-weight:600;font-size:13px;cursor:pointer}
+.lib{display:grid;gap:4px;padding:0 6px 6px}
+.li{display:flex;align-items:center;gap:8px;padding:6px 7px;border:1px solid #e3e6e5;border-radius:6px;cursor:grab;font-size:12.5px;background:#fafafa;user-select:none;touch-action:none}
+.li:hover{border-color:#f26b1d}.sw{width:16px;height:16px;border-radius:3px;flex:none;border:1px solid #0002}
+.li small{color:#888;margin-left:auto;white-space:nowrap}
+#stage{position:relative;overflow:hidden;background:#dfe4e2}
+#plan{width:100%;height:100%;display:block;touch-action:none}
+#plan .u{cursor:move}#plan .u.sel rect.b{stroke:#f26b1d;stroke-width:.08}
+#plan text{pointer-events:none;font-family:system-ui,sans-serif;text-anchor:middle;dominant-baseline:middle}
+#plan .vtx{fill:#fff;stroke:#2d6cdf;stroke-width:.05;cursor:pointer}
+.tb{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}.tb button{font-size:12px;padding:6px 9px}
+.hint{font-size:12px;color:#666}
+#status{position:absolute;left:10px;bottom:10px;background:#fffd;border-radius:6px;padding:5px 8px;font-size:12px;color:#444;max-width:70%}
+.f{display:block;font-size:12px;color:#444;margin:6px 0}.f input,.f select,.f textarea{width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;font:inherit;font-size:13px;margin-top:2px}
+.row{display:flex;gap:6px}.row>*{flex:1}
+.cells{display:grid;gap:3px}.cells input{padding:5px;font-size:12px;border:1px solid #ddd;border-radius:5px;width:100%}
+.eqi{display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 6px;border:1px solid #eee;border-radius:6px;margin-bottom:3px}.eqi span{flex:1}.eqi button{padding:2px 7px;font-size:11px}
+.dragghost{position:fixed;pointer-events:none;z-index:99;background:#fff;border:2px solid #f26b1d;border-radius:6px;padding:4px 8px;font-size:12px;box-shadow:0 4px 12px #0003}
+#modal{position:fixed;inset:0;background:#0008;display:none;z-index:50;align-items:center;justify-content:center;padding:16px}#modal.on{display:flex}
+.mcard{background:#fff;border-radius:12px;width:min(1000px,100%);height:min(90vh,900px);display:flex;flex-direction:column;overflow:hidden}
+.mhead{display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid #eee}.mhead b{flex:1}
+.mcard iframe{flex:1;border:0;width:100%}
+.devw{display:flex;gap:4px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:8px;opacity:0;transition:.2s;z-index:99;pointer-events:none}#toast.on{opacity:1}
+.warn{background:#fff4e5;border:1px solid #f0c27a;border-radius:6px;padding:6px 8px;font-size:12px;margin:4px 0}
+@media(max-width:900px){body{height:auto;overflow:auto}main{grid-template-columns:1fr}#stage{height:70vh}aside{border:0}}
+</style></head><body>
+<header><h1>🧰 CribOps Builder</h1><input id="title" placeholder="Room / tracker name">
+<button class="alt" id="bNew">New room</button><button class="alt" id="bEx">Load example</button>
+<button class="alt" id="bOpen">Open project</button><button class="alt" id="bSave">Save project</button>
+<span class="grow"></span><button class="ghost" id="bPrev">▶ Preview tracker</button><button id="bExport">⬇ Export tracker HTML</button>
+<input type="file" id="file" accept=".json,.cribops" hidden></header>
+<main>
+ <aside>
+  <h2>Room</h2>
+  <div class="row"><label class="f">Width (ft)<input id="rw" type="number" step="0.25" value="14"></label><label class="f">Depth (ft)<input id="rd" type="number" step="0.25" value="20"></label></div>
+  <div class="row"><button class="ghost" id="bRect">Rectangle</button><button class="ghost" id="bDraw">✏️ Draw walls</button></div>
+  <label class="f">Wall corners (x, y in ft — one per line)<textarea id="poly" rows="5"></textarea></label>
+  <button class="ghost" id="bPoly" style="width:100%">Apply corners</button>
+  <h2>Library — drag onto the plan</h2>
+  <div id="lib"></div>
+  <p class="hint">Machines and fixtures dropped <b>on</b> a bench or wall group sit on it; dropped on the floor they get their own spot. On a phone, tap an item to add it to the middle of the room.</p>
+ </aside>
+ <section id="stage"><svg id="plan"></svg>
+  <div class="tb"><button class="alt" id="bRot" disabled>⟳ Rotate</button><button class="alt" id="bDup" disabled>⧉ Duplicate</button><button class="bad" id="bDel" disabled>Delete</button><button class="ghost" id="bFit">Fit</button></div>
+  <div id="status"></div></section>
+ <aside class="right" id="props"></aside>
+</main>
+<div id="modal"><div class="mcard"><div class="mhead"><b>Tracker preview</b><div class="devw"><button class="ghost" data-w="390">Phone</button><button class="ghost" data-w="100%">Desktop</button></div><button class="alt" id="mClose">Close</button></div><div style="flex:1;display:flex;justify-content:center;background:#ccc"><iframe id="pv" style="background:#fff;max-width:100%"></iframe></div></div></div>
+<div id="toast"></div>
+<script>
+const TEMPLATE=/*TRACKER_TEMPLATE*/null;
+const CFG_RE=/\/\*CRIBOPS_CONFIG\*\/[\s\S]*?\/\*END_CONFIG\*\//;
+const $=id=>document.getElementById(id);
+const esc=t=>String(t??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const snap=v=>Math.round(v*4)/4;
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
+
+/* ---------- library ---------- */
+const M=(a,t,w,h,fp,slots,extra)=>({kind:'machine',a,n:t,eq:{a,t,w,h,...(slots?{slots}:{}),...(extra||{})},fp});
+const F=(a,t,w,h,fp,extra)=>({kind:'fixture',a,n:t,eq:{a,t,w,h,...(extra||{})},fp});
+const LIB=[
+ {cat:'Workbenches & tool chests',items:[
+  {k:'uline60',n:'Steel workbench 60"',fp:[5,2.5],kind:'storage',style:'uline',front:[60,33],surf:1,preset:'bench',color:'#9aa0a6'},
+  {k:'uline72',n:'Steel workbench 72"',fp:[6,2.5],kind:'storage',style:'uline',front:[72,33],surf:1,preset:'bench',color:'#9aa0a6'},
+  {k:'bench2',n:'Workbench, 2 drawer stacks 72"',fp:[6,2.5],kind:'storage',style:'uline',front:[72,33],surf:1,preset:'bench2',color:'#9aa0a6'},
+  {k:'open72',n:'Open workbench 72" (lower shelf)',fp:[6,2.5],kind:'storage',style:'uline',front:[72,34],surf:1,preset:'shelves',pn:1,color:'#b9a27a'},
+  {k:'husky72',n:'Husky 72" mobile workbench',fp:[6,1.66],kind:'storage',style:'husky',front:[72,32],surf:1,preset:'husky11',color:'#2a2a2a',tc:'#fff'},
+  {k:'chest46',n:'Tool chest 46" (8 drawers)',fp:[3.83,1.5],kind:'storage',style:'husky',front:[46,38],surf:1,preset:'drawers',pn:8,color:'#2a2a2a',tc:'#fff'},
+  {k:'cart',n:'Rolling tool cart',fp:[2.5,1.5],kind:'storage',style:'cart',front:[30,33],surf:1,preset:'shelves',pn:3,color:'#c0392b',tc:'#fff'}]},
+ {cat:'Cabinets & shelving',items:[
+  {k:'flam17',n:'Flammable cabinet 17 gal',fp:[3.6,1.5],kind:'storage',style:'chem',front:[43,24],preset:'shelves',pn:2,color:'#f2c811'},
+  {k:'flam30',n:'Flammable cabinet 30 gal',fp:[3.6,1.5],kind:'storage',style:'chem',front:[43,44],preset:'shelves',pn:3,color:'#f2c811'},
+  {k:'flam45',n:'Flammable cabinet 45 gal',fp:[3.6,1.5],kind:'storage',style:'chem',front:[43,65],preset:'shelves',pn:3,color:'#f2c811'},
+  {k:'store',n:'Storage cabinet 36" (2-door)',fp:[3,1.5],kind:'storage',style:'cabinet',front:[36,72],preset:'shelves',pn:5,color:'#8d949b'},
+  {k:'wallcab',n:'Wall cabinet 30"',fp:[2.5,1],kind:'storage',style:'cabinet',front:[30,30],preset:'shelves',pn:2,color:'#a8aeb4'},
+  {k:'drawercab',n:'Drawer cabinet (10)',fp:[2.5,2],kind:'storage',style:'cabinet',front:[30,40],preset:'drawers',pn:10,color:'#8d949b'},
+  {k:'wire',n:'Wire shelving 48"',fp:[4,1.5],kind:'storage',style:'shelf',front:[48,72],preset:'shelves',pn:5,color:'#c9ccd0'},
+  {k:'bins',n:'Bin rack 36" (4×4)',fp:[3,1],kind:'storage',style:'bins',front:[36,48],preset:'grid',pn:4,pc:4,color:'#3b6fb6',tc:'#fff'}]},
+ {cat:'Machines',items:[
+  M('prusa','Prusa MK4 (enclosure)',26.8,23.6,[2.2,2],[{l:'Filament spool',cat:'prusa'}]),
+  M('bambu','Bambu Lab X1C',15.4,18.8,[1.3,1.4],[{l:'Filament spool',cat:'prusa'}]),
+  M('form4','Formlabs Form 4',15.4,20.9,[1.3,1.25],[{l:'Resin tank',cat:'formlabs'},{l:'Resin cartridge',cat:'formlabs'}]),
+  M('wash','Form Wash V2',12.4,15.9,[1.05,1],[{l:'Resin wash (IPA)',cat:'formlabs'}]),
+  M('cure','Form Cure V2',13.3,15.9,[1.1,1.2]),
+  M('glowforge','Glowforge Pro HD',38.5,8.6,[3.2,1.75],[{l:'Material',cat:'glowforge'}]),
+  M('cnc','Desktop CNC router',30,24,[2.5,2.5],[{l:'Stock material',cat:''}]),
+  M('hakko','Hakko FX-951 soldering',4.8,4.3,[.5,.6]),
+  M('monitor','Monitor',21.3,18,[1.8,.7]),
+  M('pc','Desktop PC',6.7,14.5,[.6,1.3])]},
+ {cat:'Room fixtures',items:[
+  F('sink','Sink + eyewash',20,8,[1.7,1.5],{up:28}),
+  F('ext','Fire extinguisher',9,24,[.75,.3],{up:20}),
+  F('eyewash','Eyewash station',10,30,[.9,.5],{up:18}),
+  F('aid','First aid kit + towels',16,26,[1.3,.3],{up:24}),
+  F('trash','Trash can',15,28,[1.25,1.25]),
+  {kind:'door',a:'door',n:'Door',fp:[3,.4]}]}];
+LIB.forEach(c=>c.items.forEach(it=>{if(!it.k)it.k=it.a;it.cat=c.cat}));
+
+/* ---------- presets ---------- */
+const PRESETS={bench:'4 drawers · open · cabinet',bench2:'4 drawers · open · 4 drawers',husky11:'Husky 11-drawer',shelves:'Shelves (n)',drawers:'Drawers (n)',drawers2:'2 columns of drawers (n each)',grid:'Bin grid (n rows × c)',none:'No storage'};
+function makeGrid(uid,preset,n=4,c=4){const C=[];const A=(r1,c1,r2,c2)=>`${r1}/${c1}/${r2}/${c2}`;
+ if(preset==='bench'||preset==='bench2'){for(let i=1;i<=4;i++)C.push({id:`${uid}-d${i}`,name:`Drawer ${i}`,area:A(i,1,i+1,2)});C.push({id:`${uid}-open`,name:'Open under-bench',cls:'cab',area:A(1,2,5,3)});
+  if(preset==='bench')C.push({id:`${uid}-cab`,name:'Cabinet',cls:'cab',area:A(1,3,5,4)});else for(let i=1;i<=4;i++)C.push({id:`${uid}-e${i}`,name:`Right drawer ${i}`,area:A(i,3,i+1,4)});
+  return{cols:preset==='bench'?'3fr 3fr 2fr':'3fr 2fr 3fr',rows:'repeat(4,minmax(0,1fr))',cells:C}}
+ if(preset==='husky11'){C.push({id:`${uid}-top`,name:'Top drawer (locking)',cls:'full',area:A(1,1,2,3)});['2/1/3/2','3/1/4/2','4/1/5/2','5/1/10/2'].forEach((a,i)=>C.push({id:`${uid}-L${i+1}`,name:`Left ${i+1}`+(i==3?' (deep)':''),cls:i==3?'deep':'',area:a}));
+  ['2/2/3/3','3/2/4/3','4/2/5/3','5/2/6/3','6/2/10/3'].forEach((a,i)=>C.push({id:`${uid}-R${i+1}`,name:`Right ${i+1}`+(i==4?' (deep)':''),cls:i==4?'deep':'',area:a}));C.push({id:`${uid}-cab`,name:'Side cabinet',cls:'cab',area:A(1,3,10,4)});
+  return{cols:'3fr 3fr 2fr',rows:'1.4fr repeat(8,minmax(0,1fr))',cells:C}}
+ if(preset==='shelves'){for(let i=1;i<=n;i++)C.push({id:`${uid}-s${i}`,name:n==1?'Lower shelf':i==1?'Top shelf':i==n?'Bottom shelf':`Shelf ${i}`,cls:'shelf',area:A(i,1,i+1,2)});return{cols:'1fr',rows:`repeat(${n},minmax(0,1fr))`,cells:C}}
+ if(preset==='drawers'){for(let i=1;i<=n;i++)C.push({id:`${uid}-d${i}`,name:`Drawer ${i}`,area:A(i,1,i+1,2)});return{cols:'1fr',rows:`repeat(${n},minmax(0,1fr))`,cells:C}}
+ if(preset==='drawers2'){for(let k=0;k<2;k++)for(let i=1;i<=n;i++)C.push({id:`${uid}-${k?'R':'L'}${i}`,name:`${k?'Right':'Left'} ${i}`,area:A(i,k+1,i+1,k+2)});return{cols:'1fr 1fr',rows:`repeat(${n},minmax(0,1fr))`,cells:C}}
+ if(preset==='grid'){for(let r=1;r<=n;r++)for(let k=1;k<=c;k++)C.push({id:`${uid}-r${r}c${k}`,name:`Row ${r} · Bin ${k}`,area:A(r,k,r+1,k+1)});return{cols:`repeat(${c},1fr)`,rows:`repeat(${n},minmax(0,1fr))`,cells:C}}
+ return null}
+
+/* ---------- project ---------- */
+let P,selId=null,seq=1,drawMode=false;
+const blank=()=>({v:1,title:'My Lab',room:{poly:[[0,0],[14,0],[14,20],[0,20]]},units:[]});
+function nid(p){let id;do{id=p+(seq++)}while(P.units.some(u=>u.id===id||(u.grid&&u.grid.cells.some(c=>c.id.startsWith(id+'-')))));return id}
+function save(){try{localStorage.setItem('cribops-builder',JSON.stringify(P))}catch(e){}}
+function load(){try{const j=JSON.parse(localStorage.getItem('cribops-builder'));if(j&&j.room)return j}catch(e){}return null}
+const U=id=>P.units.find(u=>u.id===id);
+function exampleConfig(){if(!TEMPLATE)return null;const m=TEMPLATE.match(CFG_RE);if(!m)return null;return JSON.parse(m[0].replace('/*CRIBOPS_CONFIG*/','').replace('/*END_CONFIG*/',''))}
+
+function addFromLib(it,x,y){const tgt=hitUnit(x,y);
+ if((it.kind==='machine'||it.kind==='fixture')&&tgt&&(tgt.surf||tgt.style==='fixture'||tgt.style==='plain')){const e=JSON.parse(JSON.stringify(it.eq));(e.slots||[]).forEach(s=>s.id=tgt.id+'-'+e.a+'-'+(seq++));tgt.eq=tgt.eq||[];tgt.eq.push(e);fitLen(tgt);select(tgt.id);commit(`Put ${it.n} on ${tgt.name}`);return}
+ const [w,d]=it.fp;const id=nid(it.kind==='storage'?'u':it.kind==='door'?'door':'m');
+ const u={id,name:it.n,tab:'',x:snap(x-w/2),y:snap(y-d/2),w,d,lib:it.k};
+ if(it.kind==='storage'){Object.assign(u,{style:it.style,mapColor:it.color,mapTextColor:it.tc,front:{W:it.front[0],H:it.front[1]},preset:it.preset,pn:it.pn,pc:it.pc,eq:[]});if(it.surf)u.surf=[id+'-surf','Worktop'];u.grid=makeGrid(id,it.preset,it.pn,it.pc)}
+ else if(it.kind==='door'){Object.assign(u,{mapOnly:true,kind:'door',mapColor:'#fff',name:'Door'})}
+ else{const e=JSON.parse(JSON.stringify(it.eq));(e.slots||[]).forEach(s=>s.id=id+'-'+e.a+'-'+(seq++));Object.assign(u,{style:it.kind==='fixture'?'fixture':'plain',mapColor:it.kind==='fixture'?'#cfe8f5':'#d8c3a5',eqLen:Math.max(24,Math.round(e.w*1.4)),eq:[e]})}
+ const n=P.units.filter(v=>v.lib===it.k).length;if(n)u.name+=' '+(n+1);
+ P.units.push(u);select(id);commit('Added '+u.name)}
+function fitLen(u){if(u.front)return;const sum=(u.eq||[]).reduce((a,e)=>a+e.w,0);u.eqLen=Math.max(24,Math.round(sum*1.3+6))}
+function hitUnit(x,y){for(let i=P.units.length-1;i>=0;i--){const u=P.units[i];if(!u.mapOnly&&x>=u.x&&x<=u.x+u.w&&y>=u.y&&y<=u.y+u.d)return u}return null}
+
+/* ---------- plan rendering ---------- */
+const svg=$('plan');let VB={x:-1,y:-1,w:16,h:22};
+function fit(){const P0=P.room.poly,xs=P0.map(p=>p[0]).concat(P.units.flatMap(u=>[u.x,u.x+u.w])),ys=P0.map(p=>p[1]).concat(P.units.flatMap(u=>[u.y,u.y+u.d]));
+ const x0=Math.min(...xs)-1.5,y0=Math.min(...ys)-1.5,x1=Math.max(...xs)+1.5,y1=Math.max(...ys)+1.5;VB={x:x0,y:y0,w:x1-x0,h:y1-y0};draw()}
+function draw(){svg.setAttribute('viewBox',`${VB.x} ${VB.y} ${VB.w} ${VB.h}`);const g=[];const S=Math.max(VB.w,VB.h);
+ g.push(`<defs><pattern id="g1" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M1 0H0V1" fill="none" stroke="#c7cecb" stroke-width=".02"/></pattern></defs><rect x="${VB.x}" y="${VB.y}" width="${VB.w}" height="${VB.h}" fill="url(#g1)"/>`);
+ const poly=P.room.poly;if(poly.length>2)g.push(`<path d="M${poly.map(p=>p.join(' ')).join('L')}Z" fill="#fbfbf7" stroke="#111" stroke-width="${S/150}"/>`);
+ else if(poly.length)g.push(`<polyline points="${poly.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#111" stroke-width="${S/150}"/>`);
+ // wall lengths
+ if(poly.length>2)poly.forEach((p,i)=>{const q=poly[(i+1)%poly.length],L=Math.hypot(q[0]-p[0],q[1]-p[1]);if(L<1)return;g.push(`<text x="${(p[0]+q[0])/2}" y="${(p[1]+q[1])/2}" style="font-size:${S/60}px" fill="#2d6cdf" dy="${q[0]===p[0]?0:-S/80}" dx="${q[0]===p[0]?S/45:0}">${+L.toFixed(2)}'</text>`)});
+ P.units.forEach(u=>{const fs=Math.max(.15,Math.min(S/45,Math.min(u.w,u.d)*.45,Math.max(u.w,u.d)*.9/Math.max(3,(u.mapText??u.name).length*.6))),v=u.d>u.w*1.3;
+  g.push(`<g class="u${u.id===selId?' sel':''}" data-id="${u.id}"><rect class="b" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.d}" rx=".06" fill="${u.mapColor||'#bbb'}" stroke="#333" stroke-width="${S/500}" ${u.kind==='door'?'stroke-dasharray=".2 .1" fill-opacity=".9"':''}/><text x="${u.x+u.w/2}" y="${u.y+u.d/2}" style="font-size:${fs}px" fill="${u.mapTextColor||'#111'}" ${v?`transform="rotate(-90 ${u.x+u.w/2} ${u.y+u.d/2})"`:''}>${esc(u.mapText??u.name)}</text>${(u.eq||[]).length&&u.grid?`<text x="${u.x+u.w-.15}" y="${u.y+.25}" style="font-size:${S/70}px;text-anchor:end">⚙${u.eq.length}</text>`:''}</g>`)});
+ if(drawMode)poly.forEach((p,i)=>g.push(`<circle class="vtx" cx="${p[0]}" cy="${p[1]}" r="${S/90}" data-v="${i}"/>`));
+ svg.innerHTML=g.join('');status()}
+function status(){const w=[];const inside=(x,y)=>{let c=false,p=P.room.poly;for(let i=0,j=p.length-1;i<p.length;j=i++){if(((p[i][1]>y)!=(p[j][1]>y))&&(x<(p[j][0]-p[i][0])*(y-p[i][1])/(p[j][1]-p[i][1])+p[i][0]))c=!c}return c};
+ P.units.forEach(u=>{if(u.kind!=='door'&&![[u.x+.05,u.y+.05],[u.x+u.w-.05,u.y+.05],[u.x+.05,u.y+u.d-.05],[u.x+u.w-.05,u.y+u.d-.05]].every(p=>inside(...p)))w.push(`${u.name} is outside the walls`)});
+ for(let i=0;i<P.units.length;i++)for(let j=i+1;j<P.units.length;j++){const a=P.units[i],b=P.units[j];if(a.mapOnly||b.mapOnly)continue;if(a.x<b.x+b.w-.01&&b.x<a.x+a.w-.01&&a.y<b.y+b.d-.01&&b.y<a.y+a.d-.01)w.push(`${a.name} overlaps ${b.name}`)}
+ const n=P.units.filter(u=>!u.mapOnly).length,cells=P.units.reduce((a,u)=>a+((u.grid&&u.grid.cells.length)||0)+(u.surf?1:0)+(u.under?1:0),0);
+ $('status').innerHTML=`${n} units · ${cells} storage spots${drawMode?' · <b>Drawing walls: click to add corners, click the first corner to finish</b>':''}${w.length?'<br>⚠ '+w.slice(0,3).map(esc).join('<br>⚠ ')+(w.length>3?` (+${w.length-3} more)`:''):''}`;P._warn=w}
+
+/* ---------- interactions ---------- */
+function pt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const r=p.matrixTransform(svg.getScreenCTM().inverse());return{x:r.x,y:r.y}}
+let drag=null;
+svg.addEventListener('pointerdown',e=>{const q=pt(e);
+ if(drawMode){const poly=P.room.poly;const s={x:snap(q.x),y:snap(q.y)};if(poly.length>2&&Math.hypot(s.x-poly[0][0],s.y-poly[0][1])<.4){drawMode=false;$('bDraw').textContent='✏️ Draw walls';syncPoly();commit('Walls drawn');return}
+  if(poly.length){const l=poly[poly.length-1];if(Math.abs(s.x-l[0])<Math.abs(s.y-l[1]))s.x=l[0];else s.y=l[1]}poly.push([s.x,s.y]);syncPoly();draw();return}
+ const g=e.target.closest('.u');if(!g){select(null);return}const u=U(g.dataset.id);select(u.id);drag={id:u.id,dx:q.x-u.x,dy:q.y-u.y,moved:false};svg.setPointerCapture(e.pointerId)});
+svg.addEventListener('pointermove',e=>{if(!drag)return;const q=pt(e),u=U(drag.id);const nx=snap(q.x-drag.dx),ny=snap(q.y-drag.dy);if(nx!==u.x||ny!==u.y){u.x=nx;u.y=ny;drag.moved=true;draw();renderProps(true)}});
+svg.addEventListener('pointerup',()=>{if(drag&&drag.moved)commit('Moved');drag=null});
+svg.addEventListener('wheel',e=>{e.preventDefault();const q=pt(e),k=e.deltaY>0?1.1:1/1.1;VB={x:q.x-(q.x-VB.x)*k,y:q.y-(q.y-VB.y)*k,w:VB.w*k,h:VB.h*k};draw()},{passive:false});
+function select(id){selId=id;['bRot','bDup','bDel'].forEach(b=>$(b).disabled=!id);draw();renderProps()}
+function commit(msg){save();draw();if(msg&&msg!=='Moved')toast(msg)}
+$('bRot').onclick=()=>{const u=U(selId);if(!u)return;const cx=u.x+u.w/2,cy=u.y+u.d/2;[u.w,u.d]=[u.d,u.w];u.x=snap(cx-u.w/2);u.y=snap(cy-u.d/2);commit();renderProps()};
+$('bDel').onclick=()=>{const u=U(selId);if(!u)return;if(!confirmBtn($('bDel')))return;P.units=P.units.filter(v=>v!==u);select(null);commit('Deleted '+u.name)};
+$('bDup').onclick=()=>{const u=U(selId);if(!u)return;const c=JSON.parse(JSON.stringify(u));const id=nid(u.mapOnly?'door':u.grid?'u':'m');const re=new RegExp('^'+u.id+'-');c.id=id;c.x=snap(u.x+u.w+.25);c.name=u.name+' copy';
+ if(c.grid)c.grid.cells.forEach(x=>x.id=x.id.replace(re,id+'-'));if(c.surf)c.surf[0]=id+'-surf';if(c.under)c.under[0]=id+'-under';(c.eq||[]).forEach(e=>(e.slots||[]).forEach(s=>s.id=id+'-'+e.a+'-'+(seq++)));P.units.push(c);select(id);commit('Duplicated')};
+function confirmBtn(b){if(b._c){b._c=0;b.textContent=b._t;return true}b._t=b.textContent;b._c=1;b.textContent='Tap again';setTimeout(()=>{if(b._c){b._c=0;b.textContent=b._t}},2000);return false}
+document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select'))return;if((e.key==='Delete'||e.key==='Backspace')&&selId){P.units=P.units.filter(v=>v.id!==selId);select(null);commit('Deleted')}if(e.key==='r'&&selId)$('bRot').click()});
+$('bFit').onclick=fit;
+
+/* library drag */
+function renderLib(){$('lib').innerHTML=LIB.map((c,ci)=>`<details ${ci<2?'open':''}><summary>${c.cat}</summary><div class="lib">${c.items.map(it=>`<div class="li" data-k="${it.k}"><span class="sw" style="background:${it.color||(it.kind==='machine'?'#d8c3a5':it.kind==='door'?'#fff':'#cfe8f5')}"></span>${esc(it.n)}<small>${it.fp[0]}×${it.fp[1]}'</small></div>`).join('')}</div></details>`).join('');
+ $('lib').querySelectorAll('.li').forEach(el=>el.addEventListener('pointerdown',e=>{e.preventDefault();const it=LIB.flatMap(c=>c.items).find(i=>i.k===el.dataset.k);
+  const gh=document.createElement('div');gh.className='dragghost';gh.textContent=it.n;document.body.appendChild(gh);let moved=false;const x0=e.clientX,y0=e.clientY;
+  const mv=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)>5)moved=true;gh.style.left=ev.clientX+8+'px';gh.style.top=ev.clientY+8+'px'};mv(e);
+  const up=ev=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);gh.remove();const r=svg.getBoundingClientRect();
+   if(moved&&ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom){const q=pt(ev);addFromLib(it,q.x,q.y)}
+   else if(!moved){const b=P.room.poly,xs=b.map(p=>p[0]),ys=b.map(p=>p[1]);addFromLib(it,(Math.min(...xs)+Math.max(...xs))/2,(Math.min(...ys)+Math.max(...ys))/2)}};
+  document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up)}))}
+
+/* ---------- properties ---------- */
+function renderProps(soft){const el=$('props'),u=U(selId);
+ if(soft&&u){['px','py'].forEach(k=>{const i=$(k);if(i)i.value=k==='px'?u.x:u.y});return}
+ if(!u){el.innerHTML=`<h2>How it works</h2><ol class="hint" style="padding-left:18px;line-height:1.5"><li>Set the room size or draw its walls.</li><li>Drag furniture, machines and fixtures from the library onto the plan.</li><li>Click a piece to rename it, change its drawers/shelves, or add machines on top.</li><li><b>Preview</b> to try the tracker, then <b>Export</b> a single HTML file anyone can open.</li></ol>
+  <h2>Checks</h2>${(P._warn||[]).length?P._warn.map(w=>`<div class="warn">⚠ ${esc(w)}</div>`).join(''):'<p class="hint">✓ Everything is inside the walls and nothing overlaps.</p>'}`;return}
+ const isSt=!!u.front,F=(lab,id,val,type='text',ex='')=>`<label class="f">${lab}<input id="${id}" type="${type}" value="${esc(val??'')}" ${ex}></label>`;
+ let h=`<h2>${u.kind==='door'?'Door':isSt?'Storage unit':u.style==='fixture'?'Fixture group':'Machine spot'}</h2>${F('Name','pn',u.name)}`;
+ if(!u.mapOnly)h+=`<div class="row">${F('Tab label','ptab',u.tab,'text','placeholder="(uses name)"')}${F('Map label','pmt',u.mapText,'text','placeholder="(uses name)"')}</div>`;
+ h+=`<div class="row">${F('X (ft)','px',u.x,'number','step="0.25"')}${F('Y (ft)','py',u.y,'number','step="0.25"')}</div><div class="row">${F('Footprint W','pw',u.w,'number','step="0.05"')}${F('Footprint D','pd',u.d,'number','step="0.05"')}</div>`;
+ if(!u.mapOnly)h+=`<label class="f">Map color<input id="pc" type="color" value="${u.mapColor||'#bbbbbb'}"></label>`;
+ if(isSt){h+=`<h2>Front view</h2><div class="row">${F('Width (in)','pfw',u.front.W,'number')}${F('Height (in)','pfh',u.front.H,'number')}</div>
+  <label class="f">Style<select id="pst">${['uline','husky','chem','cabinet','shelf','cart','bins'].map(s=>`<option ${u.style===s?'selected':''}>${s}</option>`).join('')}</select></label>
+  <div class="row"><label class="f"><input type="checkbox" id="psurf" ${u.surf?'checked':''} style="width:auto"> Worktop storage</label><label class="f"><input type="checkbox" id="punder" ${u.under?'checked':''} style="width:auto"> Space underneath</label></div>
+  <h2>Drawers / shelves</h2><label class="f">Layout<select id="ppre">${Object.entries(PRESETS).map(([k,v])=>`<option value="${k}" ${u.preset===k?'selected':''}>${v}</option>`).join('')}${u.preset?'':'<option selected value="">Custom (from example)</option>'}</select></label>
+  ${['shelves','drawers','drawers2','grid'].includes(u.preset)?`<div class="row">${F('n','ppn',u.pn||4,'number','min="1" max="16"')}${u.preset==='grid'?F('columns','ppc',u.pc||4,'number','min="1" max="8"'):''}</div>`:''}
+  <div class="cells">${(u.grid?u.grid.cells:[]).map((c,i)=>`<input data-ci="${i}" value="${esc(c.name)}">`).join('')}</div><p class="hint">Rename drawers here. Changing the layout regenerates them.</p>`}
+ if(!u.mapOnly){h+=`<h2>${isSt?'Machines on top':'Items'}</h2>${(u.eq||[]).map((e,i)=>`<div class="eqi"><span>${esc(e.t)}${e.stack>1?` ×${e.stack} stacked`:''}${(e.slots||[]).length?` <small class="hint">· ${e.slots.length} slot${e.slots.length>1?'s':''}</small>`:''}</span>${e.slots&&e.slots.length===1&&(u.eq.length===1||u.grid)?`<button class="ghost" data-stk="${i}">${e.stack>1?'unstack':'stack ×2'}</button>`:''}<button class="ghost" data-up="${i}">↑</button><button class="bad" data-rm="${i}">✕</button></div>`).join('')||'<p class="hint">Drag a machine or fixture from the library onto this unit on the plan.</p>'}`;
+  if(!isSt)h+=F('Wall/space width for front view (in)','pel',u.eqLen,'number')}
+ h+=`<div style="margin-top:12px;display:flex;gap:6px"><button class="alt" onclick="$('bRot').click()">⟳ Rotate</button><button class="alt" onclick="$('bDup').click()">⧉ Duplicate</button><button class="bad" onclick="$('bDel').click()">Delete</button></div>`;
+ el.innerHTML=h;
+ const on=(id,f,ev='change')=>{const i=$(id);if(i)i.addEventListener(ev,()=>{f(i);commit()})};
+ on('pn',i=>{u.name=i.value},'input');on('ptab',i=>{u.tab=i.value},'input');on('pmt',i=>{u.mapText=i.value||undefined},'input');
+ on('px',i=>u.x=+i.value);on('py',i=>u.y=+i.value);on('pw',i=>u.w=Math.max(.1,+i.value));on('pd',i=>u.d=Math.max(.1,+i.value));on('pc',i=>u.mapColor=i.value,'input');
+ on('pfw',i=>u.front.W=+i.value);on('pfh',i=>u.front.H=+i.value);on('pst',i=>u.style=i.value);on('pel',i=>u.eqLen=+i.value);
+ on('psurf',i=>{u.surf=i.checked?[u.id+'-surf','Worktop']:undefined});on('punder',i=>{u.under=i.checked?[u.id+'-under','Space underneath']:undefined});
+ on('ppre',i=>{u.preset=i.value;u.grid=makeGrid(u.id,u.preset,u.pn||4,u.pc||4);renderProps()});
+ on('ppn',i=>{u.pn=Math.max(1,Math.min(16,+i.value));u.grid=makeGrid(u.id,u.preset,u.pn,u.pc||4);renderProps()});on('ppc',i=>{u.pc=Math.max(1,Math.min(8,+i.value));u.grid=makeGrid(u.id,u.preset,u.pn||4,u.pc);renderProps()});
+ el.querySelectorAll('[data-ci]').forEach(i=>i.addEventListener('input',()=>{u.grid.cells[+i.dataset.ci].name=i.value||'Drawer';save()}));
+ el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{u.eq.splice(+b.dataset.rm,1);fitLen(u);commit();renderProps()});
+ el.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>{const i=+b.dataset.up;if(i>0){[u.eq[i-1],u.eq[i]]=[u.eq[i],u.eq[i-1]];commit();renderProps()}});
+ el.querySelectorAll('[data-stk]').forEach(b=>b.onclick=()=>{const e=u.eq[+b.dataset.stk];if(e.stack>1){e.stack=1;e.slots=[e.slots[0]];delete e.slots[0].idx;delete e.slots[0].m}else{e.stack=2;const s0=e.slots[0];s0.idx=0;s0.m=e.t+' (top)';e.slots=[s0,{...s0,id:s0.id+'b',idx:1,m:e.t+' (bottom)'}]}commit();renderProps()})}
+
+/* ---------- room ---------- */
+function syncPoly(){$('poly').value=P.room.poly.map(p=>p.join(', ')).join('\n');const xs=P.room.poly.map(p=>p[0]),ys=P.room.poly.map(p=>p[1]);if(xs.length){$('rw').value=+(Math.max(...xs)-Math.min(...xs)).toFixed(2);$('rd').value=+(Math.max(...ys)-Math.min(...ys)).toFixed(2)}}
+$('bRect').onclick=()=>{const w=+$('rw').value||10,d=+$('rd').value||10;P.room.poly=[[0,0],[w,0],[w,d],[0,d]];syncPoly();fit();commit('Room set to '+w+' × '+d+' ft')};
+$('bPoly').onclick=()=>{const pts=$('poly').value.split('\n').map(l=>l.split(/[ ,]+/).filter(Boolean).map(Number)).filter(p=>p.length===2&&p.every(isFinite));if(pts.length<3){toast('Need at least 3 corners');return}P.room.poly=pts;fit();commit('Walls updated')};
+$('bDraw').onclick=()=>{drawMode=!drawMode;if(drawMode){P.room.poly=[];select(null);$('bDraw').textContent='✓ Finish';toast('Click corners on the grid — walls snap straight')}else{$('bDraw').textContent='✏️ Draw walls';if(P.room.poly.length<3){P.room.poly=[[0,0],[14,0],[14,20],[0,20]]}syncPoly();commit()}draw()};
+
+/* ---------- export ---------- */
+const slug=t=>(t||'lab').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'lab';
+function toConfig(){const units=P.units.map(u=>{const c=JSON.parse(JSON.stringify(u));delete c.lib;delete c.preset;delete c.pn;delete c.pc;if(!c.tab)delete c.tab;return c});
+ const id=P.exampleKey?P.exampleKey:'cribops-'+slug(P.title);return{id:slug(P.title),title:P.title||'Lab Storage Organizer',storageKey:id,sample:!!P.sample,room:P.room,units}}
+function buildTracker(){if(!TEMPLATE){toast('Template missing — run build.py');return null}const j=JSON.stringify(toConfig()).replace(/<\//g,'<\\/');return TEMPLATE.replace(CFG_RE,()=>'/*CRIBOPS_CONFIG*/'+j+'/*END_CONFIG*/')}
+$('bPrev').onclick=()=>{const h=buildTracker();if(!h)return;$('pv').srcdoc=h;$('pv').style.width='390px';$('modal').classList.add('on')};
+$('mClose').onclick=()=>$('modal').classList.remove('on');document.querySelectorAll('.devw button').forEach(b=>b.onclick=()=>$('pv').style.width=b.dataset.w.includes('%')?b.dataset.w:b.dataset.w+'px');
+function download(name,text,type){const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+$('bExport').onclick=()=>{if((P._warn||[]).length&&!confirmBtn($('bExport'))){toast('There are layout warnings — tap again to export anyway');return}const h=buildTracker();if(!h)return;download(slug(P.title)+'-tracker.html',h,'text/html');toast('Exported '+slug(P.title)+'-tracker.html')};
+$('bSave').onclick=()=>{download(slug(P.title)+'.cribops.json',JSON.stringify(P,null,1),'application/json');toast('Project saved')};
+$('bOpen').onclick=()=>$('file').click();
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!j.room||!j.units)throw 0;P=j;init();toast('Opened '+f.name)}catch(err){toast('Not a CribOps project file')}e.target.value=''};
+$('bNew').onclick=()=>{if(!confirmBtn($('bNew')))return;P=blank();init();toast('New room')};
+$('bEx').onclick=()=>{const c=exampleConfig();if(!c){toast('Example unavailable');return}if(P.units.length&&!confirmBtn($('bEx')))return;P={v:1,title:c.title,room:c.room,units:c.units,sample:true,exampleKey:c.storageKey};init();toast('Loaded HatchBridge example')};
+$('title').oninput=e=>{P.title=e.target.value;save()};
+function init(){$('title').value=P.title||'';selId=null;drawMode=false;syncPoly();fit();select(null)}
+renderLib();P=load()||blank();init();
+</script></body></html>
