@@ -55,7 +55,7 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 <button class="alt editonly" id="bUnits" title="Switch between feet/inches and metres/centimetres">📏 ft · in</button><button class="alt editonly" id="bEx">Load example</button>
 <button class="alt editonly" id="bAI" title="Let ChatGPT, Claude or another AI generate the layout">🤖 AI layout</button><button class="alt" id="bOpen">Open project</button><button class="alt" id="bSave">Save project</button>
 <span class="grow"></span><button id="bExport" title="Download this room as a standalone offline tracker file">⬇ Export tracker HTML</button>
-<input type="file" id="file" accept=".json,.lablayout,.cribops" hidden></header>
+<input type="file" id="file" accept=".json,.lablayout,.cribops" hidden><input type="file" id="fRoom" accept=".json,application/json" hidden></header>
 <nav id="rooms"></nav>
 <main id="editv">
  <aside>
@@ -505,12 +505,23 @@ $('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=
 $('bUnits').onclick=()=>{PROJ.metric=!PROJ.metric;save();applyUnits();toast(MET()?'Showing metres and centimetres':'Showing feet and inches')};
 function applyUnits(){$('bUnits').textContent=MET()?'📏 m · cm':'📏 ft · in';$('frad').placeholder=MET()?'Fillet all corners, e.g. 15 cm':'Fillet all corners, e.g. 6"';syncPoly();renderLib();renderProps();draw()}
 /* ---------- rooms ---------- */
-function renderRooms(){const R=PROJ.rooms;$('rooms').innerHTML=R.map((r,i)=>`<button class="${i===PROJ.cur?'on':''}" data-room="${i}" title="${i===PROJ.cur?'Rename it with the name box above':'Switch to this room'}">${esc(r.title||'Room '+(i+1))}</button>`).join('')+`<button class="add" id="bRoomAdd" title="Add another room to this project">＋ Room</button><button class="add" id="bRoomDup" title="Copy this room">⧉ Copy room</button>`+(R.length>1?`<button class="rx" id="bRoomDel" title="Delete this room (tap twice)">🗑 Delete room</button>`:'');
+function renderRooms(){const R=PROJ.rooms;$('rooms').innerHTML=R.map((r,i)=>`<button class="${i===PROJ.cur?'on':''}" data-room="${i}" title="${i===PROJ.cur?'Rename it with the name box above':'Switch to this room'}">${esc(r.title||'Room '+(i+1))}</button>`).join('')+`<button class="add" id="bRoomAdd" title="Add another room to this project">＋ Room</button><button class="add" id="bRoomDup" title="Copy this room">⧉ Copy room</button><button class="add" id="bRoomIn" title="Add a room from a .room.json file (also takes project files and AI layout specs)">⬆ Import room</button><button class="add" id="bRoomOut" title="Download this room as a .room.json file">⬇ Room JSON</button>`+(R.length>1?`<button class="rx" id="bRoomDel" title="Delete this room (tap twice)">🗑 Delete room</button>`:'');
  $('rooms').querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>goRoom(+b.dataset.room));
  $('bRoomAdd').onclick=()=>{save();const n=PROJ.rooms.length+1;PROJ.rooms.push(blank('Room '+n));goRoom(PROJ.rooms.length-1);toast('Added Room '+n)};
  $('bRoomDup').onclick=()=>{save();const c=JSON.parse(JSON.stringify(P));c.title=(P.title||'Room')+' copy';delete c.storeKey;delete c.exampleKey;delete c.sample;PROJ.rooms.push(c);goRoom(PROJ.rooms.length-1);toast('Copied room')};
+ $('bRoomIn').onclick=()=>$('fRoom').click();$('bRoomOut').onclick=exportRoom;
  const d=$('bRoomDel');if(d)d.onclick=()=>{if(!confirmBtn(d))return;const t=P.title;PROJ.rooms.splice(PROJ.cur,1);PROJ.cur=Math.max(0,PROJ.cur-1);P=PROJ.rooms[PROJ.cur];init();toast('Deleted '+t)}}
 function goRoom(i){save();PROJ.cur=i;P=PROJ.rooms[i];init()}
+/* ---------- single-room JSON ---------- */
+function exportRoom(){save();const r=JSON.parse(JSON.stringify(P));download(slug(P.title||'room')+'.room.json',JSON.stringify({lablayout_room:1,exported:new Date().toISOString(),room:r},null,1),'application/json');toast('Downloaded '+slug(P.title||'room')+'.room.json')}
+function importRooms(j){let rooms;
+ if(j&&j.lablayout_room&&j.room)rooms=[j.room];else if(j&&Array.isArray(j.rooms))rooms=j.rooms;else if(j&&j.room&&Array.isArray(j.units))rooms=[j];
+ else if(j&&j.lablayout&&j.items){const v=validateSpec(j);if(v.errors.length)throw Error(v.errors[0]);rooms=[specToProject(j)]}
+ else throw Error('Not a LabLayout room, project or layout spec');
+ rooms.forEach(r=>{if(!r.room||!Array.isArray(r.units))throw Error('Room is missing walls or units');r=JSON.parse(JSON.stringify(r));delete r.customLib;
+  if(r.storeKey&&PROJ.rooms.some(x=>(x.storeKey||x.exampleKey)===r.storeKey))delete r.storeKey;if(r.exampleKey&&PROJ.rooms.some(x=>x.exampleKey===r.exampleKey))delete r.exampleKey;
+  PROJ.rooms.push(r)});save();goRoom(PROJ.rooms.length-1);return rooms.length}
+$('fRoom').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const n=importRooms(JSON.parse(await f.text()));toast(n>1?`Added ${n} rooms from ${f.name}`:`Added room “${P.title}”`)}catch(err){toast('Couldn’t import: '+err.message)}};
 /* ---------- Edit layout / Inventory modes ---------- */
 let MODE='edit',useSrc='';
 function setMode(m){MODE=m;try{localStorage.setItem('lablayout-mode',m)}catch(e){}$('mEdit').classList.toggle('on',m==='edit');$('mUse').classList.toggle('on',m==='use');

@@ -137,6 +137,7 @@ def main():
             b.click("#bUnits")
             b.evaluate("goRoom(1)"); b.click("#bRoomDel"); b.click("#bRoomDel")
             check(b.evaluate("PROJ.rooms.length") == 1, "room can be deleted")
+            check(b.evaluate("(()=>{const r=JSON.parse(JSON.stringify(P));const n=importRooms({lablayout_room:1,room:r});const ok=PROJ.rooms.length===2&&P.units.length===r.units.length&&P.storeKey!==PROJ.rooms[0].storeKey;goRoom(1);PROJ.rooms.splice(1,1);PROJ.cur=0;P=PROJ.rooms[0];init();return n===1&&ok})()"), "room JSON import adds a room with its own inventory key")
             print("AI layout spec")
             before = b.evaluate("JSON.stringify(P.units)")
             rt = b.evaluate("(()=>{const s=LabLayout.exportSpec(),a=JSON.stringify(P.units.map(u=>[u.id,u.x,u.y,u.w,u.d,(u.grid||{cells:[]}).cells.map(c=>c.id+c.name)]));const r=LabLayout.importSpec(JSON.parse(JSON.stringify(s)));return [r.ok, a===JSON.stringify(P.units.map(u=>[u.id,u.x,u.y,u.w,u.d,(u.grid||{cells:[]}).cells.map(c=>c.id+c.name)]))]})()")

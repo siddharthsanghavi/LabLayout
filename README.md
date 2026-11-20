@@ -19,7 +19,7 @@ Open `dist/builder.html`. The switch at the top has two modes:
 - **✏️ Edit layout**: draw the room and arrange furniture (steps below).
 - **📦 Inventory**: use the room's tracker in the same window: check items in and out, consumables, reorder list, activity log. Inventory is stored in the browser, so switching back to Edit and changing the layout keeps it. Drawers you keep keep their items, and items from deleted drawers move to *Unsorted*. The app reopens in whichever mode you used last.
 
-**Rooms**: a project can hold several rooms, shown as tabs under the header. **＋ Room** adds an empty room, **⧉ Copy room** duplicates the current one, and the name box renames it. Each room keeps its own inventory. **Save project** writes every room into one `.lablayout.json` file.
+**Rooms**: a project can hold several rooms, shown as tabs under the header. **＋ Room** adds an empty room, **⧉ Copy room** duplicates the current one, and the name box renames it. Each room keeps its own inventory. **Save project** writes every room into one `.lablayout.json` file. **⬇ Room JSON** downloads just the current room as a `.room.json` file, and **⬆ Import room** adds one as a new room. Import also accepts project files (all their rooms are added) and AI layout specs. `*.room.json` files and the `local/` folder are git-ignored, so your own room files stay out of the repo.
 
 **Metric**: **📏 ft · in** switches the whole app to metres and centimetres: room size, wall lengths, positions, footprints, front sizes and the designer. You can always type `2.4 m`, `240 cm` or `2400 mm`, and in metric mode a bare number means metres. Layouts are stored internally in feet and inches, so switching units never changes the design.
 

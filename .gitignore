@@ -28,3 +28,7 @@ desktop.ini
 
 # Claude Code local state (worktrees, per-machine settings)
 .claude/
+
+# Local-only examples and room exports (never committed)
+local/
+*.room.json
