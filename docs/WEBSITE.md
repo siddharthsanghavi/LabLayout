@@ -5,7 +5,7 @@
 | File | What it is |
 |---|---|
 | `index.html` | landing page |
-| `builder.html` | the room builder (everything inlined, one file) |
+| `builder.html` | the app: layout editor and inventory (everything inlined, one file) |
 | `example-tracker.html` | sample tracker |
 | `llms.txt`, `AI_LAYOUT_GUIDE.md` | instructions that AI agents can find |
 
@@ -19,7 +19,7 @@ Run `python build.py`, then upload the contents of `dist/` to any static host or
 ## Option 2: embed in an existing page
 
 ```html
-<iframe src="/lablayout/builder.html" title="LabLayout room builder"
+<iframe src="/lablayout/builder.html" title="LabLayout"
         style="width:100%;height:85vh;border:0;border-radius:8px"
         allow="clipboard-write"></iframe>
 ```

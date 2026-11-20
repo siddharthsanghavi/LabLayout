@@ -1,6 +1,6 @@
 # LabLayout
 
-> Offline, single-file room builder for labs, shops and tool cribs. You sketch the room, place benches, cabinets and machines, then export a self-contained HTML inventory tracker.
+> Offline, single-file app for labs, shops and tool cribs. You lay out one or more rooms (feet or metric), place benches, cabinets and machines, then switch to Inventory mode to track what's in every drawer. Each room can also be exported as a standalone tracker.
 
 AI agents can generate layouts as JSON specs:
 

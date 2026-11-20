@@ -1,20 +1,31 @@
 # LabLayout
 
-Lay out any lab or tool crib, then generate a self-contained inventory tracker for it.
+Lay out your labs and tool cribs and run their inventory in the same app. One HTML file, works offline, in feet/inches or metres.
 
 ## What's here
 
 | File | What it is |
 |---|---|
-| `dist/builder.html` | **The room builder.** Open it in a browser — no install. |
+| `dist/builder.html` | **The app**: layout editor and inventory in one file. Open it in a browser, no install. |
 | `dist/example-tracker.html` | The HatchBridge prototyping lab tracker (the built-in example). |
-| `src/builder.html` | Builder source. |
+| `src/builder.html` | App source. |
 | `src/tracker.html` | Tracker template. Its room/furniture layout lives in one JSON block between `/*LABLAYOUT_CONFIG*/` and `/*END_CONFIG*/`. |
 | `build.py` | Inlines the tracker template into the builder → `dist/`. |
 
-## Using the builder
+## Using LabLayout
 
-1. Open `dist/builder.html`.
+Open `dist/builder.html`. The switch at the top has two modes:
+
+- **✏️ Edit layout**: draw the room and arrange furniture (steps below).
+- **📦 Inventory**: use the room's tracker in the same window: check items in and out, consumables, reorder list, activity log. Inventory is stored in the browser, so switching back to Edit and changing the layout keeps it. Drawers you keep keep their items, and items from deleted drawers move to *Unsorted*. The app reopens in whichever mode you used last.
+
+**Rooms**: a project can hold several rooms, shown as tabs under the header. **＋ Room** adds an empty room, **⧉ Copy room** duplicates the current one, and the name box renames it. Each room keeps its own inventory. **Save project** writes every room into one `.lablayout.json` file.
+
+**Metric**: **📏 ft · in** switches the whole app to metres and centimetres: room size, wall lengths, positions, footprints, front sizes and the designer. You can always type `2.4 m`, `240 cm` or `2400 mm`, and in metric mode a bare number means metres. Layouts are stored internally in feet and inches, so switching units never changes the design.
+
+### Editing a room
+
+1. Open `dist/builder.html` and pick ✏️ Edit layout.
 2. **Room**: type a width × depth and press *Rectangle*, sketch the walls, or paste corner coordinates.
    - **✏️ Draw walls** works like a CAD sketch. The cursor snaps to corners (□), wall midpoints (△), horizontal, vertical and 45° lines, and lines up with other corners (dashed blue guides). Otherwise it snaps to a 3" grid. A live preview shows the length and angle of the wall you're drawing.
    - **Typing a length**: while drawing, type a length (`10`, `10.5`, `10' 6"`, `126"`) and press Enter to place the next corner exactly that far along the preview direction.
@@ -45,8 +56,8 @@ Lay out any lab or tool crib, then generate a self-contained inventory tracker f
      - **⬇ SVG / ⬇ PNG / Copy SVG**: export the generated artwork at real size in inches. The SVG imports back into the designer with the same layout, since decoration is marked and skipped on import.
      - Any storage unit on the plan can be opened in the designer with *🪚 Edit layout in designer*.
 4. **Click a piece** to rename it, set its tab label, move/resize/rotate it, change its front size, pick a drawer/shelf layout (or set how many), rename each drawer, toggle worktop and under-space storage, reorder or remove machines, or stack a printer ×2.
-5. **▶ Preview tracker** to try it (phone or desktop width).
-6. **⬇ Export tracker HTML** — saves `<room-name>-tracker.html`, a single file that works offline on any phone or computer.
+5. **📦 Inventory** to start using it.
+6. Optional: **⬇ Export tracker HTML** saves the current room as `<room-name>-tracker.html`, a single file that works offline on any phone or computer.
 
 *Save project* / *Open project* keep the layout as a `.lablayout.json` file so you can edit it later. The builder also autosaves in your browser. *Load example* opens the HatchBridge lab.
 
