@@ -19,7 +19,13 @@ Open `dist/builder.html`. The switch at the top has two modes:
 - **✏️ Edit layout**: draw the room and arrange furniture (steps below).
 - **📦 Inventory**: use the room's tracker in the same window: check items in and out, consumables, reorder list, activity log. Inventory is stored in the browser, so switching back to Edit and changing the layout keeps it. Drawers you keep keep their items, and items from deleted drawers move to *Unsorted*. The app reopens in whichever mode you used last.
 
-**Rooms**: a project can hold several rooms, shown as tabs under the header. **＋ Room** adds an empty room, **⧉ Copy room** duplicates the current one, and the name box renames it. Each room keeps its own inventory. **Save project** writes every room into one `.lablayout.json` file. **⬇ Room JSON** downloads just the current room as a `.room.json` file, and **⬆ Import room** adds one as a new room. Import also accepts project files (all their rooms are added) and AI layout specs. `*.room.json` files and the `local/` folder are git-ignored, so your own room files stay out of the repo.
+**Rooms**: a project can hold several rooms, shown as tabs under the header. **＋ Room** adds an empty room, **⧉ Copy room** duplicates the current one, and the name box renames it. Each room keeps its own inventory. There are two file formats:
+
+| | Export | Import |
+|---|---|---|
+| **Layout JSON** (`.lablayout.json`): the full layout, every room | **⬇ Export layout JSON** (header) | **⬆ Import layout JSON** replaces the open layout. A room JSON opens as a one-room layout |
+| **Room JSON** (`.room.json`): one room | **⬇ Room JSON** (room bar) | **⬆ Import room** adds it as a new room. A layout JSON adds all its rooms, and AI layout specs work too |
+ `*.room.json` files and the `local/` folder are git-ignored, so your own room files stay out of the repo.
 
 **Metric**: **📏 ft · in** switches the whole app to metres and centimetres: room size, wall lengths, positions, footprints, front sizes and the designer. You can always type `2.4 m`, `240 cm` or `2400 mm`, and in metric mode a bare number means metres. Layouts are stored internally in feet and inches, so switching units never changes the design.
 
@@ -59,7 +65,7 @@ Open `dist/builder.html`. The switch at the top has two modes:
 5. **📦 Inventory** to start using it.
 6. Optional: **⬇ Export tracker HTML** saves the current room as `<room-name>-tracker.html`, a single file that works offline on any phone or computer.
 
-*Save project* / *Open project* keep the layout as a `.lablayout.json` file so you can edit it later. The builder also autosaves in your browser. *Load example* opens the HatchBridge lab.
+*Export layout JSON* / *Import layout JSON* keep the full layout as a `.lablayout.json` file so you can edit it later. The app also autosaves in your browser. *Load example* opens the HatchBridge lab.
 
 The builder warns you if anything sits outside the walls or overlaps.
 

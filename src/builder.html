@@ -53,7 +53,7 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 </style></head><body>
 <header><h1>🧰 LabLayout</h1><div class="seg" id="modes"><button id="mEdit">✏️ Edit layout</button><button id="mUse">📦 Inventory</button></div><input id="title" placeholder="Room name">
 <button class="alt editonly" id="bUnits" title="Switch between feet/inches and metres/centimetres">📏 ft · in</button><button class="alt editonly" id="bEx">Load example</button>
-<button class="alt editonly" id="bAI" title="Let ChatGPT, Claude or another AI generate the layout">🤖 AI layout</button><button class="alt" id="bOpen">Open project</button><button class="alt" id="bSave">Save project</button>
+<button class="alt editonly" id="bAI" title="Let ChatGPT, Claude or another AI generate the layout">🤖 AI layout</button><button class="alt" id="bOpen" title="Open a full layout (all rooms). A room JSON opens as a one-room layout">⬆ Import layout JSON</button><button class="alt" id="bSave" title="Download the full layout with every room">⬇ Export layout JSON</button>
 <span class="grow"></span><button id="bExport" title="Download this room as a standalone offline tracker file">⬇ Export tracker HTML</button>
 <input type="file" id="file" accept=".json,.lablayout,.cribops" hidden><input type="file" id="fRoom" accept=".json,application/json" hidden></header>
 <nav id="rooms"></nav>
@@ -499,9 +499,9 @@ function buildTracker(){if(!TEMPLATE){toast('Template missing — run build.py')
 $('mClose').onclick=()=>$('modal').classList.remove('on');document.querySelectorAll('.devw button').forEach(b=>b.onclick=()=>$('pv').style.width=b.dataset.w.includes('%')?b.dataset.w:b.dataset.w+'px');
 function download(name,text,type){const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 $('bExport').onclick=()=>{if((P._warn||[]).length&&!confirmBtn($('bExport'))){toast('There are layout warnings — tap again to export anyway');return}const h=buildTracker();if(!h)return;download(slug(P.title)+'-tracker.html',h,'text/html');toast('Exported '+slug(P.title)+'-tracker.html')};
-$('bSave').onclick=()=>{save();download(slug(PROJ.rooms.length>1?PROJ.rooms[0].title+'-project':P.title)+'.lablayout.json',JSON.stringify(PROJ,null,1),'application/json');toast('Project saved ('+PROJ.rooms.length+' room'+(PROJ.rooms.length>1?'s':'')+')')};
+$('bSave').onclick=()=>{save();download(slug(PROJ.rooms.length>1?PROJ.rooms[0].title+'-project':P.title)+'.lablayout.json',JSON.stringify(PROJ,null,1),'application/json');toast('Layout exported ('+PROJ.rooms.length+' room'+(PROJ.rooms.length>1?'s':'')+')')};
 $('bOpen').onclick=()=>$('file').click();
-$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!(j.rooms||(j.room&&j.units)))throw 0;const met=MET();PROJ=wrapProj(j);if(!j.rooms)PROJ.metric=met;P=PROJ.rooms[PROJ.cur];init();toast('Opened '+f.name)}catch(err){toast('Not a LabLayout project file')}e.target.value=''};
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{let j=JSON.parse(await f.text());if(j&&j.lablayout_room&&j.room)j=j.room;if(!(j.rooms||(j.room&&j.units)))throw 0;const met=MET();PROJ=wrapProj(j);if(!j.rooms)PROJ.metric=met;P=PROJ.rooms[PROJ.cur];init();toast('Opened '+f.name)}catch(err){toast('Not a LabLayout layout or room file')}e.target.value=''};
 $('bUnits').onclick=()=>{PROJ.metric=!PROJ.metric;save();applyUnits();toast(MET()?'Showing metres and centimetres':'Showing feet and inches')};
 function applyUnits(){$('bUnits').textContent=MET()?'📏 m · cm':'📏 ft · in';$('frad').placeholder=MET()?'Fillet all corners, e.g. 15 cm':'Fillet all corners, e.g. 6"';syncPoly();renderLib();renderProps();draw()}
 /* ---------- rooms ---------- */
