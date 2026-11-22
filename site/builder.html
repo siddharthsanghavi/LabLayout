@@ -20,9 +20,9 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 .li small{color:#888;margin-left:auto;white-space:nowrap}
 #stage{position:relative;overflow:hidden;background:#dfe4e2}
 #plan{width:100%;height:100%;display:block;touch-action:none}
-#plan .u{cursor:move}#plan .u.sel rect.b{stroke:#f26b1d;stroke-width:.08}
+#plan .u{cursor:move}#plan .u.sel .b{stroke:#f26b1d;stroke-width:.08}
 #plan text{pointer-events:none;font-family:system-ui,sans-serif;text-anchor:middle;dominant-baseline:middle}
-#plan .vtx{fill:#fff;stroke:#2d6cdf;cursor:move}#plan .vtx:hover{fill:#2d6cdf}#plan .wl{cursor:text;pointer-events:all;text-decoration:underline dotted}#plan .wseg{cursor:copy}#plan .wdrag{cursor:move}#plan .u.locked{cursor:default}#plan .u.locked rect.b{stroke:#2d6cdf;stroke-width:.09}#plan .u.locked.sel rect.b{stroke:#2d6cdf;stroke-width:.12;stroke-dasharray:none}#bLock.on{background:#2d6cdf;color:#fff}#plan .wdrag:hover{stroke:rgba(45,108,223,.25)}#plan .mh{cursor:ew-resize}
+#plan .vtx{fill:#fff;stroke:#2d6cdf;cursor:move}#plan .vtx:hover{fill:#2d6cdf}#plan .wl{cursor:text;pointer-events:all;text-decoration:underline dotted}#plan .wseg{cursor:copy}#plan .wdrag{cursor:move}#stage.zrect #plan{cursor:crosshair}#plan .u.locked{cursor:default}#plan .u.locked .b{stroke:#2d6cdf;stroke-width:.09}#plan .u.locked.sel .b{stroke:#2d6cdf;stroke-width:.12;stroke-dasharray:none}#bLock.on{background:#2d6cdf;color:#fff}#plan .wdrag:hover{stroke:rgba(45,108,223,.25)}#plan .mh{cursor:ew-resize}
 #dimin{position:absolute;display:none;z-index:5;width:110px;padding:5px 7px;border:2px solid #f26b1d;border-radius:6px;font:inherit;font-size:13px;box-shadow:0 3px 10px #0003}
 #stage.sketch #plan{cursor:crosshair}
 .tb{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}.tb button{font-size:12px;padding:6px 9px}
@@ -39,7 +39,7 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 .mcard iframe{flex:1;border:0;width:100%}
 .devw{display:flex;gap:4px}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:8px;opacity:0;transition:.2s;z-index:99;pointer-events:none}#toast.on{opacity:1}
-#plan .u.msel rect.b{stroke:#2d6cdf;stroke-width:.06;stroke-dasharray:.15 .08}#plan .meas{pointer-events:none}#plan .mq{fill:#2d6cdf22;stroke:#2d6cdf;stroke-dasharray:.1 .06}
+#plan .u.msel .b{stroke:#2d6cdf;stroke-width:.06;stroke-dasharray:.15 .08}#plan .meas{pointer-events:none}#plan .mq{fill:#2d6cdf22;stroke:#2d6cdf;stroke-dasharray:.1 .06}
 .li .rmx{margin-left:6px;color:#c62828;font-weight:700;cursor:pointer;padding:0 3px}
 #printhead{display:none}
 @media print{body{height:auto;overflow:visible;background:#fff}header,aside,.tb,#status,#toast{display:none!important}main{display:block}#stage{height:92vh;background:#fff}#printhead{display:block;font:600 16px system-ui;margin:0 0 6px}#plan rect[fill='url(#g1)']{display:none}}
@@ -50,11 +50,72 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 #dsv text{text-anchor:middle;pointer-events:none;font-family:system-ui,sans-serif}.lkgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.lk{font-size:11px;text-align:center}.lk input[type=color]{height:30px;padding:1px}.swatches{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 6px}.sw2{width:20px;height:20px;padding:0;border:1px solid #0003;border-radius:4px}.f input[type=range]{padding:0}#dsv .dc{cursor:pointer}@media(max-width:900px){.dbody{grid-template-columns:1fr;overflow:auto}#dsv{min-height:50vh}}
 .warn{background:#fff4e5;border:1px solid #f0c27a;border-radius:6px;padding:6px 8px;font-size:12px;margin:4px 0}
 @media(max-width:900px){body{height:auto;overflow:auto}main{grid-template-columns:1fr}#stage{height:70vh}aside{border:0}}
+
+/* ===== LabLayout theme ===== */
+:root{--ink:#16181b;--ink2:#2a2e33;--paper:#f6f5f2;--panel:#fcfbf9;--line:#e3e1dc;--line2:#d2cfc8;--mut:#6b6f75;--acc:#f26b1d;--accd:#d95a10;--blue:#2d6cdf;--r:9px;--sh:0 1px 2px #0000000f,0 2px 8px #0000000a}
+body{font-family:"Segoe UI Variable Text","Segoe UI",ui-sans-serif,system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+input,select,textarea,button{font-family:inherit}
+button{border-radius:8px;padding:7px 12px;font-weight:500;transition:background .12s,border-color .12s,box-shadow .12s,transform .06s}
+button:active:not(:disabled){transform:translateY(1px)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button:not(.alt):not(.ghost):not(.bad):hover:not(:disabled){background:var(--accd)}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line2);box-shadow:var(--sh)}button.ghost:hover:not(:disabled){border-color:#b7b3aa;background:#fff}
+button.bad:hover:not(:disabled){filter:brightness(.92)}
+button:disabled{opacity:.42;cursor:not-allowed}
+/* header */
+header{background:var(--ink);padding:8px 14px;gap:8px;flex-wrap:nowrap;border-bottom:1px solid #000;min-height:54px}
+header h1{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:650;letter-spacing:.01em;margin:0 6px 0 0;white-space:nowrap}
+header .logo{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;background:var(--acc);color:#fff;font-size:15px}
+header input{background:#22262b;border:1px solid #343a41;border-radius:8px;padding:7px 10px;width:200px;min-width:120px;color:#fff}header input:focus{border-color:#5a6470;outline:0}
+header button.alt{background:transparent;color:#d8dbde;border:1px solid #343a41;padding:6px 10px;font-size:13px;white-space:nowrap}header button.alt:hover{background:#22262b;color:#fff}
+header #bExport{white-space:nowrap;box-shadow:0 1px 0 #ffffff22 inset}
+.seg{background:#22262b;border:1px solid #343a41;border-radius:9px;padding:3px}.seg button{border-radius:6px;padding:5px 11px;font-size:13px;color:#aeb4ba}.seg button:hover{color:#fff}.seg button.on{background:var(--acc);color:#fff;box-shadow:0 1px 3px #0005}
+.menu{position:relative;background:transparent;border:0;margin:0}.menu[open]>summary{border-bottom:1px solid #343a41}.menu summary{list-style:none;cursor:pointer;color:#d8dbde;border:1px solid #343a41;border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap;user-select:none}.menu summary::-webkit-details-marker{display:none}.menu summary::after{content:" ▾";opacity:.6}.menu[open] summary,.menu summary:hover{background:#22262b;color:#fff}
+.menu .mlist{position:absolute;right:0;top:calc(100% + 6px);z-index:40;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px #0003;padding:6px;display:flex;flex-direction:column;gap:2px;min-width:210px}
+.menu .mlist button,.menu .mlist button.alt{background:transparent;color:var(--ink);border:0;text-align:left;padding:8px 10px;font-size:13px}.menu .mlist button:hover{background:#f1efea}
+/* rooms bar */
+#rooms{background:#1e2226;padding:0 10px;gap:2px;min-height:38px;border-bottom:1px solid #000}
+#rooms button{background:transparent;color:#aeb4ba;border-radius:7px 7px 0 0;padding:8px 13px;font-size:13px;border-bottom:2px solid transparent;margin-top:4px}
+#rooms button:hover{color:#fff;background:#262b30}
+#rooms button.on{background:var(--paper);color:var(--ink);font-weight:600;border-bottom-color:var(--paper)}
+#rooms button.add{border:1px dashed #4a525b;border-radius:7px;margin:4px 0;padding:5px 10px}
+#rooms .rx{color:#8b9299}
+/* layout */
+main{grid-template-columns:272px 1fr 312px}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:14px 14px 20px}aside.right{border-left:1px solid var(--line)}
+h2{font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--mut);margin:18px 0 8px}h2:first-child{margin-top:0}
+.hint{color:var(--mut);line-height:1.45}
+details{border:1px solid var(--line);border-radius:var(--r);background:#fff}summary{padding:8px 10px;font-size:13px}details[open]>summary{border-bottom:1px solid var(--line)}
+.f{color:#4a4e54;font-size:12px;font-weight:500;margin:8px 0}
+.f input,.f select,.f textarea{border:1px solid var(--line2);border-radius:8px;padding:7px 9px;background:#fff;margin-top:4px;transition:border-color .12s,box-shadow .12s}
+.f input:focus,.f select:focus,.f textarea:focus,#libq:focus,#frad:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px #2d6cdf22}
+.f input:disabled{background:#f2f1ee;color:#999}
+#libq,#frad{border:1px solid var(--line2)!important;border-radius:8px!important;padding:8px 10px!important;background:#fff}
+.row{gap:8px}
+.lib{gap:5px;padding:8px}
+.li{border:1px solid var(--line);border-radius:8px;background:#fff;padding:7px 9px;font-size:13px;transition:border-color .12s,box-shadow .12s,transform .12s}
+.li:hover{border-color:var(--acc);box-shadow:0 3px 10px #0000000f;transform:translateY(-1px)}
+.li small{color:#8e9197;font-variant-numeric:tabular-nums}
+#libtabs button{border-radius:999px!important;padding:5px 12px!important;font-size:12.5px!important}
+/* stage */
+#stage{background:#eceae5}
+.tb{left:12px;top:12px;gap:4px;background:#ffffffee;backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:11px;padding:4px;box-shadow:0 4px 16px #0000001a}
+.tb button{font-size:12.5px;padding:6px 10px;border-radius:7px}
+.tb button.alt{background:transparent;color:var(--ink)}.tb button.alt:hover:not(:disabled){background:#f1efea}
+.tb button.ghost{box-shadow:none;border-color:transparent;background:transparent}.tb button.ghost:hover{background:#f1efea}
+.tb button.bad{background:transparent;color:#c62828}.tb button.bad:hover:not(:disabled){background:#fdecec;filter:none}
+#bLock.on{background:var(--blue)!important;color:#fff!important}
+#status{left:12px;bottom:12px;background:#ffffffe8;backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:9px;padding:7px 11px;color:#3d4146;box-shadow:var(--sh);line-height:1.5}
+#toast{background:var(--ink);border-radius:10px;padding:10px 16px;font-size:13px;box-shadow:0 8px 24px #0004}
+#dimin{border-radius:8px;box-shadow:0 6px 18px #0003}
+.okmsg{border-radius:8px}.warn{border-radius:8px}
+.eqi{border-color:var(--line);border-radius:8px;background:#fff}
+.mcard,.aicard,.dcard{border-radius:14px;box-shadow:0 24px 60px #0005}
+.mhead{border-bottom:1px solid var(--line);padding:10px 14px}
+@media(max-width:1180px){header{flex-wrap:wrap}header input{width:160px}}
+@media(max-width:900px){main{grid-template-columns:1fr}}
 </style></head><body>
-<header><h1>🧰 LabLayout</h1><div class="seg" id="modes"><button id="mEdit">✏️ Edit layout</button><button id="mUse">📦 Inventory</button></div><input id="title" placeholder="Room name">
-<button class="alt" id="bCB" title="Colour-blind friendly colours (Okabe-Ito palette)">👁 Colour-blind</button><button class="alt editonly" id="bUnits" title="Switch between feet/inches and metres/centimetres">📏 ft · in</button><button class="alt editonly" id="bEx">Load example</button>
-<button class="alt editonly" id="bAI" title="Let ChatGPT, Claude or another AI generate the layout">🤖 AI layout</button><button class="alt" id="bOpen" title="Open a full layout (all rooms). A room JSON opens as a one-room layout">⬆ Import layout JSON</button><button class="alt" id="bSave" title="Download the full layout with every room">⬇ Export layout JSON</button>
-<span class="grow"></span><button id="bExport" title="Download this room as a standalone offline tracker file">⬇ Export tracker HTML</button>
+<header><h1><span class="logo">▦</span>LabLayout</h1><div class="seg" id="modes"><button id="mEdit">✏️ Edit layout</button><button id="mUse">📦 Inventory</button></div><input id="title" placeholder="Room name"><span class="grow"></span><button class="alt editonly" id="bUnits" title="Switch between feet/inches and metres/centimetres">📏 ft · in</button><button class="alt" id="bCB" title="Colour-blind friendly colours (Okabe-Ito palette)">👁 Colour-blind</button><details class="menu"><summary>📁 File</summary><div class="mlist"><button class="alt editonly" id="bEx">Load example</button><button class="alt" id="bOpen" title="Open a full layout (all rooms). A room JSON opens as a one-room layout">⬆ Import layout JSON</button><button class="alt" id="bSave" title="Download the full layout with every room">⬇ Export layout JSON</button></div></details><button class="alt editonly" id="bAI" title="Let ChatGPT, Claude or another AI generate the layout">🤖 AI layout</button><button id="bExport" title="Download this room as a standalone offline tracker file">⬇ Export tracker HTML</button>
 <input type="file" id="file" accept=".json,.lablayout,.cribops" hidden><input type="file" id="fRoom" accept=".json,application/json" hidden></header>
 <nav id="rooms"></nav>
 <main id="editv">
@@ -65,6 +126,7 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
   <div class="row" style="margin-top:6px"><button class="ghost" id="bEdit">📐 Edit walls</button><button class="ghost" id="bGrid" title="Change the grid size (furniture and dragged walls snap to it)">▦ Grid</button></div>
   <div class="row" style="margin-top:6px"><input id="frad" placeholder="Fillet all corners, e.g. 6&quot;" style="padding:6px;border:1px solid #ccc;border-radius:6px;font:inherit;font-size:13px;min-width:0"><button class="ghost" id="bFil" style="flex:none">⌒ Fillet</button></div>
   <details style="margin-top:6px"><summary>Wall tool tips</summary><ul class="hint" style="padding:0 10px 6px 24px;margin:0;line-height:1.5"><li>Snaps to corners (□), wall midpoints (△), horizontal/vertical/45°, and lines up with other corners (dashed blue).</li><li>Type a length while drawing — <b>10</b>, <b>10.5</b>, <b>10' 6"</b>, <b>126"</b> — then Enter.</li><li>Backspace removes the last corner. Click the first corner, double-click, right-click or press Enter to finish. Esc cancels.</li><li>Hold <b>Alt</b> to place freely.</li><li><b>Stretch a wall</b>: drag any straight wall in or out; it snaps to the grid (Alt = free). Pick the grid size with <b>▦ Grid</b>.</li><li>In Edit walls: drag a wall to stretch it (it clicks into line with other walls), drag a corner onto another wall to join them, drag the floor to move the whole room, drag corners, double-click a wall to add one, right-click a corner to delete, click a length to type it.</li><li><b>Fillets</b>: click a corner (without dragging) and type a radius, or use <i>Fillet all corners</i>.</li><li><b>Curved walls</b>: drag the round handle in the middle of a wall sideways, or click it and type the curve depth (0 = straight).</li></ul></details>
+  <h2 style="margin-top:12px">Mark rooms &amp; areas</h2><div class="row"><button class="ghost" id="bZone" title="Click corners like walls; Enter or click the first corner to finish">⬠ Draw area</button><button class="ghost" id="bZRect" title="Drag a box on the plan">▭ Drag a box</button></div><p class="hint" style="margin:4px 0 8px">Mark offices, zones or areas inside the walls. Click one to name it and set who it belongs to.</p>
   <label class="f">Wall corners (x, y[, fillet radius][, arc depth] in <span class="lu">ft</span> — one per line)<textarea id="poly" rows="5"></textarea></label>
   <button class="ghost" id="bPoly" style="width:100%">Apply corners</button>
   <details><summary>☁ Shared inventory (optional)</summary><div style="padding:0 8px 8px"><p class="hint">Bake a Supabase connection into exported trackers so every device shares one inventory. See README for setup. The anon key ends up inside the HTML file — only share the file with people who should edit the inventory.</p><label class="f">Supabase URL<input id="syu" placeholder="https://xxxx.supabase.co"></label><label class="f">Anon key<input id="syk" placeholder="eyJ…"></label></div></details>
@@ -181,6 +243,20 @@ body.fit .eq.art .cap{display:none}body.fit .eqs{padding-top:2px!important}body.
 .lowb{font-size:10px}.outr .dmb{color:#fff}.whoh{margin:10px 0 4px;font-size:13px}.outbar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.outbar button{font-size:12px;padding:5px 9px}#syncst{font-size:11px;color:#9f9}#syncst.err{color:#f99}.rotbl{width:100%;border-collapse:collapse;font-size:13px}.rotbl td,.rotbl th{padding:5px;border-bottom:1px solid #eee;text-align:left}
 .unit.look .body{background:var(--lb)!important}.unit.look .drawer{background:var(--lc)!important;border-color:#0003!important}.unit.look .drawer .lbl{color:var(--lt)!important;border-top-color:var(--lh)!important}.unit.look .bench,.unit.look .ubench{background:var(--ltop)!important}.unit.look .drawer.surf,.unit.look .drawer.under{background:transparent!important}.unit.look .surf .lbl,.unit.look .under .lbl{color:#555!important}
 .dim{opacity:.25}.hit{outline:2px solid #f26b1d}
+
+/* ===== LabLayout theme ===== */
+:root{--ink:#16181b;--paper:#f3f2ee;--line:#e3e1dc;--line2:#d2cfc8;--mut:#6b6f75;--acc:#f26b1d;--accd:#d95a10;--blue:#2d6cdf}
+body{font-family:"Segoe UI Variable Text","Segoe UI",ui-sans-serif,system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+input,select,textarea,button{font-family:inherit}
+header{background:var(--ink);padding:10px 16px;border-bottom:1px solid #000;gap:6px}header h1{font-weight:650;font-size:16px}
+button{border-radius:8px;padding:7px 12px;font-weight:500;transition:background .12s,border-color .12s}
+button:not(.alt):hover{background:var(--accd)}
+header button.alt{background:transparent;color:#d8dbde;border:1px solid #343a41;font-size:13px;padding:6px 10px}header button.alt:hover{background:#22262b;color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.panel{border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px #0000000d}
+.panel h2{font-size:13px;font-weight:650}
+input:not([type=checkbox]):not([type=radio]):not([type=color]),select{border:1px solid var(--line2)!important;border-radius:8px!important}
+input:focus,select:focus{outline:0;border-color:var(--blue)!important;box-shadow:0 0 0 3px #2d6cdf22}
 </style></head><body>
 <header><h1 id="apptitle">Lab Storage Organizer</h1><span id="syncst"></span><button class="alt" id="seed">Test data</button><button class="alt" id="bCB" title="Colour-blind friendly colours">👁 Colour-blind</button><button class="alt" id="reset">Reset</button><button class="alt" id="bPeople">👥 People</button><button class="alt" id="bBackup">💾 Backup</button><button class="alt" id="bRestore">📂 Restore</button><button class="alt" id="bSync">☁ Sync</button><input type="file" id="restoref" accept=".json" hidden><datalist id="peoplelist"></datalist><button id="copy">Copy list</button></header>
 <div id="modal" onclick="if(event.target===this)closeDrawer()"><div class="mcard"><button class="alt mclose" onclick="closeDrawer()">Close</button><div class="mbody"></div></div></div>
@@ -297,7 +373,7 @@ function drawerEl(d){const e=document.createElement('div');e.className='drawer '
  e.innerHTML=`<div class="lbl"><span contenteditable="true" data-n="${d.id}"></span><b data-c="${d.id}"></b></div><div class="zone" data-z="${d.id}"></div>`;
  e.querySelector('[data-n]').textContent=S.names[d.id];return e}
 
-const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out}));
+const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly}));
 // real front dimensions in inches (W x H); bench tops are 60" long
 const EQ=Object.fromEntries(UNITS.filter(u=>(u.eq||[]).length).map(u=>[u.id,{len:u.front?u.front.W:(u.eqLen||48),items:u.eq}]));
 
@@ -348,6 +424,10 @@ function roomOutline(P0){const n=P0.length,at=i=>P0[((i%n)+n)%n],B=i=>+(at(i)[3]
  return out}
 const outlinePath=P0=>'M'+roomOutline(P0).map(p=>(+p[0].toFixed(4))+' '+(+p[1].toFixed(4))).join('L')+'Z';
 /* doorway symbol: gap in the wall, jambs, and the door's swing */
+/* marked rooms / areas: rectangle or polygon (corners stored as fractions of the box) */
+const pcen=P=>{let A=0,x=0,y=0;P.forEach((p,i)=>{const q=P[(i+1)%P.length],k=p[0]*q[1]-q[0]*p[1];A+=k;x+=(p[0]+q[0])*k;y+=(p[1]+q[1])*k});return Math.abs(A)<1e-9?P[0]:[x/(3*A),y/(3*A)]};
+function zoneSvg(f,sz){const pts=f.poly?f.poly.map(([a,b])=>[f.x+a*f.w,f.y+b*f.h]):[[f.x,f.y],[f.x+f.w,f.y],[f.x+f.w,f.y+f.h],[f.x,f.y+f.h]],c=pcen(pts);
+ return `<path d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity=".45" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="#2f5d3a">${esc(f.t)}</text>`}
 function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',sw=sz/400,o=[];
  const A=H?[f.x,f.y+f.h/2]:[f.x+f.w/2,f.y],B=H?[f.x+f.w,f.y+f.h/2]:[f.x+f.w/2,f.y+f.h],n=H?[0,1]:[1,0];
  const inside=(x,y)=>{let k=false;for(let i=0,j=OL.length-1;i<OL.length;j=i++){const p=OL[i],q=OL[j];if(((p[1]>y)!=(q[1]>y))&&(x<(q[0]-p[0])*(y-p[1])/(q[1]-p[1])+p[0]))k=!k}return k};
@@ -364,7 +444,7 @@ function drawMap(){const m=document.getElementById('map');const P=CONFIG.room.po
  const x0=Math.min(...xs),y0=Math.min(...ys),x1=Math.max(...xs),y1=Math.max(...ys),sz=Math.max(x1-x0,y1-y0);m.setAttribute('viewBox',`${x0-1} ${y0-1} ${x1-x0+2} ${y1-y0+2}`);m.style.setProperty('--fs',(sz/30).toFixed(3)+'px');
  let h=`<path d="${outlinePath(P)}" fill="#f7f7f2" stroke="#111" stroke-width="${(sz/160).toFixed(3)}"/>`;
  h+=`<text x="${(x0+x1)/2}" y="${y0-.4}" style="font-size:${(sz/45).toFixed(3)}px" fill="#777">${CONFIG.metric?`${+((x1-x0)*.3048).toFixed(2)} m × ${+((y1-y0)*.3048).toFixed(2)} m`:`${+(x1-x0).toFixed(2)} ft × ${+(y1-y0).toFixed(2)} ft`}</text>`;
- FP.forEach((f,i)=>{const v=f.h>f.w*1.3;if(f.mapOnly){h+=f.kind==='door'?doorSvg(f,sz,OL):`<rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" fill="${f.f}" opacity=".6"/>`;return}
+ FP.forEach((f,i)=>{const v=f.h>f.w*1.3;if(f.mapOnly){h+=f.kind==='door'?doorSvg(f,sz,OL):f.kind==='zone'?zoneSvg(f,sz):`<rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" fill="${f.f}" opacity=".6"/>`;return}
   h+=`<rect class="fp" data-i="${i}" x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".08" fill="${f.f}"/><text x="${f.x+f.w/2}" y="${f.y+f.h/2}" fill="${f.tc||'#111'}" style="font-size:${Math.max(.15,Math.min(sz/34,Math.min(f.w,f.h)*.55,Math.max(f.w,f.h)*.9/Math.max(3,String(f.t).length*.6))).toFixed(3)}px" ${v?`transform="rotate(-90 ${f.x+f.w/2} ${f.y+f.h/2})"`:''}>${esc(f.t)}</text>`});
  m.innerHTML=h;
  m.querySelectorAll('.fp').forEach(r=>r.addEventListener('click',()=>showFP(+r.dataset.i)))}
@@ -2299,7 +2379,7 @@ function doorG(u,S){const H=u.w>=u.d,L=H?u.w:u.d,T=H?u.d:u.w,sw=S/400,c='#8a6d3b
  o.push(`<rect class="b" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.d}" fill="transparent" stroke="none"/>`);return o.join('')}
 function draw(){svg.setAttribute('viewBox',`${VB.x} ${VB.y} ${VB.w} ${VB.h}`);const g=[];const S=Math.max(VB.w,VB.h);let GR='';
  {const G=gridStep();if(G){const M=MET()?1/.3048:(G<1?1:G*5),sw=S/900;g.push(`<defs><pattern id="g1" width="${G}" height="${G}" patternUnits="userSpaceOnUse"><path d="M${G} 0H0V${G}" fill="none" stroke="#dde2df" stroke-width="${sw}"/></pattern><pattern id="g2" width="${M}" height="${M}" patternUnits="userSpaceOnUse"><path d="M${M} 0H0V${M}" fill="none" stroke="#b9c2be" stroke-width="${sw*1.6}"/></pattern></defs>`);GR=`<g pointer-events="none"><rect x="${VB.x}" y="${VB.y}" width="${VB.w}" height="${VB.h}" fill="url(#g1)"/><rect x="${VB.x}" y="${VB.y}" width="${VB.w}" height="${VB.h}" fill="url(#g2)"/></g>`}}
- const poly=SK?[]:P.room.poly;if(poly.length>2)g.push(`<path d="${outlinePath(poly)}" fill="#fbfbf7" stroke="#111" stroke-width="${S/150}"/>`);
+ const poly=SK&&SK.target!=='zone'?[]:P.room.poly;if(poly.length>2)g.push(`<path d="${outlinePath(poly)}" fill="#fbfbf7" stroke="#111" stroke-width="${S/150}"/>`);
  else if(poly.length)g.push(`<polyline points="${poly.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#111" stroke-width="${S/150}"/>`);
  g.push(GR);
  if(poly.length>2&&!editMode&&!drawMode)segsOf(poly,true).forEach(([a,b,i])=>{if(!a[3])g.push(`<line class="wseg wdrag" data-w="${i}" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="transparent" stroke-width="${S/70}"/>`)});
@@ -2307,6 +2387,7 @@ function draw(){svg.setAttribute('viewBox',`${VB.x} ${VB.y} ${VB.w} ${VB.h}`);co
  if(poly.length>2&&!editMode)poly.forEach((p,i)=>{const q=poly[(i+1)%poly.length],L=Math.hypot(q[0]-p[0],q[1]-p[1]);if(L<1)return;g.push(`<text x="${(p[0]+q[0])/2}" y="${(p[1]+q[1])/2}" style="font-size:${S/60}px" fill="#2d6cdf" dy="${q[0]===p[0]?0:-S/80}" dx="${q[0]===p[0]?S/45:0}">${uL(L)}</text>`)});
  P.units.forEach(u=>{const fs=Math.max(.15,Math.min(S/45,Math.min(u.w,u.d)*.45,Math.max(u.w,u.d)*.9/Math.max(3,(u.mapText??u.name).length*.6))),v=u.d>u.w*1.3;
   if(u.kind==='door'){g.push(`<g class="u door${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}">${doorG(u,S)}</g>`);return}
+  if(u.kind==='zone'&&u.poly){const bx=pcen(u.poly);g.push(`<g class="u zonep${u.locked?' locked':''}${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}"><path class="b" d="${zonePath(u)}" fill="${asgColor(u)}" fill-opacity=".45" stroke="#7a9" stroke-width="${S/500}" stroke-dasharray=".4 .2"/><text x="${u.x+bx[0]*u.w}" y="${u.y+bx[1]*u.d}" style="font-size:${Math.min(S/60,.9)}px;font-weight:600" fill="#2f5d3a">${esc(asgLabel(u))}</text></g>`);return}
   g.push(`<g class="u${u.locked?' locked':''}${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}"><rect class="b" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.d}" rx=".06" fill="${isAsg(u)?asgColor(u):u.mapColor||'#bbb'}" stroke="${u.kind==='zone'?'#7a9':'#333'}" stroke-width="${S/500}" ${u.kind==='door'?'stroke-dasharray=".2 .1" fill-opacity=".9"':u.kind==='zone'?'stroke-dasharray=".4 .2" fill-opacity=".45"':''}/>${u.kind==='wall'?'':u.kind==='zone'?`<text x="${u.x+u.w/2}" y="${u.y+Math.min(S/45,1.2)}" style="font-size:${Math.min(S/60,.9)}px;font-weight:600" fill="#2f5d3a">${esc(asgLabel(u))}</text>`:`<text x="${u.x+u.w/2}" y="${u.y+u.d/2}" style="font-size:${fs}px" fill="${u.mapTextColor||'#111'}" ${v?`transform="rotate(-90 ${u.x+u.w/2} ${u.y+u.d/2})"`:''}>${esc(u.kind==='desk'?asgLabel(u):(u.mapText??u.name))}</text>`}${(u.eq||[]).length&&u.grid?`<text x="${u.x+u.w-.15}" y="${u.y+.25}" style="font-size:${S/70}px;text-anchor:end">⚙${u.eq.length}</text>`:''}</g>`)});
  if(selSet.size===1&&selId&&!drawMode)g.push(measure(U(selId),S));
  if(marq)g.push(`<rect class="mq" x="${Math.min(marq.x0,marq.x1)}" y="${Math.min(marq.y0,marq.y1)}" width="${Math.abs(marq.x1-marq.x0)}" height="${Math.abs(marq.y1-marq.y0)}" stroke-width="${S/400}"/>`);
@@ -2357,13 +2438,22 @@ function sketchSnap(q,o){o=o||{};const pts=o.pts||[],from=o.from,tol=tolFt(11),r
  res.x=+x.toFixed(4);res.y=+y.toFixed(4);res.kind=res.kind||(res.guides.length?'align':res.tag?'hv':'grid');return res}
 
 function segsOf(p,closed){const s=[];for(let i=0;i<p.length-(closed?0:1);i++)s.push([p[i],p[(i+1)%p.length],i]);return s}
-function startDraw(){exitEdit();SK={pts:[],hover:null,typed:'',prev:P.room.poly};drawMode=true;select(null);$('bDraw').textContent='✓ Finish';dimBox(null);toast('Click corners. Type a number + Enter for an exact length.');draw()}
-function finishDraw(cancel){if(!SK)return;const pts=SK.pts;drawMode=false;$('bDraw').textContent='✏️ Draw walls';dimBox(null);
+function startDraw(target){exitEdit();zrStop();SK={pts:[],hover:null,typed:'',prev:target==='zone'?[]:P.room.poly,target};drawMode=true;select(null);$(target==='zone'?'bZone':'bDraw').textContent='✓ Finish';dimBox(null);toast(target==='zone'?'Click the area\'s corners. It snaps to walls. Enter or click the first corner to finish.':'Click corners. Type a number + Enter for an exact length.');draw()}
+function zoneFromPts(pts){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x,d=Math.max(...ys)-y;if(w<.3||d<.3){toast('That area is too small');return null}
+ const rect=pts.length===4&&pts.every(p=>(near(p[0],x)||near(p[0],x+w))&&(near(p[1],y)||near(p[1],y+d)));const id=nid('zone'),n=P.units.filter(u=>u.kind==='zone').length+1;
+ const u={id,kind:'zone',mapOnly:true,name:'Room '+n,assign:'shared',x:+x.toFixed(4),y:+y.toFixed(4),w:+w.toFixed(4),d:+d.toFixed(4)};if(!rect)u.poly=pts.map(p=>[+((p[0]-x)/w).toFixed(5),+((p[1]-y)/d).toFixed(5)]);
+ P.units.unshift(u);select(id);commit('Marked '+u.name);return u}
+const pcen=P=>{let A=0,x=0,y=0;P.forEach((p,i)=>{const q=P[(i+1)%P.length],k=p[0]*q[1]-q[0]*p[1];A+=k;x+=(p[0]+q[0])*k;y+=(p[1]+q[1])*k});return Math.abs(A)<1e-9?P[0]:[x/(3*A),y/(3*A)]};
+function zonePath(u){return 'M'+u.poly.map(([a,b])=>(+(u.x+a*u.w).toFixed(4))+' '+(+(u.y+b*u.d).toFixed(4))).join('L')+'Z'}
+let ZR=null;function zrStart(){if(SK)finishDraw(true);exitEdit();ZR={};$('stage').classList.add('zrect');$('bZRect').textContent='✕ Cancel';toast('Drag a box on the plan to mark an area');select(null)}
+function zrStop(){if(!ZR)return;ZR=null;$('stage').classList.remove('zrect');$('bZRect').textContent='▭ Drag a box';draw()}
+function finishDraw(cancel){if(!SK)return;const pts=SK.pts;drawMode=false;$('bDraw').textContent='✏️ Draw walls';$('bZone').textContent='⬠ Draw area';dimBox(null);
+ if(SK.target==='zone'){SK=null;if(!cancel&&pts.length>=3)zoneFromPts(pts);else{if(!cancel)toast('An area needs at least 3 corners');draw()}return}
  if(!cancel&&pts.length>=3){P.room.poly=pts.map(p=>[+p[0].toFixed(4),+p[1].toFixed(4)]);SK=null;syncPoly();fit();commit('Walls drawn')}
  else{P.room.poly=SK.prev;SK=null;if(!cancel)toast('Need at least 3 corners — kept the old walls');draw()}}
 function skPlace(p){const pts=SK.pts,l=pts[pts.length-1];if(l&&near(l[0],p[0])&&near(l[1],p[1]))return;
  if(pts.length>=3&&near(p[0],pts[0][0])&&near(p[1],pts[0][1])){finishDraw();return}pts.push([p[0],p[1]]);SK.typed='';draw()}
-function skHover(e){const q=pt(e),pts=SK.pts;SK.hover=sketchSnap(q,{pts,from:pts[pts.length-1],closing:pts.length>=3,segs:segsOf(pts,false),free:e.altKey});SK.raw=q;draw();dimFollow()}
+function skHover(e){const q=pt(e),pts=SK.pts,Z=SK.target==='zone';SK.hover=sketchSnap(q,{pts:Z?pts.concat(P.room.poly.map(v=>[v[0],v[1]])):pts,from:pts[pts.length-1],closing:pts.length>=3,segs:Z?segsOf(pts,false).concat(segsOf(P.room.poly,true)):segsOf(pts,false),onSeg:Z,free:e.altKey});SK.raw=q;draw();dimFollow()}
 function skTypedPoint(){const L=parseLen(SK.typed),pts=SK.pts,l=pts[pts.length-1];if(L==null||!l||!SK.hover)return null;
  let dx=SK.hover.x-l[0],dy=SK.hover.y-l[1],n=Math.hypot(dx,dy);if(n<1e-6){dx=1;dy=0;n=1}return[l[0]+dx/n*L,l[1]+dy/n*L]}
 
@@ -2390,8 +2480,9 @@ function sketchLayer(S){const g=[],sw=S/150,fs=S/60,mk=S/110;
  const lenTxt=(a,b,cls,i)=>{const L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(L<.3)return'';const sg=+(a[3]||0),mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,nx=-(b[1]-a[1])/L,ny=(b[0]-a[0])/L,off=fs*(editMode?1.7:.9)+(sg>0?sg:0)+(sg?fs*1.2:0);
   return `<text class="${cls||''}" ${i!=null?`data-wl="${i}"`:''} x="${mx+nx*(sg<0?-off+sg:off)}" y="${my+ny*(sg<0?-off+sg:off)}" style="font-size:${fs}px" fill="#2d6cdf">${fmtLen(L)}${sg?' ⌒':''}</text>`};
  if(dragW&&dragW.guide){const G2=dragW.guide,B=VB;g.push(G2.ax?`<line x1="${B.x}" y1="${G2.c}" x2="${B.x+B.w}" y2="${G2.c}" stroke="#2d6cdf" stroke-width="${S/700}" stroke-dasharray="${S/150} ${S/250}"/>`:`<line x1="${G2.c}" y1="${B.y}" x2="${G2.c}" y2="${B.y+B.h}" stroke="#2d6cdf" stroke-width="${S/700}" stroke-dasharray="${S/150} ${S/250}"/>`)}
+ if(ZR&&ZR.a){const[a,b]=[ZR.a,ZR.b],x=Math.min(a[0],b[0]),y=Math.min(a[1],b[1]),w=Math.abs(b[0]-a[0]),d=Math.abs(b[1]-a[1]);g.push(`<rect x="${x}" y="${y}" width="${w}" height="${d}" fill="#d6ecd9" fill-opacity=".5" stroke="#2f7d4a" stroke-width="${S/400}" stroke-dasharray="${S/120} ${S/240}"/><text x="${x+w/2}" y="${y+d/2}" style="font-size:${S/55}px" fill="#2f5d3a">${uL(w)} × ${uL(d)}</text>`)}
  if(SK){const pts=SK.pts,h=SK.hover;
-  if(SK.prev.length>2)g.push(`<path d="${outlinePath(SK.prev)}" fill="none" stroke="#999" stroke-width="${sw/2}" stroke-dasharray="${S/120}"/>`);
+  if(SK.prev&&SK.prev.length>2)g.push(`<path d="${outlinePath(SK.prev)}" fill="none" stroke="#999" stroke-width="${sw/2}" stroke-dasharray="${S/120}"/>`);
   if(pts.length>1)g.push(`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#111" stroke-width="${sw}"/>`);
   segsOf(pts,false).forEach(([a,b])=>g.push(lenTxt(a,b)));
   if(h){(h.guides||[]).forEach(p=>g.push(`<line x1="${p[0]}" y1="${p[1]}" x2="${h.x}" y2="${h.y}" stroke="#2d6cdf" stroke-width="${S/700}" stroke-dasharray="${S/150} ${S/250}"/>`));
@@ -2415,7 +2506,7 @@ function snapMark(h,mk){const c=h.kind==='end'?'#f2a900':h.kind==='mid'?'#14a3a3
  return `<circle cx="${h.x}" cy="${h.y}" r="${mk*.6}" fill="${c}"/><line x1="${h.x-mk*2}" y1="${h.y}" x2="${h.x+mk*2}" y2="${h.y}" stroke="${c}" stroke-width="${mk/5}"/><line x1="${h.x}" y1="${h.y-mk*2}" x2="${h.x}" y2="${h.y+mk*2}" stroke="${c}" stroke-width="${mk/5}"/>`}
 
 /* events */
-function sketchDown(e,q){if(e.button===2)return true;
+function sketchDown(e,q){if(ZR&&e.button===0){ZR.a=[snap(q.x),snap(q.y)];ZR.b=ZR.a.slice();svg.setPointerCapture(e.pointerId);return true}if(e.button===2)return true;
  if(SK){if(!SK.hover)skHover(e);if(SK.typed){const p=skTypedPoint();if(p){dimBox(null);skPlace(p);return true}}skPlace([SK.hover.x,SK.hover.y]);return true}
  if(editMode){const mh=e.target.closest('.mh');if(mh){dragM={i:+mh.dataset.m,moved:false};svg.setPointerCapture(e.pointerId);return true}
   const v=e.target.closest('.vtx');if(v){dragV={i:+v.dataset.v,moved:false};svg.setPointerCapture(e.pointerId);return true}
@@ -2424,7 +2515,7 @@ function sketchDown(e,q){if(e.button===2)return true;
  if(!drawMode){const ws=e.target.closest('.wseg');if(ws&&e.button===0){const i=+ws.dataset.w,p=P.room.poly,a=p[i],b=p[(i+1)%p.length],c=Math.hypot(b[0]-a[0],b[1]-a[1]);if(c>1e-6){dragW={i,q0:q,a0:[a[0],a[1]],b0:[b[0],b[1]],n:[-(b[1]-a[1])/c,(b[0]-a[0])/c],moved:false};if(!editMode)select(null);svg.setPointerCapture(e.pointerId);return true}}}
  if(editMode&&e.button===0&&!e.target.closest('.u')){dragR={q0:q,p0:P.room.poly.map(v=>v.slice()),u0:P.units.map(u=>[u.x,u.y]),moved:false};svg.setPointerCapture(e.pointerId);return true}
  return false}
-function sketchMove(e){if(SK){skHover(e);return true}
+function sketchMove(e){if(ZR){if(ZR.a){const q=pt(e);ZR.b=[snap(q.x),snap(q.y)];draw()}return true}if(SK){skHover(e);return true}
  if(dragR){const q=pt(e),dx=e.altKey?q.x-dragR.q0.x:snap(q.x-dragR.q0.x),dy=e.altKey?q.y-dragR.q0.y:snap(q.y-dragR.q0.y);P.room.poly.forEach((v,k)=>{v[0]=+(dragR.p0[k][0]+dx).toFixed(4);v[1]=+(dragR.p0[k][1]+dy).toFixed(4)});P.units.forEach((u,k)=>{u.x=+(dragR.u0[k][0]+dx).toFixed(3);u.y=+(dragR.u0[k][1]+dy).toFixed(3)});dragR.moved=dx||dy;syncPoly();draw();return true}
  if(dragW){const p=P.room.poly,i=dragW.i,a=p[i],b=p[(i+1)%p.length],q=pt(e),[nx,ny]=dragW.n;let s=(q.x-dragW.q0.x)*nx+(q.y-dragW.q0.y)*ny;const G=gridStep()||.25;
   dragW.guide=null;if(!e.altKey){const ax=near(ny,0)?0:near(nx,0)?1:-1;if(ax<0)s=Math.round(s/G)*G;else{const sg=ax?ny:nx,c=dragW.a0[ax]+s*sg,j=(i+1)%p.length,tol=tolFt(10);let hit=null;p.forEach((v,k)=>{if(k===i||k===j)return;const d=Math.abs(v[ax]-c);if(d<tol&&(!hit||d<hit.d))hit={d,c:v[ax],v}});
@@ -2435,7 +2526,7 @@ function sketchMove(e){if(SK){skHover(e);return true}
  if(editMode&&dragV){const p=P.room.poly,i=dragV.i;const h=sketchSnap(pt(e),{pts:p,skip:i,free:e.altKey,onSeg:true,segs:segsOf(p,true).filter(([,,k])=>k!==i&&(k+1)%p.length!==i)});dragV.h=h;if(!near(p[i][0],h.x)||!near(p[i][1],h.y)){p[i][0]=h.x;p[i][1]=h.y;dragV.moved=true;syncPoly()}draw();return true}
  if(editMode){const s=e.target.closest('.wseg');if(s){const i=+s.dataset.w,p=P.room.poly,a=p[i],b=p[(i+1)%p.length],q=pt(e),dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((q.x-a[0])*dx+(q.y-a[1])*dy)/(dx*dx+dy*dy||1)));hoverE={i,x:r4(a[0]+dx*t),y:r4(a[1]+dy*t)};if(near(dx,0))hoverE.x=a[0];if(near(dy,0))hoverE.y=a[1]}else hoverE=null;draw()}
  return false}
-function sketchUp(){if(dragR){const d=dragR;dragR=null;if(d.moved)commit('Room moved');return true}if(dragW){const d=dragW;dragW=null;if(d.moved)commit('Wall moved '+fmtLen(Math.abs(d.s||0)));else draw();return true}
+function sketchUp(){if(ZR&&ZR.a){const[a,b]=[ZR.a,ZR.b];ZR.a=null;zrStop();zoneFromPts([[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]]);return true}if(ZR)return true;if(dragR){const d=dragR;dragR=null;if(d.moved)commit('Room moved');return true}if(dragW){const d=dragW;dragW=null;if(d.moved)commit('Wall moved '+fmtLen(Math.abs(d.s||0)));else draw();return true}
  if(dragM){const d=dragM;dragM=null;if(d.moved){commit('Wall curved');return true}askArc(d.i);return true}
  if(dragV){const d=dragV;dragV=null;if(d.moved)commit('Corner moved');else askFillet(d.i);return true}return false}
 let dragM=null,dragW=null,dragR=null;
@@ -2492,7 +2583,7 @@ $('bUndo').onclick=()=>stepHist(-1);$('bRedo').onclick=()=>stepHist(1);
 function commit(msg){save();record(msg);draw();if(msg&&msg!=='Moved')toast(msg)}
 const anyLocked=()=>[...selSet].some(id=>(U(id)||{}).locked),lockedMsg=()=>toast('⚓ Anchored. Click ⚓ to unanchor first');
 $('bLock').onclick=()=>{const L=[...selSet].map(U).filter(Boolean);if(!L.length)return;const on=!L.every(u=>u.locked);L.forEach(u=>{if(on)u.locked=true;else delete u.locked});commit(on?(L.length>1?'Anchored '+L.length+' pieces':'Anchored '+L[0].name):'Unanchored');selChanged()};
-$('bRot').onclick=()=>{const u=U(selId);if(!u)return;if(u.locked)return lockedMsg();const cx=u.x+u.w/2,cy=u.y+u.d/2;[u.w,u.d]=[u.d,u.w];u.x=snap(cx-u.w/2);u.y=snap(cy-u.d/2);commit();renderProps()};
+$('bRot').onclick=()=>{const u=U(selId);if(!u)return;if(u.locked)return lockedMsg();if(u.poly)u.poly=u.poly.map(([a,b])=>[+(1-b).toFixed(5),a]);const cx=u.x+u.w/2,cy=u.y+u.d/2;[u.w,u.d]=[u.d,u.w];u.x=snap(cx-u.w/2);u.y=snap(cy-u.d/2);commit();renderProps()};
 $('bDel').onclick=()=>{if(!selSet.size)return;if(anyLocked())return lockedMsg();if(!confirmBtn($('bDel')))return;const n=selSet.size,nm=(U(selId)||{}).name;P.units=P.units.filter(v=>!selSet.has(v.id));select(null);commit(n>1?'Deleted '+n+' pieces':'Deleted '+nm)};
 $('bDup').onclick=()=>{const u=U(selId);if(!u)return;const c=JSON.parse(JSON.stringify(u));const id=nid(u.mapOnly?'door':u.grid?'u':'m');const re=new RegExp('^'+u.id+'-');c.id=id;c.x=snap(u.x+u.w+.25);c.name=u.name+' copy';
  if(c.grid)c.grid.cells.forEach(x=>x.id=x.id.replace(re,id+'-'));if(c.surf)c.surf[0]=id+'-surf';if(c.under)c.under[0]=id+'-under';(c.eq||[]).forEach(e=>(e.slots||[]).forEach(s=>s.id=id+'-'+e.a+'-'+(seq++)));P.units.push(c);select(id);commit('Duplicated')};
@@ -2571,12 +2662,15 @@ function syncPoly(){document.querySelectorAll('.lu').forEach(e=>e.textContent=LU
 $('bRect').onclick=()=>{const w=frL(+$('rw').value)||10,d=frL(+$('rd').value)||10;P.room.poly=[[0,0],[w,0],[w,d],[0,d]];syncPoly();fit();commit('Room set to '+uL(w)+' × '+uL(d))};
 $('bPoly').onclick=()=>{const pts=$('poly').value.split('\n').map(l=>l.split(/[ ,]+/).filter(Boolean).map(Number)).filter(p=>p.length>=2&&p.length<=4&&p.every(isFinite)).map(p=>p.map(frL));if(pts.length<3){toast('Need at least 3 corners');return}P.room.poly=pts;fit();commit('Walls updated')};
 $('bDraw').onclick=()=>SK?finishDraw():startDraw();
+$('bZone').onclick=()=>SK?finishDraw():startDraw('zone');
+$('bZRect').onclick=()=>ZR?zrStop():zrStart();
+document.addEventListener('keydown',e=>{if(ZR&&e.key==='Escape')zrStop()});
 $('bEdit').onclick=()=>editMode?exitEdit():startEdit();
 $('bFil').onclick=()=>{const r=parseLen($('frad').value||'0');if(r==null||r<0){toast('Type a radius like 6" or 1.5');return}P.room.poly.forEach(p=>{if(r>0)p[2]=r;else if(p.length>2)p[2]=0;if(!p[2]&&!p[3])p.length=2});syncPoly();commit(r>0?'Filleted corners — '+fmtLen(r):'Corners made sharp')};
 
 /* ---------- export ---------- */
 const slug=t=>(t||'lab').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'lab';
-function toConfig(){const units=P.units.map(u=>{const c=JSON.parse(JSON.stringify(u));delete c.lib;delete c.custom;delete c.preset;delete c.pn;delete c.pc;if(!c.tab)delete c.tab;return c});
+function toConfig(){const units=P.units.map(u=>{const c=JSON.parse(JSON.stringify(u));if(u.kind==='zone'){c.mapColor=c.mapColor||asgColor(u);c.mapText=asgLabel(u)}delete c.lib;delete c.custom;delete c.preset;delete c.pn;delete c.pc;if(!c.tab)delete c.tab;return c});
  const id=P.exampleKey||P.storeKey||'lablayout-'+slug(P.title);return{id:slug(P.title),title:P.title||'Lab Storage Organizer',storageKey:id,sample:!!P.sample,...(MET()?{metric:true}:{}),room:P.room,units,...(P.sync&&P.sync.url&&P.sync.key?{sync:{url:P.sync.url,key:P.sync.key}}:{})}}
 function buildTracker(){if(!TEMPLATE){toast('Tracker template missing');return null}const j=JSON.stringify(toConfig()).replace(/<\//g,'<\\/');return TEMPLATE.replace(CFG_RE,()=>'/*LABLAYOUT_CONFIG*/'+j+'/*END_CONFIG*/')}
 $('mClose').onclick=()=>$('modal').classList.remove('on');document.querySelectorAll('.devw button').forEach(b=>b.onclick=()=>$('pv').style.width=b.dataset.w.includes('%')?b.dataset.w:b.dataset.w+'px');
@@ -2612,6 +2706,7 @@ let MODE='edit',useSrc='';
 function setMode(m){MODE=m;try{localStorage.setItem('lablayout-mode',m)}catch(e){}$('mEdit').classList.toggle('on',m==='edit');$('mUse').classList.toggle('on',m==='use');
  $('editv').style.display=m==='edit'?'':'none';$('usev').hidden=m!=='use';document.querySelectorAll('.editonly').forEach(e=>e.style.display=m==='edit'?'':'none');
  if(m==='use'){save();const h=buildTracker();if(!h){setMode('edit');return}if(h!==useSrc){useSrc=h;$('usef').srcdoc=h}}}
+document.addEventListener('click',e=>{document.querySelectorAll('details.menu[open]').forEach(m=>{if(!m.contains(e.target)||e.target.closest('.mlist button'))m.open=false})});
 $('mEdit').onclick=()=>setMode('edit');$('mUse').onclick=()=>setMode('use');
 $('bEx').onclick=()=>{const c=exampleConfig();if(!c){toast('Example unavailable');return}if(P.units.length&&!confirmBtn($('bEx')))return;P={v:1,title:c.title,room:c.room,units:c.units,sample:true,exampleKey:c.storageKey};init();toast('Loaded HatchBridge example')};
 $('title').oninput=e=>{P.title=e.target.value;save();const b=$('rooms').querySelector('.on');if(b)b.textContent=P.title||'Room'};

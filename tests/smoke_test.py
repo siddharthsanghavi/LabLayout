@@ -97,7 +97,7 @@ def main():
             print("builder")
             b = ctx.new_page(); watch_errors(b, errs)
             b.goto(base + "/builder.html")
-            b.click("#bEx")
+            b.click("details.menu summary"); b.click("#bEx")
             b.wait_for_timeout(200)
             n0 = b.evaluate("P.units.length")
             check(n0 > 3, f"example loads ({n0} units)")
@@ -208,11 +208,25 @@ def main():
             b.click("#bLock"); b.keyboard.press("ArrowRight")
             check(b.evaluate("P.units[0].locked") is None and b.evaluate("P.units[0].x") == x0[0] + .25, "unanchoring lets it move again")
             b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);draw()")
+            # mark rooms / areas: drag a box, or draw a polygon like walls
+            b.evaluate("P0=JSON.parse(JSON.stringify(P.room.poly));U0=JSON.stringify(P.units);P.room.poly=[[0,0],[20,0],[20,14],[0,14]];P.units=[];syncPoly();fit()")
+            def zs(x, y):
+                return b.evaluate(f"(()=>{{const a=toScreen({x},{y}),r=$('stage').getBoundingClientRect();return [a.x+r.left,a.y+r.top]}})()")
+            b.click("#bZRect"); p0, p1 = zs(0.1, 0.1), zs(8, 6)
+            b.mouse.move(*p0); b.mouse.down(); b.mouse.move((p0[0]+p1[0])/2, (p0[1]+p1[1])/2); b.mouse.move(*p1); b.mouse.up()
+            check(b.evaluate("(u=>u.kind==='zone'&&u.x===0&&u.y===0&&u.w===8&&u.d===6&&!u.poly)(P.units[0])"), "drag a box marks a rectangular area")
+            b.click("#bZone")
+            for x, y in [(10, 0), (20, 0), (20, 14), (14, 14), (14, 7), (10, 7)]:
+                b.mouse.click(*zs(x, y))
+            b.keyboard.press("Enter")
+            check(b.evaluate("(u=>u.kind==='zone'&&u.poly.length===6&&u.x===10&&u.w===10&&u.d===14)(P.units[0])"), "draw area makes an L-shaped zone snapped to the walls")
+            check(b.evaluate("document.querySelectorAll('.u.zonep path.b').length===1"), "polygon area renders as a shape")
+            b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);syncPoly();draw()")
             # colour-blind mode
             b.click("#bCB")
-            check(b.evaluate("cbOn()&&getComputedStyle(document.querySelector('button.bad')).backgroundColor==='rgb(213, 94, 0)'"), "colour-blind mode swaps red for vermillion")
+            check(b.evaluate("cbOn()&&getComputedStyle($('bDel')).color==='rgb(213, 94, 0)'"), "colour-blind mode swaps red for vermillion")
             b.click("#bCB")
-            check(b.evaluate("!cbOn()&&getComputedStyle(document.querySelector('button.bad')).backgroundColor==='rgb(198, 40, 40)'"), "colour-blind mode turns back off")
+            check(b.evaluate("!cbOn()&&getComputedStyle($('bDel')).color==='rgb(198, 40, 40)'"), "colour-blind mode turns back off")
             # doorways snap into walls and show their swing
             b.evaluate("P0=JSON.parse(JSON.stringify(P.room.poly));U0=JSON.stringify(P.units);P.room.poly=[[0,0],[14,0],[14,12],[0,12]];P.units=[];draw()")
             b.evaluate("addFromLib(allLib().flatMap(c=>c.items).find(i=>i.k==='door'),5,0.6)")
