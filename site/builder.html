@@ -2334,11 +2334,11 @@ function addFromLib(it,x,y){if(it.kind==='custom')return addCustomPiece(it,x,y);
  P.units.push(u);select(id);commit('Added '+u.name)}
 function fitLen(u){if(u.front)return;const sum=(u.eq||[]).reduce((a,e)=>a+e.w,0);u.eqLen=Math.max(24,Math.round(sum*1.3+6))}
 function hitUnit(x,y){for(let i=P.units.length-1;i>=0;i--){const u=P.units[i];if(!u.mapOnly&&x>=u.x&&x<=u.x+u.w&&y>=u.y&&y<=u.y+u.d)return u}for(let i=P.units.length-1;i>=0;i--){const u=P.units[i];if(u.mapOnly&&u.kind!=='wall'&&x>=u.x&&x<=u.x+u.w&&y>=u.y&&y<=u.y+u.d)return u}return null}
-/* rooms (zones) and desks can be assigned: shared = our room, assigned = for someone, vacant */
-const ASG={shared:['Shared (ours)','#d6ecd9'],assigned:['Assigned','#f8dfb0'],vacant:['Vacant','#e6e6e6']};
+/* rooms (zones) and desks can be assigned: ours = strictly ours, shared = shared with others, assigned = for someone, vacant */
+const ASG={ours:['Ours only','#cfe0f7'],shared:['Shared','#d6ecd9'],assigned:['Assigned','#f8dfb0'],vacant:['Vacant','#e6e6e6']};
 const isAsg=u=>u&&(u.kind==='zone'||u.kind==='desk');
 function asgColor(u){return (ASG[u.assign||'shared']||ASG.shared)[1]}
-function asgLabel(u){const a=u.assign||'shared';return (u.mapText??u.name)+(a==='assigned'?' · '+(u.owner||'(who?)'):a==='vacant'?' · vacant':u.kind==='zone'?' · ours':'')}
+function asgLabel(u){const a=u.assign||'shared';return (u.mapText??u.name)+(a==='assigned'?' · '+(u.owner||'(who?)'):a==='vacant'?' · vacant':a==='ours'?' · ours only':u.kind==='zone'?' · shared':'')}
 
 /* room outline: corners [x,y,filletRadius?,arcDepth?]; arcDepth curves the wall to the next corner (+ = bulges left of travel) */
 function roomOutline(P0){const n=P0.length,at=i=>P0[((i%n)+n)%n],B=i=>+(at(i)[3]||0),R=i=>+(at(i)[2]||0),out=[];if(n<3)return P0.map(p=>[p[0],p[1]]);
@@ -2624,7 +2624,7 @@ function renderProps(soft){const el=$('props'),u=U(selId);
  const isSt=!!u.front,F=(lab,id,val,type='text',ex='')=>`<label class="f">${lab}<input id="${id}" type="${type}" value="${esc(val??'')}" ${ex}></label>`;
  let h=`<h2>${u.kind==='zone'?'Room':u.kind==='desk'?'Desk':u.kind==='wall'?'Wall':u.kind==='furn'?'Furniture':u.kind==='door'?'Door':isSt?'Storage unit':u.style==='fixture'?'Fixture group':'Machine spot'}</h2>${F('Name','pn',u.name)}`;
  if(!u.mapOnly)h+=`<div class="row">${F('Tab label','ptab',u.tab,'text','placeholder="(uses name)"')}${F('Map label','pmt',u.mapText,'text','placeholder="(uses name)"')}</div>`;
- if(isAsg(u))h+=`<label class="f">This ${u.kind==='zone'?'room':'desk'} is<select id="pasg">${Object.entries(ASG).map(([k,v])=>`<option value="${k}" ${(u.assign||'shared')===k?'selected':''}>${k==='shared'?(u.kind==='zone'?'Our room (shared)':'Shared / hot desk'):k==='assigned'?'Assigned to someone':'Vacant'}</option>`).join('')}</select></label>${(u.assign||'shared')==='assigned'?F('Assigned to','powner',u.owner,'text','placeholder="Person or startup"')+F('Since','psince',u.since,'date'):''}${F('Notes','pnote',u.note)}`;
+ if(isAsg(u))h+=`<label class="f">This ${u.kind==='zone'?'room':'desk'} is<select id="pasg">${Object.entries(ASG).map(([k,v])=>`<option value="${k}" ${(u.assign||'shared')===k?'selected':''}>${k==='ours'?(u.kind==='zone'?'Strictly ours (not shared)':'Ours only'):k==='shared'?(u.kind==='zone'?'Shared with others':'Shared / hot desk'):k==='assigned'?'Assigned to someone':'Vacant'}</option>`).join('')}</select></label>${(u.assign||'shared')==='assigned'?F('Assigned to','powner',u.owner,'text','placeholder="Person or startup"')+F('Since','psince',u.since,'date'):''}${F('Notes','pnote',u.note)}`;
  h+=`<div class="row">${F(`X (${LU()})`,'px',toL(u.x),'number',MET()?'step="0.05"':'step="0.25"')}${F(`Y (${LU()})`,'py',toL(u.y),'number',MET()?'step="0.05"':'step="0.25"')}</div><div class="row">${F(`Footprint W (${LU()})`,'pw',toL(u.w),'number','step="0.05"')}${F(`Footprint D (${LU()})`,'pd',toL(u.d),'number','step="0.05"')}</div>`;
  if(u.kind==='door')h+=`<label class="f">Doorway<select id="pdt">${[['swing','Single swing door'],['double','Double doors'],['slide','Sliding door'],['open','Open doorway (no door)']].map(([k,v])=>`<option value="${k}" ${(u.dtype||'swing')===k?'selected':''}>${v}</option>`).join('')}</select></label>${F(`Width (${LU()})`,'pdw',+toL(Math.max(u.w,u.d)).toFixed(3),'number','step="0.05"')}<div class="row"><button class="ghost" id="bHinge">⇆ Hinge side</button><button class="ghost" id="bSwing">⇅ Swing in / out</button></div><p class="hint">Drag a doorway onto a wall and it snaps in. Hold Alt to place it freely.</p>`;
  if(!u.mapOnly)h+=`<label class="f">Map color<input id="pc" type="color" value="${u.mapColor||'#bbbbbb'}"></label>`;

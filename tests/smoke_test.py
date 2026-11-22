@@ -221,6 +221,8 @@ def main():
             b.keyboard.press("Enter")
             check(b.evaluate("(u=>u.kind==='zone'&&u.poly.length===6&&u.x===10&&u.w===10&&u.d===14)(P.units[0])"), "draw area makes an L-shaped zone snapped to the walls")
             check(b.evaluate("document.querySelectorAll('.u.zonep path.b').length===1"), "polygon area renders as a shape")
+            b.evaluate("select(P.units[0].id);renderProps()"); b.select_option("#pasg","ours")
+            check(b.evaluate("P.units[0].assign==='ours'&&asgColor(P.units[0])==='#cfe0f7'&&asgLabel(P.units[0]).endsWith('ours only')"), "a room can be marked strictly ours")
             b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);syncPoly();draw()")
             # colour-blind mode
             b.click("#bCB")
