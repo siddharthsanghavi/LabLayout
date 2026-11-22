@@ -4,7 +4,7 @@
 
 AI agents can generate layouts as JSON specs:
 
-- Spec format, rules and library kinds: [docs/AI_LAYOUT_GUIDE.md](AI_LAYOUT_GUIDE.md)
+- Spec format, rules and library kinds: [AI_LAYOUT_GUIDE.md](AI_LAYOUT_GUIDE.md)
 - Load a spec: open `builder.html#layout=<base64url JSON>`, or call `window.LabLayout.importSpec(spec)` on the builder page
 - Check before loading: `window.LabLayout.validate(spec)`; read the current room: `window.LabLayout.exportSpec()`
 - Units: feet for the room and positions, inches for furniture fronts and cells; origin at the top-left

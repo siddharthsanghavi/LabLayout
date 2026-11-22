@@ -6,15 +6,15 @@ Lay out your labs and tool cribs and run their inventory in the same app. One HT
 
 | File | What it is |
 |---|---|
-| `dist/builder.html` | **The app**: layout editor and inventory in one file. Open it in a browser, no install. |
-| `dist/example-tracker.html` | The HatchBridge prototyping lab tracker (the built-in example). |
-| `src/builder.html` | App source. |
-| `src/tracker.html` | Tracker template. Its room/furniture layout lives in one JSON block between `/*LABLAYOUT_CONFIG*/` and `/*END_CONFIG*/`. |
-| `build.py` | Inlines the tracker template into the builder → `dist/`. |
+| `site/` | **The website.** Upload this folder as-is; there is no build step. |
+| `site/builder.html` | **The app**: layout editor and inventory in one file. Open it in a browser, no install. It carries its own copy of the tracker template and the equipment library. |
+| `site/example-tracker.html` | The HatchBridge prototyping lab tracker (the built-in example), and the tracker template. Its room/furniture layout lives in one JSON block between `/*LABLAYOUT_CONFIG*/` and `/*END_CONFIG*/`. |
+| `site/index.html`, `site/llms.txt`, `site/AI_LAYOUT_GUIDE.md` | Landing page and AI instructions. |
+| `library/equipment.json` | The equipment library as a separate pack file. |
 
 ## Using LabLayout
 
-Open `dist/builder.html`. The switch at the top has two modes:
+Open `site/builder.html`. The switch at the top has two modes:
 
 - **✏️ Edit layout**: draw the room and arrange furniture (steps below).
 - **📦 Inventory**: use the room's tracker in the same window: check items in and out, consumables, reorder list, activity log. Inventory is stored in the browser, so switching back to Edit and changing the layout keeps it. Drawers you keep keep their items, and items from deleted drawers move to *Unsorted*. The app reopens in whichever mode you used last.
@@ -31,7 +31,7 @@ Open `dist/builder.html`. The switch at the top has two modes:
 
 ### Editing a room
 
-1. Open `dist/builder.html` and pick ✏️ Edit layout.
+1. Open `site/builder.html` and pick ✏️ Edit layout.
 2. **Room**: type a width × depth and press *Rectangle*, sketch the walls, or paste corner coordinates.
    - **✏️ Draw walls** works like a CAD sketch. The cursor snaps to corners (□), wall midpoints (△), horizontal, vertical and 45° lines, and lines up with other corners (dashed blue guides). Otherwise it snaps to a 3" grid. A live preview shows the length and angle of the wall you're drawing.
    - **Typing a length**: while drawing, type a length (`10`, `10.5`, `10' 6"`, `126"`) and press Enter to place the next corner exactly that far along the preview direction.
@@ -81,8 +81,8 @@ The builder warns you if anything sits outside the walls or overlaps.
 
 The library has two tabs. **Furniture** holds benches, cabinets and office pieces. **Equipment** has 108 items drawn to scale: 3D printers, paper printers, desk and computer gear, electronics bench instruments, shop tools, and lab equipment. A search box looks across both tabs.
 
-- Equipment lives in [library/equipment.json](library/equipment.json). To add something, add an item `{"k", "n", "w", "h", "fp"}` (front width/height in inches, footprint in feet) and run `python build.py`. Every `library/*.json` file is bundled, and each file gets its own tab.
-- Without rebuilding, click **📚 Add a library file** in the builder. The file is kept in that browser.
+- Equipment lives in [library/equipment.json](library/equipment.json). To add something, add an item `{"k", "n", "w", "h", "fp"}` (front width/height in inches, footprint in feet) and paste the same item into the `lib-packs` block near the top of `site/builder.html` (the tests check the two stay identical).
+- Or, without touching the app, click **📚 Add a library file** in the builder. The file is kept in that browser.
 
 ### Let an AI lay out the room
 
@@ -135,24 +135,20 @@ How it works: the tracker saves changes about 1 second after each edit and check
 
 ## Hosting on a website
 
-`dist/` is a ready-to-upload static site: a landing page, the builder, an example tracker and `llms.txt`. To put it on a site, upload the folder or embed the builder in an iframe. See [docs/WEBSITE.md](docs/WEBSITE.md).
+`site/` is a ready-to-upload static site: a landing page, the builder, an example tracker and `llms.txt`. To put it on a site, upload the folder or embed the builder in an iframe. See [docs/WEBSITE.md](docs/WEBSITE.md).
 
 ## Tests
 
 ```
 pip install playwright && python -m playwright install chromium
-python build.py && python tests/smoke_test.py
+python tests/smoke_test.py
 ```
 
 The smoke test runs the builder and the generated tracker in headless Chromium. It checks export, undo/redo, multi-select, custom pieces, re-export keeping data, backup/restore, reorder, overdue check-outs, and two-device sync against a fake Supabase.
 
-## Rebuilding
+## Editing
 
-After editing anything in `src/`:
-
-```
-python build.py
-```
+Edit the files in `site/` directly; there is nothing to build. The tracker template appears twice: as `site/example-tracker.html` and inside `site/builder.html` (the `tpl-tracker` block, where `<//script` stands for a closing script tag). Change both, and run the tests, which fail if they drift apart.
 
 ## Roadmap
 

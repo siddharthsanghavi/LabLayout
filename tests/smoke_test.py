@@ -1,7 +1,7 @@
 """LabLayout smoke tests (headless Chromium via Playwright).
 
     pip install playwright && python -m playwright install chromium
-    python build.py && python tests/smoke_test.py
+    python tests/smoke_test.py
 
 Covers: builder load/export, undo/redo, multi-select + align, custom library
 pieces, re-export keeping data, tracker backup/restore, reorder list, due
@@ -11,7 +11,7 @@ import functools, http.server, json, pathlib, re, shutil, sys, tempfile, threadi
 from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DIST = ROOT / "dist"
+DIST = ROOT / "site"
 FAILS = []
 
 
@@ -72,7 +72,19 @@ class FakeSupabase:
         return route.fulfill(status=405, body="")
 
 
+def embedded_copies():
+    """builder.html carries its own copy of the tracker template and the library packs."""
+    print("embedded copies")
+    b = (DIST / "builder.html").read_text(encoding="utf-8")
+    tpl = re.search(r'<script type="text/plain" id="tpl-tracker">(.*?)</script>', b, re.S).group(1).replace("<//script", "</script")
+    check(tpl == (DIST / "example-tracker.html").read_text(encoding="utf-8"), "tracker template in builder.html matches example-tracker.html")
+    packs = json.loads(re.search(r'<script type="application/json" id="lib-packs">(.*?)</script>', b, re.S).group(1))
+    files = [json.loads(f.read_text(encoding="utf-8")) for f in sorted((ROOT / "library").glob("*.json"))]
+    check(packs == files, "built-in library in builder.html matches library/*.json")
+
+
 def main():
+    embedded_copies()
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="lablayout-test-"))
     shutil.copy(DIST / "builder.html", tmp / "builder.html")
     srv, base = serve(tmp)
@@ -165,6 +177,39 @@ def main():
             ol = b.evaluate("roomOutline(P.room.poly)")
             check(len(ol) > 20 and any(abs(p[0]-6) < .3 and abs(p[1]-6.5) < .05 for p in ol), "fillets and curved walls render as smooth outlines")
             b.evaluate("P.room.poly=P0;draw()")
+            # drag-to-stretch walls, click into line with other walls, move the room
+            b.evaluate("P0=JSON.parse(JSON.stringify(P.room.poly));U0=JSON.stringify(P.units);P.room.poly=[[0,0],[14,0],[14,10],[8,10],[8,20],[0,20]];fit();startEdit()")
+            def scr(x, y):
+                return b.evaluate(f"(()=>{{const a=toScreen({x},{y}),r=$('stage').getBoundingClientRect();return [a.x+r.left,a.y+r.top]}})()")
+            def mdrag(p0, p1):
+                b.mouse.move(*p0); b.mouse.down(); b.mouse.move((p0[0]+p1[0])/2, (p0[1]+p1[1])/2); b.mouse.move(*p1); b.mouse.up()
+            mdrag(scr(8, 18), scr(13.93, 18))
+            check(b.evaluate("P.room.poly[3][0]===14&&P.room.poly[4][0]===14&&P.room.poly[0][0]===0"), "dragging a wall stretches it and clicks into line with another wall")
+            b.evaluate("P.room.poly=[[0,0],[14,0],[14,10],[8,10],[8,20],[0,20]];draw()")
+            mdrag(scr(8, 18), scr(10.6, 18))
+            check(b.evaluate("P.room.poly[3][0]===11&&P.room.poly[4][0]===11"), "a dragged wall snaps to the grid")
+            mdrag(scr(4, 5), scr(7, 7))
+            check(b.evaluate("P.room.poly[0][0]===3&&P.room.poly[0][1]===2"), "dragging the floor in Edit walls moves the whole room")
+            b.evaluate("P.room.poly=[[0,0],[14,0],[14,10],[8,10],[8,20],[0,20]];draw()")
+            mdrag(scr(14, 10), scr(0.15, 10.3))
+            check(b.evaluate("P.room.poly[2][0]===0"), "a dragged corner snaps onto another wall")
+            b.evaluate("exitEdit();P.room.poly=P0;P.units=JSON.parse(U0);draw()")
+            check(b.evaluate("/Grid: /.test($('bGrid').textContent)"), "grid button shows the grid size")
+            # doorways snap into walls and show their swing
+            b.evaluate("P0=JSON.parse(JSON.stringify(P.room.poly));U0=JSON.stringify(P.units);P.room.poly=[[0,0],[14,0],[14,12],[0,12]];P.units=[];draw()")
+            b.evaluate("addFromLib(allLib().flatMap(c=>c.items).find(i=>i.k==='door'),5,0.6)")
+            check(b.evaluate("(u=>u.y===-0.2&&u.w===3&&u.d===0.4)(P.units[0])"), "a door dropped near a wall snaps into it")
+            b.evaluate("addFromLib(allLib().flatMap(c=>c.items).find(i=>i.k==='door2'),13.5,6)")
+            check(b.evaluate("(u=>u.x===13.8&&u.d===6&&u.dtype==='double')(P.units[1])"), "a double door turns to fit a side wall")
+            check(b.evaluate("document.querySelectorAll('.u.door path').length===3"), "doors draw their swing arcs (1 single + 2 double)")
+            b.evaluate("select(P.units[0].id)"); b.click("#bSwing"); b.click("#bHinge")
+            check(b.evaluate("P.units[0].out===true&&P.units[0].hinge==='b'"), "swing direction and hinge side can be flipped")
+            b.click("#mUse"); b.wait_for_timeout(800)
+            fr = b.frame_locator("#usef")
+            check(fr.locator("#map path.swing").count() == 3, "Inventory map shows door swings too")
+            check("14 ft" in fr.locator("#map").text_content(), "doorways don't change the room size label")
+            b.click("#mEdit")
+            b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);draw()")
 
             print("furniture designer")
             svg = ('<svg xmlns="http://www.w3.org/2000/svg" width="914.4mm" height="762mm" viewBox="0 0 914.4 762">'

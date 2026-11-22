@@ -10,9 +10,8 @@ playwright-report/
 .pytest_cache/
 
 # Exported trackers, project files and backups made while testing locally
-# (dist/ is committed on purpose — it's the ready-to-open builder)
 *-tracker.html
-!dist/*-tracker.html
+!site/*-tracker.html
 *.lablayout.json
 *.cribops.json
 *-backup-*.json
