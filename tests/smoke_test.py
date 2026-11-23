@@ -148,6 +148,16 @@ def main():
             b.click("#bUnits")
             check(b.evaluate("[MET(),fmtLen(10),Math.abs(parseLen('3 m')-9.8425)<1e-3,Math.abs(parseLen('2')-6.5617)<1e-3]") == [True, "3.048 m", True, True], "metric display and entry")
             b.click("#bUnits")
+            cases = {"45 in":3.75,"45in":3.75,"1/2 in":1/24,"3 1/2 ft":3.5,"5' 6\"":5.5,"5 ft 6 in":5.5,"5 6":5.5,"30 cm":30/30.48,"3/5 cm":.6/30.48,"1.2 m":120/30.48,"1 m 20 cm":120/30.48,"2.5":2.5,"-6 in":-.5,"abc":None,"1/0 in":None}
+            got = b.evaluate("(c=>Object.fromEntries(Object.keys(c).map(k=>[k,parseLen(k)])))(%s)" % __import__('json').dumps(cases))
+            bad = [k for k,v in cases.items() if (v is None) != (got[k] is None) or (v is not None and abs(got[k]-v) > 1e-6)]
+            check(not bad, "lengths accept in/ft/cm/m, fractions and mixed units " + (str([(k,got[k]) for k in bad]) if bad else ""))
+            b.evaluate("UU=JSON.stringify(P.units);P.units=[];addFromLib(allLib().flatMap(c=>c.items).find(i=>i.kind==='storage'),3,3);select(P.units[0].id)")
+            b.fill("#pw", "45 in"); b.press("#pw", "Tab")
+            check(b.evaluate("P.units[0].w===3.75&&$('pw').value==='3.75'&&/45 in → 3' 9\" = 1.143 m/.test($('toast').textContent)"), "typing 45 in converts to feet and shows the metric too")
+            b.fill("#pw", "30cm"); b.press("#pw", "Tab"); b.fill("#pfw", "30 cm"); b.press("#pfw", "Tab")
+            check(b.evaluate("!MET()&&Math.abs(P.units[0].w-30/30.48)<1e-3&&Math.abs(P.units[0].front.W-30/2.54)<1e-2"), "in feet mode, 30cm works in footprint and front-view boxes")
+            b.evaluate("select(null);P.units=JSON.parse(UU);draw()")
             b.evaluate("goRoom(1)"); b.click("#bRoomDel"); b.click("#bRoomDel")
             check(b.evaluate("PROJ.rooms.length") == 1, "room can be deleted")
             check(b.evaluate("(()=>{const r=JSON.parse(JSON.stringify(P));const n=importRooms({lablayout_room:1,room:r});const ok=PROJ.rooms.length===2&&P.units.length===r.units.length&&P.storeKey!==PROJ.rooms[0].storeKey;goRoom(1);PROJ.rooms.splice(1,1);PROJ.cur=0;P=PROJ.rooms[0];init();return n===1&&ok})()"), "room JSON import adds a room with its own inventory key")
