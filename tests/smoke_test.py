@@ -207,6 +207,20 @@ def main():
             check(b.evaluate("[P.units[0].x,P.units[0].y,P.units[0].w]") == x0 and b.evaluate("P.units.length") == 1, "anchored piece can't be dragged, nudged, rotated or deleted")
             b.click("#bLock"); b.keyboard.press("ArrowRight")
             check(b.evaluate("P.units[0].locked") is None and b.evaluate("P.units[0].x") == x0[0] + .25, "unanchoring lets it move again")
+            # multi-select: ctrl-click, then rotate / duplicate / anchor / delete the group
+            b.evaluate("P.units=[];addFromLib(allLib().flatMap(c=>c.items).find(i=>i.kind==='storage'),3,3);addFromLib(allLib().flatMap(c=>c.items).find(i=>i.kind==='storage'),9,3);select(null)")
+            for i in range(2):
+                c = b.evaluate("(()=>{const u=P.units[%d],a=toScreen(u.x+u.w/2,u.y+u.d/2),r=$('stage').getBoundingClientRect();return [a.x+r.left,a.y+r.top]})()" % i)
+                b.keyboard.down("Control"); b.mouse.click(*c); b.keyboard.up("Control")
+            check(b.evaluate("selSet.size") == 2, "ctrl-click selects several pieces")
+            ws = b.evaluate("P.units.map(u=>u.w)"); b.click("#bRot")
+            check(b.evaluate("P.units.map(u=>u.d)") == ws, "rotate turns the whole selection")
+            b.click("#bDup")
+            check(b.evaluate("P.units.length===4&&selSet.size===2&&[...selSet].every(i=>!['%s','%s'].includes(i))" % tuple(b.evaluate("P.units.slice(0,2).map(u=>u.id)"))), "duplicate copies the whole selection")
+            b.click("#bLock")
+            check(b.evaluate("[...selSet].every(i=>U(i).locked)"), "anchor applies to every selected piece")
+            b.click("#bLock"); b.click("#bDel"); b.click("#bDel")
+            check(b.evaluate("P.units.length") == 2, "delete removes the whole selection")
             b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);draw()")
             # mark rooms / areas: drag a box, or draw a polygon like walls
             b.evaluate("P0=JSON.parse(JSON.stringify(P.room.poly));U0=JSON.stringify(P.units);P.room.poly=[[0,0],[20,0],[20,14],[0,14]];P.units=[];syncPoly();fit()")
