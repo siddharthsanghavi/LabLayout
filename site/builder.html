@@ -22,7 +22,7 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 #plan{width:100%;height:100%;display:block;touch-action:none}
 #plan .u{cursor:move}#plan .u.sel .b{stroke:#f26b1d;stroke-width:.08}
 #plan text{pointer-events:none;font-family:system-ui,sans-serif;text-anchor:middle;dominant-baseline:middle}
-#plan .vtx{fill:#fff;stroke:#2d6cdf;cursor:move}#plan .vtx:hover{fill:#2d6cdf}#plan .wl{cursor:text;pointer-events:all;text-decoration:underline dotted}#plan .wseg{cursor:copy}#plan .wdrag{cursor:move}#stage.zrect #plan{cursor:crosshair}#plan .u.locked{cursor:default}#plan .u.locked .b{stroke:#2d6cdf;stroke-width:.09}#plan .u.locked.sel .b{stroke:#2d6cdf;stroke-width:.12;stroke-dasharray:none}#bLock.on{background:#2d6cdf;color:#fff}#plan .wdrag:hover{stroke:rgba(45,108,223,.25)}#plan .mh{cursor:ew-resize}
+#plan .vtx{fill:#fff;stroke:#2d6cdf;cursor:move}#plan .vtx:hover{fill:#2d6cdf}#plan .wl{cursor:text;pointer-events:all;text-decoration:underline dotted}#plan .wseg{cursor:copy}#plan .wdrag{cursor:move}#plan .zh{cursor:grab}.swatches{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.sw{width:24px;height:24px;padding:0!important;border-radius:6px!important;border:1px solid #0003!important;box-shadow:none!important;cursor:pointer}.sw.on{outline:2px solid #2d6cdf;outline-offset:2px}.swc{display:grid;place-items:center;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);color:#fff;font-weight:700;font-size:13px;position:relative;text-shadow:0 0 2px #000}.swc input{position:absolute;inset:0;opacity:0;cursor:pointer}.swr{padding:2px 8px!important;font-size:12px!important}#bMeasure.on{background:#2d6cdf!important;color:#fff!important}#stage.zrect #plan{cursor:crosshair}#plan .u.locked{cursor:default}#plan .u.locked .b{stroke:#2d6cdf;stroke-width:.09}#plan .u.locked.sel .b{stroke:#2d6cdf;stroke-width:.12;stroke-dasharray:none}#bLock.on{background:#2d6cdf;color:#fff}#plan .wdrag:hover{stroke:rgba(45,108,223,.25)}#plan .mh{cursor:ew-resize}
 #dimin{position:absolute;display:none;z-index:5;width:110px;padding:5px 7px;border:2px solid #f26b1d;border-radius:6px;font:inherit;font-size:13px;box-shadow:0 3px 10px #0003}
 #stage.sketch #plan{cursor:crosshair}
 .tb{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}.tb button{font-size:12px;padding:6px 9px}
@@ -139,7 +139,7 @@ details{border:1px solid var(--line);border-radius:var(--r);background:#fff}summ
   <p class="hint">Machines and fixtures dropped <b>on</b> a bench or wall group sit on it; dropped on the floor they get their own spot. On a phone, tap an item to add it to the middle of the room.</p>
  </aside>
  <section id="stage"><svg id="plan"></svg><input id="dimin" autocomplete="off">
-  <div class="tb"><button class="alt" id="bUndo" disabled title="Undo (Ctrl+Z)">↶ Undo</button><button class="alt" id="bRedo" disabled title="Redo (Ctrl+Shift+Z)">↷ Redo</button><button class="alt" id="bRot" disabled>⟳ Rotate</button><button class="alt" id="bDup" disabled>⧉ Duplicate</button><button class="alt" id="bLock" disabled title="Anchor the selection so it can't be moved, rotated or deleted by accident (L)">⚓ Anchor</button><button class="bad" id="bDel" disabled>Delete</button><button class="ghost" id="bFit">Fit</button><button class="ghost" id="bPrint">🖨 Print plan</button></div><div id="printhead"></div>
+  <div class="tb"><button class="alt" id="bUndo" disabled title="Undo (Ctrl+Z)">↶ Undo</button><button class="alt" id="bRedo" disabled title="Redo (Ctrl+Shift+Z)">↷ Redo</button><button class="alt" id="bRot" disabled>⟳ Rotate</button><button class="alt" id="bDup" disabled>⧉ Duplicate</button><button class="alt" id="bLock" disabled title="Anchor the selection so it can't be moved, rotated or deleted by accident (L)">⚓ Anchor</button><button class="bad" id="bDel" disabled>Delete</button><button class="ghost" id="bMeasure" title="Measure between two points (M)">📏 Measure</button><button class="ghost" id="bFit">Fit</button><button class="ghost" id="bPrint">🖨 Print plan</button></div><div id="printhead"></div>
   <div id="status"></div></section>
  <aside class="right" id="props"></aside>
 </main>
@@ -373,7 +373,7 @@ function drawerEl(d){const e=document.createElement('div');e.className='drawer '
  e.innerHTML=`<div class="lbl"><span contenteditable="true" data-n="${d.id}"></span><b data-c="${d.id}"></b></div><div class="zone" data-z="${d.id}"></div>`;
  e.querySelector('[data-n]').textContent=S.names[d.id];return e}
 
-const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly}));
+const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly,blk:u.assign==='blocked'}));
 // real front dimensions in inches (W x H); bench tops are 60" long
 const EQ=Object.fromEntries(UNITS.filter(u=>(u.eq||[]).length).map(u=>[u.id,{len:u.front?u.front.W:(u.eqLen||48),items:u.eq}]));
 
@@ -427,7 +427,7 @@ const outlinePath=P0=>'M'+roomOutline(P0).map(p=>(+p[0].toFixed(4))+' '+(+p[1].t
 /* marked rooms / areas: rectangle or polygon (corners stored as fractions of the box) */
 const pcen=P=>{let A=0,x=0,y=0;P.forEach((p,i)=>{const q=P[(i+1)%P.length],k=p[0]*q[1]-q[0]*p[1];A+=k;x+=(p[0]+q[0])*k;y+=(p[1]+q[1])*k});return Math.abs(A)<1e-9?P[0]:[x/(3*A),y/(3*A)]};
 function zoneSvg(f,sz){const pts=f.poly?f.poly.map(([a,b])=>[f.x+a*f.w,f.y+b*f.h]):[[f.x,f.y],[f.x+f.w,f.y],[f.x+f.w,f.y+f.h],[f.x,f.y+f.h]],c=pcen(pts);
- return `<path d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity=".45" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="#2f5d3a">${esc(f.t)}</text>`}
+ return `<path d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity="${f.blk?.88:.45}" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="${f.tc||'#2f5d3a'}">${esc(f.t)}</text>`}
 function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',sw=sz/400,o=[];
  const A=H?[f.x,f.y+f.h/2]:[f.x+f.w/2,f.y],B=H?[f.x+f.w,f.y+f.h/2]:[f.x+f.w/2,f.y+f.h],n=H?[0,1]:[1,0];
  const inside=(x,y)=>{let k=false;for(let i=0,j=OL.length-1;i<OL.length;j=i++){const p=OL[i],q=OL[j];if(((p[1]>y)!=(q[1]>y))&&(x<(q[0]-p[0])*(y-p[1])/(q[1]-p[1])+p[0]))k=!k}return k};
@@ -706,7 +706,7 @@ document.getElementById('bSync').onclick=()=>{const m=document.getElementById('m
 
 drawMap();build();buildTabs();syncStart();
 
-{const b=document.getElementById('bCB');const upd=()=>{b.textContent=cbOn()?'👁 Colour-blind: on':'👁 Colour-blind';};upd();if(cbOn())cbApply(true);b.onclick=()=>{try{localStorage.setItem('lablayout-cb',cbOn()?'0':'1')}catch(e){}cbApply(cbOn());upd();if(!cbOn())location.reload()}}
+{const b=document.getElementById('bCB');if(window.parent!==window)b.style.display='none';const upd=()=>{b.textContent=cbOn()?'👁 Colour-blind: on':'👁 Colour-blind';};upd();if(cbOn())cbApply(true);b.onclick=()=>{try{localStorage.setItem('lablayout-cb',cbOn()?'0':'1')}catch(e){}cbApply(cbOn());upd();if(!cbOn())location.reload()}}
 <//script></body></html>
 </script>
 <!-- Built-in equipment library. More packs can be added at runtime with "📚 Add a library file". -->
@@ -2335,10 +2335,20 @@ function addFromLib(it,x,y){if(it.kind==='custom')return addCustomPiece(it,x,y);
 function fitLen(u){if(u.front)return;const sum=(u.eq||[]).reduce((a,e)=>a+e.w,0);u.eqLen=Math.max(24,Math.round(sum*1.3+6))}
 function hitUnit(x,y){for(let i=P.units.length-1;i>=0;i--){const u=P.units[i];if(!u.mapOnly&&x>=u.x&&x<=u.x+u.w&&y>=u.y&&y<=u.y+u.d)return u}for(let i=P.units.length-1;i>=0;i--){const u=P.units[i];if(u.mapOnly&&u.kind!=='wall'&&x>=u.x&&x<=u.x+u.w&&y>=u.y&&y<=u.y+u.d)return u}return null}
 /* rooms (zones) and desks can be assigned: ours = strictly ours, shared = shared with others, assigned = for someone, vacant */
-const ASG={ours:['Ours only','#cfe0f7'],shared:['Shared','#d6ecd9'],assigned:['Assigned','#f8dfb0'],vacant:['Vacant','#e6e6e6']};
+const ASG={ours:['Ours only','#cfe0f7'],shared:['Shared','#d6ecd9'],assigned:['Assigned','#f8dfb0'],vacant:['Vacant','#e6e6e6'],blocked:['Blocked off','#222222']};
+/* furniture colours: swatches + any custom colour; text flips light/dark for contrast */
+const SWATCH=['#bbbbbb','#d8c3a5','#8d6e63','#90a4ae','#cfe8f5','#a5d6a7','#fff59d','#ffcc80','#ef9a9a','#ce93d8','#455a64','#ffffff'];
+const canColor=u=>u&&(!u.mapOnly||u.kind==='desk')&&u.kind!=='wall';
+const curColor=u=>u.kind==='desk'?(u.deskColor||asgColor(u)):(u.mapColor||'#bbbbbb');
+function setColor(L,c){const h=c.replace('#',''),[R,G,B]=[0,2,4].map(i=>parseInt(h.substr(i,2),16)/255),lu=.2126*R+.7152*G+.0722*B;
+ L.filter(canColor).forEach(u=>{if(u.kind==='desk'){if(c)u.deskColor=c;else delete u.deskColor}else{u.mapColor=c;u.mapTextColor=lu<.5?'#eeeeee':'#222222'}})}
+function colorRow(L){L=L.filter(canColor);if(!L.length)return'';const cur=curColor(L[0]),desk=L.some(u=>u.kind==='desk');
+ return `<label class="f" style="margin-bottom:4px">Colour</label><div class="swatches">${SWATCH.map(c=>`<button class="sw${c===cur?' on':''}" data-col="${c}" title="${c}" style="background:${c}"></button>`).join('')}<label class="sw swc" title="Pick any colour"><input id="pcol" type="color" value="${cur}">＋</label>${desk?'<button class="ghost swr" data-col="" title="Back to the colour for its status">Reset</button>':''}</div>`}
+function bindColor(el,L){el.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{setColor(L,b.dataset.col);commit('Colour changed');renderProps()});const i=el.querySelector('#pcol');if(i){i.oninput=()=>{setColor(L,i.value);draw()};i.onchange=()=>{commit('Colour changed');renderProps()}}}
+const zOp=u=>u.assign==='blocked'?.88:.45,zTx=u=>u.assign==='blocked'?'#ffffff':'#2f5d3a';
 const isAsg=u=>u&&(u.kind==='zone'||u.kind==='desk');
 function asgColor(u){return (ASG[u.assign||'shared']||ASG.shared)[1]}
-function asgLabel(u){const a=u.assign||'shared';return (u.mapText??u.name)+(a==='assigned'?' · '+(u.owner||'(who?)'):a==='vacant'?' · vacant':a==='ours'?' · ours only':u.kind==='zone'?' · shared':'')}
+function asgLabel(u){const a=u.assign||'shared';return (u.mapText??u.name)+(a==='assigned'?' · '+(u.owner||'(who?)'):a==='vacant'?' · vacant':a==='blocked'?' · blocked off':a==='ours'?' · ours only':u.kind==='zone'?' · shared':'')}
 
 /* room outline: corners [x,y,filletRadius?,arcDepth?]; arcDepth curves the wall to the next corner (+ = bulges left of travel) */
 function roomOutline(P0){const n=P0.length,at=i=>P0[((i%n)+n)%n],B=i=>+(at(i)[3]||0),R=i=>+(at(i)[2]||0),out=[];if(n<3)return P0.map(p=>[p[0],p[1]]);
@@ -2387,9 +2397,10 @@ function draw(){svg.setAttribute('viewBox',`${VB.x} ${VB.y} ${VB.w} ${VB.h}`);co
  if(poly.length>2&&!editMode)poly.forEach((p,i)=>{const q=poly[(i+1)%poly.length],L=Math.hypot(q[0]-p[0],q[1]-p[1]);if(L<1)return;g.push(`<text x="${(p[0]+q[0])/2}" y="${(p[1]+q[1])/2}" style="font-size:${S/60}px" fill="#2d6cdf" dy="${q[0]===p[0]?0:-S/80}" dx="${q[0]===p[0]?S/45:0}">${uL(L)}</text>`)});
  P.units.forEach(u=>{const fs=Math.max(.15,Math.min(S/45,Math.min(u.w,u.d)*.45,Math.max(u.w,u.d)*.9/Math.max(3,(u.mapText??u.name).length*.6))),v=u.d>u.w*1.3;
   if(u.kind==='door'){g.push(`<g class="u door${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}">${doorG(u,S)}</g>`);return}
-  if(u.kind==='zone'&&u.poly){const bx=pcen(u.poly);g.push(`<g class="u zonep${u.locked?' locked':''}${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}"><path class="b" d="${zonePath(u)}" fill="${asgColor(u)}" fill-opacity=".45" stroke="#7a9" stroke-width="${S/500}" stroke-dasharray=".4 .2"/><text x="${u.x+bx[0]*u.w}" y="${u.y+bx[1]*u.d}" style="font-size:${Math.min(S/60,.9)}px;font-weight:600" fill="#2f5d3a">${esc(asgLabel(u))}</text></g>`);return}
-  g.push(`<g class="u${u.locked?' locked':''}${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}"><rect class="b" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.d}" rx=".06" fill="${isAsg(u)?asgColor(u):u.mapColor||'#bbb'}" stroke="${u.kind==='zone'?'#7a9':'#333'}" stroke-width="${S/500}" ${u.kind==='door'?'stroke-dasharray=".2 .1" fill-opacity=".9"':u.kind==='zone'?'stroke-dasharray=".4 .2" fill-opacity=".45"':''}/>${u.kind==='wall'?'':u.kind==='zone'?`<text x="${u.x+u.w/2}" y="${u.y+Math.min(S/45,1.2)}" style="font-size:${Math.min(S/60,.9)}px;font-weight:600" fill="#2f5d3a">${esc(asgLabel(u))}</text>`:`<text x="${u.x+u.w/2}" y="${u.y+u.d/2}" style="font-size:${fs}px" fill="${u.mapTextColor||'#111'}" ${v?`transform="rotate(-90 ${u.x+u.w/2} ${u.y+u.d/2})"`:''}>${esc(u.kind==='desk'?asgLabel(u):(u.mapText??u.name))}</text>`}${(u.eq||[]).length&&u.grid?`<text x="${u.x+u.w-.15}" y="${u.y+.25}" style="font-size:${S/70}px;text-anchor:end">⚙${u.eq.length}</text>`:''}</g>`)});
+  if(u.kind==='zone'&&u.poly){const bx=pcen(u.poly);g.push(`<g class="u zonep${u.locked?' locked':''}${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}"><path class="b" d="${zonePath(u)}" fill="${asgColor(u)}" fill-opacity="${zOp(u)}" stroke="#7a9" stroke-width="${S/500}" stroke-dasharray=".4 .2"/><text x="${u.x+bx[0]*u.w}" y="${u.y+bx[1]*u.d}" style="font-size:${Math.min(S/60,.9)}px;font-weight:600" fill="${zTx(u)}">${esc(asgLabel(u))}</text></g>`);return}
+  g.push(`<g class="u${u.locked?' locked':''}${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}"><rect class="b" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.d}" rx=".06" fill="${u.kind==='desk'&&u.deskColor?u.deskColor:isAsg(u)?asgColor(u):u.mapColor||'#bbb'}" stroke="${u.kind==='zone'?'#7a9':'#333'}" stroke-width="${S/500}" ${u.kind==='door'?'stroke-dasharray=".2 .1" fill-opacity=".9"':u.kind==='zone'?`stroke-dasharray=".4 .2" fill-opacity="${zOp(u)}"`:''}/>${u.kind==='wall'?'':u.kind==='zone'?`<text x="${u.x+u.w/2}" y="${u.y+Math.min(S/45,1.2)}" style="font-size:${Math.min(S/60,.9)}px;font-weight:600" fill="${zTx(u)}">${esc(asgLabel(u))}</text>`:`<text x="${u.x+u.w/2}" y="${u.y+u.d/2}" style="font-size:${fs}px" fill="${u.mapTextColor||'#111'}" ${v?`transform="rotate(-90 ${u.x+u.w/2} ${u.y+u.d/2})"`:''}>${esc(u.kind==='desk'?asgLabel(u):(u.mapText??u.name))}</text>`}${(u.eq||[]).length&&u.grid?`<text x="${u.x+u.w-.15}" y="${u.y+.25}" style="font-size:${S/70}px;text-anchor:end">⚙${u.eq.length}</text>`:''}</g>`)});
  if(selSet.size===1&&selId&&!drawMode)g.push(measure(U(selId),S));
+ g.push(grpBoxes(S));if(selSet.size===1)g.push(zoneHandles(U(selId),S));g.push(msLayer(S));
  if(marq)g.push(`<rect class="mq" x="${Math.min(marq.x0,marq.x1)}" y="${Math.min(marq.y0,marq.y1)}" width="${Math.abs(marq.x1-marq.x0)}" height="${Math.abs(marq.y1-marq.y0)}" stroke-width="${S/400}"/>`);
  g.push(sketchLayer(S));
  svg.innerHTML=g.join('');$('stage').classList.toggle('sketch',!!SK);status()}
@@ -2506,7 +2517,8 @@ function snapMark(h,mk){const c=h.kind==='end'?'#f2a900':h.kind==='mid'?'#14a3a3
  return `<circle cx="${h.x}" cy="${h.y}" r="${mk*.6}" fill="${c}"/><line x1="${h.x-mk*2}" y1="${h.y}" x2="${h.x+mk*2}" y2="${h.y}" stroke="${c}" stroke-width="${mk/5}"/><line x1="${h.x}" y1="${h.y-mk*2}" x2="${h.x}" y2="${h.y+mk*2}" stroke="${c}" stroke-width="${mk/5}"/>`}
 
 /* events */
-function sketchDown(e,q){if(ZR&&e.button===0){ZR.a=[snap(q.x),snap(q.y)];ZR.b=ZR.a.slice();svg.setPointerCapture(e.pointerId);return true}if(e.button===2)return true;
+function sketchDown(e,q){if(MS&&e.button===0){const h=msPoint(e),p=[h.x,h.y];if(!MS.a||MS.b){MS.a=p;MS.b=null}else MS.b=p;MS.h=h;draw();return true}
+ {const zh=e.target.closest('.zh');if(zh&&e.button===0){const u=U(selId);dragZ={id:u.id,i:+zh.dataset.zv,pts:zonePts(u),moved:false};svg.setPointerCapture(e.pointerId);return true}}if(ZR&&e.button===0){ZR.a=[snap(q.x),snap(q.y)];ZR.b=ZR.a.slice();svg.setPointerCapture(e.pointerId);return true}if(e.button===2)return true;
  if(SK){if(!SK.hover)skHover(e);if(SK.typed){const p=skTypedPoint();if(p){dimBox(null);skPlace(p);return true}}skPlace([SK.hover.x,SK.hover.y]);return true}
  if(editMode){const mh=e.target.closest('.mh');if(mh){dragM={i:+mh.dataset.m,moved:false};svg.setPointerCapture(e.pointerId);return true}
   const v=e.target.closest('.vtx');if(v){dragV={i:+v.dataset.v,moved:false};svg.setPointerCapture(e.pointerId);return true}
@@ -2515,7 +2527,8 @@ function sketchDown(e,q){if(ZR&&e.button===0){ZR.a=[snap(q.x),snap(q.y)];ZR.b=ZR
  if(!drawMode){const ws=e.target.closest('.wseg');if(ws&&e.button===0){const i=+ws.dataset.w,p=P.room.poly,a=p[i],b=p[(i+1)%p.length],c=Math.hypot(b[0]-a[0],b[1]-a[1]);if(c>1e-6){dragW={i,q0:q,a0:[a[0],a[1]],b0:[b[0],b[1]],n:[-(b[1]-a[1])/c,(b[0]-a[0])/c],moved:false};if(!editMode)select(null);svg.setPointerCapture(e.pointerId);return true}}}
  if(editMode&&e.button===0&&!e.target.closest('.u')){dragR={q0:q,p0:P.room.poly.map(v=>v.slice()),u0:P.units.map(u=>[u.x,u.y]),moved:false};svg.setPointerCapture(e.pointerId);return true}
  return false}
-function sketchMove(e){if(ZR){if(ZR.a){const q=pt(e);ZR.b=[snap(q.x),snap(q.y)];draw()}return true}if(SK){skHover(e);return true}
+function sketchMove(e){if(MS){if(!MS.a||!MS.b){MS.h=msPoint(e);draw()}return true}
+ if(dragZ){const u=U(dragZ.id),pts=dragZ.pts,i=dragZ.i,others=pts.filter((_,k)=>k!==i).concat(P.room.poly.map(v=>[v[0],v[1]]));const h=sketchSnap(pt(e),{pts:others,segs:segsOf(P.room.poly,true),onSeg:true,free:e.altKey});dragZ.h=h;pts[i]=[h.x,h.y];setZonePts(u,pts);dragZ.moved=true;draw();return true}if(ZR){if(ZR.a){const q=pt(e);ZR.b=[snap(q.x),snap(q.y)];draw()}return true}if(SK){skHover(e);return true}
  if(dragR){const q=pt(e),dx=e.altKey?q.x-dragR.q0.x:snap(q.x-dragR.q0.x),dy=e.altKey?q.y-dragR.q0.y:snap(q.y-dragR.q0.y);P.room.poly.forEach((v,k)=>{v[0]=+(dragR.p0[k][0]+dx).toFixed(4);v[1]=+(dragR.p0[k][1]+dy).toFixed(4)});P.units.forEach((u,k)=>{u.x=+(dragR.u0[k][0]+dx).toFixed(3);u.y=+(dragR.u0[k][1]+dy).toFixed(3)});dragR.moved=dx||dy;syncPoly();draw();return true}
  if(dragW){const p=P.room.poly,i=dragW.i,a=p[i],b=p[(i+1)%p.length],q=pt(e),[nx,ny]=dragW.n;let s=(q.x-dragW.q0.x)*nx+(q.y-dragW.q0.y)*ny;const G=gridStep()||.25;
   dragW.guide=null;if(!e.altKey){const ax=near(ny,0)?0:near(nx,0)?1:-1;if(ax<0)s=Math.round(s/G)*G;else{const sg=ax?ny:nx,c=dragW.a0[ax]+s*sg,j=(i+1)%p.length,tol=tolFt(10);let hit=null;p.forEach((v,k)=>{if(k===i||k===j)return;const d=Math.abs(v[ax]-c);if(d<tol&&(!hit||d<hit.d))hit={d,c:v[ax],v}});
@@ -2526,10 +2539,45 @@ function sketchMove(e){if(ZR){if(ZR.a){const q=pt(e);ZR.b=[snap(q.x),snap(q.y)];
  if(editMode&&dragV){const p=P.room.poly,i=dragV.i;const h=sketchSnap(pt(e),{pts:p,skip:i,free:e.altKey,onSeg:true,segs:segsOf(p,true).filter(([,,k])=>k!==i&&(k+1)%p.length!==i)});dragV.h=h;if(!near(p[i][0],h.x)||!near(p[i][1],h.y)){p[i][0]=h.x;p[i][1]=h.y;dragV.moved=true;syncPoly()}draw();return true}
  if(editMode){const s=e.target.closest('.wseg');if(s){const i=+s.dataset.w,p=P.room.poly,a=p[i],b=p[(i+1)%p.length],q=pt(e),dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((q.x-a[0])*dx+(q.y-a[1])*dy)/(dx*dx+dy*dy||1)));hoverE={i,x:r4(a[0]+dx*t),y:r4(a[1]+dy*t)};if(near(dx,0))hoverE.x=a[0];if(near(dy,0))hoverE.y=a[1]}else hoverE=null;draw()}
  return false}
-function sketchUp(){if(ZR&&ZR.a){const[a,b]=[ZR.a,ZR.b];ZR.a=null;zrStop();zoneFromPts([[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]]);return true}if(ZR)return true;if(dragR){const d=dragR;dragR=null;if(d.moved)commit('Room moved');return true}if(dragW){const d=dragW;dragW=null;if(d.moved)commit('Wall moved '+fmtLen(Math.abs(d.s||0)));else draw();return true}
+function sketchUp(){if(MS)return true;if(dragZ){const d=dragZ;dragZ=null;if(d.moved)commit('Reshaped '+U(d.id).name);else draw();return true}if(ZR&&ZR.a){const[a,b]=[ZR.a,ZR.b];ZR.a=null;zrStop();zoneFromPts([[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]]);return true}if(ZR)return true;if(dragR){const d=dragR;dragR=null;if(d.moved)commit('Room moved');return true}if(dragW){const d=dragW;dragW=null;if(d.moved){const n=tidyPoly();commit('Wall moved '+fmtLen(Math.abs(d.s||0))+(n?' · merged '+n+' corner'+(n>1?'s':''):''))}else draw();return true}
  if(dragM){const d=dragM;dragM=null;if(d.moved){commit('Wall curved');return true}askArc(d.i);return true}
- if(dragV){const d=dragV;dragV=null;if(d.moved)commit('Corner moved');else askFillet(d.i);return true}return false}
-let dragM=null,dragW=null,dragR=null;
+ if(dragV){const d=dragV;dragV=null;if(d.moved){const n=tidyPoly();commit(n?'Corner merged into the wall':'Corner moved')}else askFillet(d.i);return true}return false}
+let dragM=null,dragW=null,dragR=null,dragZ=null,MS=null;
+/* tidy walls: drop repeated corners and corners that sit on a straight line (keeps fillets and curves) */
+function tidyPoly(){const p=P.room.poly;let n=0,ch=true;while(ch&&p.length>3){ch=false;for(let i=0;i<p.length;i++){const a=p[(i-1+p.length)%p.length],v=p[i],b=p[(i+1)%p.length];if(v[2]||v[3]||a[3])continue;
+  const dup=near(v[0],b[0])&&near(v[1],b[1]),col=Math.abs((v[0]-a[0])*(b[1]-a[1])-(v[1]-a[1])*(b[0]-a[0]))<1e-6&&((v[0]-a[0])*(b[0]-v[0])+(v[1]-a[1])*(b[1]-v[1]))>=-1e-9;
+  if(dup||col){p.splice(i,1);n++;ch=true;break}}}if(n)syncPoly();return n}
+/* room areas: absolute corners, and writing them back */
+function zonePts(u){return u.poly?u.poly.map(([a,b])=>[u.x+a*u.w,u.y+b*u.d]):[[u.x,u.y],[u.x+u.w,u.y],[u.x+u.w,u.y+u.d],[u.x,u.y+u.d]]}
+function setZonePts(u,pts){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x||.01,d=Math.max(...ys)-y||.01;Object.assign(u,{x:+x.toFixed(4),y:+y.toFixed(4),w:+w.toFixed(4),d:+d.toFixed(4)});
+ const rect=pts.length===4&&pts.every(p=>(near(p[0],x)||near(p[0],x+w))&&(near(p[1],y)||near(p[1],y+d)))&&new Set(pts.map(p=>(near(p[0],x)?0:1)+','+(near(p[1],y)?0:1))).size===4;
+ if(rect)delete u.poly;else u.poly=pts.map(p=>[+((p[0]-x)/w).toFixed(5),+((p[1]-y)/d).toFixed(5)])}
+function zoneHandles(u,S){if(!u||u.kind!=='zone'||u.locked||selSet.size!==1||drawMode||SK)return'';const mk=S/110,pts=zonePts(u);
+ return pts.map((p,i)=>`<rect class="zh" data-zv="${i}" x="${p[0]-mk}" y="${p[1]-mk}" width="${mk*2}" height="${mk*2}" fill="#fff" stroke="#2f7d4a" stroke-width="${S/500}"/>`).join('')+(dragZ&&dragZ.h?snapMark(dragZ.h,mk):'')}
+/* measure tool */
+function msPoint(e){const q=pt(e),pts=P.room.poly.map(v=>[v[0],v[1]]);P.units.forEach(u=>{if(u.kind==='zone')zonePts(u).forEach(p=>pts.push(p));else pts.push([u.x,u.y],[u.x+u.w,u.y],[u.x+u.w,u.y+u.d],[u.x,u.y+u.d])});
+ return sketchSnap(q,{pts,from:MS&&MS.a&&!MS.b?MS.a:null,segs:segsOf(P.room.poly,true),onSeg:true,free:e.altKey})}
+function msStart(){if(SK)finishDraw(true);zrStop();exitEdit();MS={};$('bMeasure').classList.add('on');$('bMeasure').textContent='📏 Measuring';$('stage').classList.add('zrect');toast('Click two points to measure. Esc to stop.');select(null)}
+function msStop(){if(!MS)return;MS=null;$('bMeasure').classList.remove('on');$('bMeasure').textContent='📏 Measure';$('stage').classList.remove('zrect');draw()}
+function msLayer(S){if(!MS)return'';const mk=S/110,a=MS.a,b=MS.b||(MS.h&&[MS.h.x,MS.h.y]),o=[];if(MS.h&&!MS.b)o.push(snapMark(MS.h,mk));
+ if(a&&b){const L=Math.hypot(b[0]-a[0],b[1]-a[1]),dx=Math.abs(b[0]-a[0]),dy=Math.abs(b[1]-a[1]),fs=S/55;o.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#2d6cdf" stroke-width="${S/350}" stroke-dasharray="${S/150} ${S/300}"/>`);
+  [a,b].forEach(p=>o.push(`<circle cx="${p[0]}" cy="${p[1]}" r="${mk*.6}" fill="#2d6cdf"/>`));
+  const t=fmtLen(L)+(dx>1e-3&&dy>1e-3?`  (${fmtLen(dx)} × ${fmtLen(dy)})`:''),mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
+  o.push(`<text class="mslbl" x="${mx}" y="${my-fs*.6}" style="font-size:${fs}px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:${fs/4}px" fill="#1d4fa8">${t}</text>`)}
+ else if(a)o.push(`<circle cx="${a[0]}" cy="${a[1]}" r="${mk*.6}" fill="#2d6cdf"/>`);return o.join('')}
+/* groups: pieces that always select and move together */
+const grpOf=id=>{const u=U(id);return u&&u.grp?P.units.filter(v=>v.grp===u.grp).map(v=>v.id):[id]};
+function expandGroups(){[...selSet].forEach(id=>grpOf(id).forEach(g=>selSet.add(g)))}
+function groupSel(){const L=[...selSet].map(U).filter(Boolean);if(L.length<2)return toast('Select two or more pieces to group');const g='g'+Date.now().toString(36)+(seq++);L.forEach(u=>u.grp=g);commit('Grouped '+L.length+' pieces');selChanged()}
+function ungroupSel(){const L=[...selSet].map(U).filter(u=>u&&u.grp);if(!L.length)return toast('Nothing grouped here');L.forEach(u=>delete u.grp);commit('Ungrouped');selChanged()}
+function grpBoxes(S){const seen=new Set(),o=[];[...selSet].forEach(id=>{const u=U(id);if(!u||!u.grp||seen.has(u.grp))return;seen.add(u.grp);const L=P.units.filter(v=>v.grp===u.grp),x0=Math.min(...L.map(v=>v.x)),y0=Math.min(...L.map(v=>v.y)),x1=Math.max(...L.map(v=>v.x+v.w)),y1=Math.max(...L.map(v=>v.y+v.d)),m=.15;
+ o.push(`<rect class="gbox" x="${x0-m}" y="${y0-m}" width="${x1-x0+2*m}" height="${y1-y0+2*m}" fill="none" stroke="#6a4cc2" stroke-width="${S/450}" stroke-dasharray="${S/100} ${S/200}" pointer-events="none"/>`)});return o.join('')}
+/* clipboard: copy here, paste in any room (kept in this browser) */
+let CLIP=null;
+function copySel(){const L=[...selSet].map(U).filter(Boolean);if(!L.length)return;CLIP=JSON.parse(JSON.stringify(L));try{localStorage.setItem('lablayout-clip',JSON.stringify(L))}catch(e){}toast('Copied '+(L.length>1?L.length+' pieces':L[0].name)+'. Ctrl+V pastes in any room')}
+function pasteClip(){let L=CLIP;try{L=JSON.parse(localStorage.getItem('lablayout-clip'))||L}catch(e){}if(!L||!L.length)return toast('Nothing copied yet');
+ const off=L.some(c=>P.units.some(u=>near(u.x,c.x)&&near(u.y,c.y)))?1:0,gm={},ids=L.map(c=>{const id=dup1(c,off,off),n=U(id);delete n.locked;if(c.grp){gm[c.grp]=gm[c.grp]||'g'+Date.now().toString(36)+(seq++);n.grp=gm[c.grp]}n.name=c.name;return id});
+ selSet.clear();ids.forEach(i=>selSet.add(i));selId=ids[ids.length-1];selChanged();commit('Pasted '+(ids.length>1?ids.length+' pieces':U(ids[0]).name))}
 function setArc(i,s){const v=P.room.poly[i];if(s){while(v.length<3)v.push(0);v[3]=+s.toFixed(4)}else if(v.length>3){v.length=3;if(!v[2])v.length=2}syncPoly()}
 function askFillet(i){const v=P.room.poly[i],s=toScreen(v[0],v[1]);dimBox({value:v[2]?fmtLen(v[2]):'',ph:'fillet radius',x:s.x+12,y:s.y+12,focus:true,ok:t=>{const r=parseLen(t||'0');dimBox(null);if(r==null||r<0){toast('Type a radius like 6" or 1.5');return}if(r>0){while(v.length<3)v.push(0);v[2]=r}else if(v.length>2){v[2]=0;if(!v[3])v.length=2}syncPoly();commit(r>0?'Fillet '+fmtLen(r):'Corner made sharp')}})}
 function askArc(i){const p=P.room.poly,a=p[i],b=p[(i+1)%p.length],s=toScreen((a[0]+b[0])/2,(a[1]+b[1])/2);dimBox({value:a[3]?fmtLen(a[3]):'',ph:'curve depth (− = other side)',x:s.x+12,y:s.y+12,focus:true,ok:t=>{const d=parseLen(t||'0');dimBox(null);if(d==null){toast('Type a depth like 1\' or -6"');return}setArc(i,d);commit(d?'Wall curved '+fmtLen(d):'Wall straightened')}})}
@@ -2551,8 +2599,8 @@ let drag=null;
 svg.addEventListener('pointerdown',e=>{const q=pt(e);
  if(sketchDown(e,q))return;
  const g=e.target.closest('.u');const tog=e.shiftKey||e.ctrlKey||e.metaKey;if(!g){if(!tog)select(null);marq={x0:q.x,y0:q.y,x1:q.x,y1:q.y,add:tog};svg.setPointerCapture(e.pointerId);return}const u=U(g.dataset.id);
- if(tog){if(selSet.has(u.id)){selSet.delete(u.id);if(selId===u.id)selId=[...selSet].pop()||null}else{selSet.add(u.id);selId=u.id}selChanged();return}
- if(!selSet.has(u.id))select(u.id);else{selId=u.id;selChanged()}
+ const G=grpOf(u.id);if(tog){if(selSet.has(u.id)){G.forEach(i=>selSet.delete(i));if(!selSet.has(selId))selId=[...selSet].pop()||null}else{G.forEach(i=>selSet.add(i));selId=u.id}selChanged();return}
+ if(!selSet.has(u.id)){select(u.id);if(G.length>1){G.forEach(i=>selSet.add(i));selChanged()}}else{selId=u.id;selChanged()}
  if(anyLocked()){drag={id:u.id,q0:q,start:[],locked:true,moved:false};svg.setPointerCapture(e.pointerId);return}
  drag={id:u.id,q0:q,start:[...selSet].map(id=>{const v=U(id);return{id,x:v.x,y:v.y}}),moved:false};svg.setPointerCapture(e.pointerId)});
 function wallSegs(){const p=P.room.poly,W=[];if(p.length<3)return W;p.forEach((a,i)=>{const b=p[(i+1)%p.length];if(a[0]===b[0])W.push({v:1,c:a[0],lo:Math.min(a[1],b[1]),hi:Math.max(a[1],b[1])});else if(a[1]===b[1])W.push({v:0,c:a[1],lo:Math.min(a[0],b[0]),hi:Math.max(a[0],b[0])})});return W}
@@ -2569,7 +2617,7 @@ svg.addEventListener('pointermove',e=>{if(sketchMove(e))return;const q=pt(e);if(
  let nx=snap(s0.x+q.x-drag.q0.x),ny=snap(s0.y+q.y-drag.q0.y);if(u.kind==='door'&&drag.start.length===1&&!e.altKey){const ox=u.x,oy=u.y,ow=u.w;snapDoor(u,nx,ny);if(u.x!==ox||u.y!==oy||u.w!==ow){drag.moved=true;draw();renderProps(true)}return}if(!e.altKey){const w=snapWall(u,nx,ny);nx=w.x;ny=w.y}const dx=nx-s0.x,dy=ny-s0.y;
  if(nx!==u.x||ny!==u.y){drag.start.forEach(s=>{const v=U(s.id);v.x=+(s.x+dx).toFixed(3);v.y=+(s.y+dy).toFixed(3)});drag.moved=true;draw();renderProps(true)}});
 svg.addEventListener('pointerup',()=>{if(sketchUp())return;if(marq){const m=marq;marq=null;const x0=Math.min(m.x0,m.x1),x1=Math.max(m.x0,m.x1),y0=Math.min(m.y0,m.y1),y1=Math.max(m.y0,m.y1);
-  if(x1-x0>.1||y1-y0>.1){if(!m.add)selSet.clear();P.units.forEach(u=>{if(u.kind==='zone'?(u.x>=x0&&u.x+u.w<=x1&&u.y>=y0&&u.y+u.d<=y1):(u.x<x1&&u.x+u.w>x0&&u.y<y1&&u.y+u.d>y0))selSet.add(u.id)});selId=[...selSet].pop()||null;selChanged()}else draw();return}
+  if(x1-x0>.1||y1-y0>.1){if(!m.add)selSet.clear();P.units.forEach(u=>{if(u.kind==='zone'?(u.x>=x0&&u.x+u.w<=x1&&u.y>=y0&&u.y+u.d<=y1):(u.x<x1&&u.x+u.w>x0&&u.y<y1&&u.y+u.d>y0))selSet.add(u.id)});expandGroups();selId=[...selSet].pop()||null;selChanged()}else draw();return}
  if(drag&&drag.moved)commit('Moved');drag=null});
 svg.addEventListener('wheel',e=>{e.preventDefault();const q=pt(e),k=e.deltaY>0?1.1:1/1.1;VB={x:q.x-(q.x-VB.x)*k,y:q.y-(q.y-VB.y)*k,w:VB.w*k,h:VB.h*k};draw()},{passive:false});
 function select(id){selId=id;selSet.clear();if(id)selSet.add(id);selChanged()}
@@ -2586,17 +2634,21 @@ $('bLock').onclick=()=>{const L=[...selSet].map(U).filter(Boolean);if(!L.length)
 function rot1(u,cx,cy){if(u.poly)u.poly=u.poly.map(([a,b])=>[+(1-b).toFixed(5),a]);const ux=u.x+u.w/2,uy=u.y+u.d/2,nx=cx-(uy-cy),ny=cy+(ux-cx);[u.w,u.d]=[u.d,u.w];u.x=snap(nx-u.w/2);u.y=snap(ny-u.d/2)}
 $('bRot').onclick=()=>{if(selSet.size>1){const L=[...selSet].map(U).filter(Boolean);if(L.some(u=>u.locked))return lockedMsg();const x0=Math.min(...L.map(u=>u.x)),x1=Math.max(...L.map(u=>u.x+u.w)),y0=Math.min(...L.map(u=>u.y)),y1=Math.max(...L.map(u=>u.y+u.d));L.forEach(u=>rot1(u,(x0+x1)/2,(y0+y1)/2));commit('Rotated '+L.length+' pieces');return}const u=U(selId);if(!u)return;if(u.locked)return lockedMsg();if(u.poly)u.poly=u.poly.map(([a,b])=>[+(1-b).toFixed(5),a]);const cx=u.x+u.w/2,cy=u.y+u.d/2;[u.w,u.d]=[u.d,u.w];u.x=snap(cx-u.w/2);u.y=snap(cy-u.d/2);commit();renderProps()};
 $('bDel').onclick=()=>{if(!selSet.size)return;if(anyLocked())return lockedMsg();if(!confirmBtn($('bDel')))return;const n=selSet.size,nm=(U(selId)||{}).name;P.units=P.units.filter(v=>!selSet.has(v.id));select(null);commit(n>1?'Deleted '+n+' pieces':'Deleted '+nm)};
-function dup1(u,dx){const c=JSON.parse(JSON.stringify(u));const id=nid(u.mapOnly?'door':u.grid?'u':'m');const re=new RegExp('^'+u.id+'-');c.id=id;c.x=snap(u.x+dx);c.name=u.name+' copy';
- if(c.grid)c.grid.cells.forEach(x=>x.id=x.id.replace(re,id+'-'));if(c.surf)c.surf[0]=id+'-surf';if(c.under)c.under[0]=id+'-under';(c.eq||[]).forEach(e=>(e.slots||[]).forEach(s=>s.id=id+'-'+e.a+'-'+(seq++)));P.units.push(c);return id}
-$('bDup').onclick=()=>{const L=[...selSet].map(U).filter(Boolean);if(!L.length)return;if(L.length===1){select(dup1(L[0],L[0].w+.25));commit('Duplicated');return}const x0=Math.min(...L.map(u=>u.x)),x1=Math.max(...L.map(u=>u.x+u.w)),ids=L.map(u=>dup1(u,x1-x0+.5));selSet.clear();ids.forEach(i=>selSet.add(i));selId=ids[ids.length-1];selChanged();commit('Duplicated '+L.length+' pieces')};
+function dup1(u,dx,dy=0){const c=JSON.parse(JSON.stringify(u));const id=nid(u.mapOnly?'door':u.grid?'u':'m');const re=new RegExp('^'+u.id+'-');c.id=id;c.x=snap(u.x+dx);c.y=snap(u.y+dy);c.name=u.name+' copy';
+ if(c.grid)c.grid.cells.forEach(x=>x.id=x.id.replace(re,id+'-'));if(c.surf)c.surf[0]=id+'-surf';if(c.under)c.under[0]=id+'-under';(c.eq||[]).forEach(e=>(e.slots||[]).forEach(s=>s.id=id+'-'+e.a+'-'+(seq++)));if(c.kind==='zone')P.units.unshift(c);else P.units.push(c);return id}
+$('bDup').onclick=()=>{const L=[...selSet].map(U).filter(Boolean);if(!L.length)return;if(L.length===1){const id=dup1(L[0],L[0].w+.25);delete U(id).grp;select(id);commit('Duplicated');return}const x0=Math.min(...L.map(u=>u.x)),x1=Math.max(...L.map(u=>u.x+u.w)),gm={},ids=L.map(u=>{const id=dup1(u,x1-x0+.5);if(u.grp){gm[u.grp]=gm[u.grp]||'g'+Date.now().toString(36)+(seq++);U(id).grp=gm[u.grp]}return id});selSet.clear();ids.forEach(i=>selSet.add(i));selId=ids[ids.length-1];selChanged();commit('Duplicated '+L.length+' pieces')};
 function confirmBtn(b){if(b._c){b._c=0;b.textContent=b._t;return true}b._t=b.textContent;b._c=1;b.textContent='Tap again';setTimeout(()=>{if(b._c){b._c=0;b.textContent=b._t}},2000);return false}
 document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select'))return;const mod=e.ctrlKey||e.metaKey;
  if(mod&&e.key.toLowerCase()==='z'){e.preventDefault();stepHist(e.shiftKey?1:-1);return}if(mod&&e.key.toLowerCase()==='y'){e.preventDefault();stepHist(1);return}
  if(mod&&e.key.toLowerCase()==='a'){e.preventDefault();P.units.forEach(u=>selSet.add(u.id));selId=[...selSet].pop()||null;selChanged();return}
- if((e.key==='Delete'||e.key==='Backspace')&&selSet.size){P.units=P.units.filter(v=>!selSet.has(v.id));select(null);commit('Deleted')}
+ if(mod&&e.key.toLowerCase()==='c'&&selSet.size){e.preventDefault();copySel();return}if(mod&&e.key.toLowerCase()==='x'&&selSet.size){e.preventDefault();if(anyLocked())return lockedMsg();copySel();P.units=P.units.filter(v=>!selSet.has(v.id));select(null);commit('Cut');return}if(mod&&e.key.toLowerCase()==='v'){e.preventDefault();pasteClip();return}
+ if(mod&&e.key.toLowerCase()==='d'&&selSet.size){e.preventDefault();$('bDup').click();return}if(mod&&e.key.toLowerCase()==='g'){e.preventDefault();e.shiftKey?ungroupSel():groupSel();return}
+ if(e.key==='Escape'&&MS){msStop();return}if(e.key==='m'&&!mod){MS?msStop():msStart();return}
+ if((e.key==='Delete'||e.key==='Backspace')&&selSet.size){if(anyLocked())return lockedMsg();P.units=P.units.filter(v=>!selSet.has(v.id));select(null);commit('Deleted')}
  if(e.key==='Escape')select(null);
  if(e.key.startsWith('Arrow')&&selSet.size){e.preventDefault();if(anyLocked())return lockedMsg();const st=e.shiftKey?1:.25;const d={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[e.key];selSet.forEach(id=>{const u=U(id);u.x=+(u.x+d[0]).toFixed(3);u.y=+(u.y+d[1]).toFixed(3)});commit('Nudge');renderProps(true)}
  if(e.key==='r'&&selId&&!mod)$('bRot').click();if(e.key==='l'&&selSet.size&&!mod)$('bLock').click()});
+$('bMeasure').onclick=()=>MS?msStop():msStart();
 $('bPrint').onclick=()=>{select(null);fit();$('printhead').textContent=(P.title||'Room')+' — floor plan · '+new Date().toLocaleDateString();setTimeout(()=>window.print(),50)};
 $('bFit').onclick=fit;
 
@@ -2618,18 +2670,18 @@ function renderLib(){const groups=[...new Set(LIB.map(c=>c.grp))];if(!groups.inc
 
 /* ---------- properties ---------- */
 function renderProps(soft){const el=$('props'),u=U(selId);
- if(selSet.size>1){if(soft)return;el.innerHTML=`<h2>${selSet.size} pieces selected</h2><p class="hint">Drag any of them to move them together. Shift- or Ctrl-click to add or remove; drag on empty floor to box-select. Esc clears.</p><div class="row"><button class="ghost" onclick="$('bRot').click()">⟳ Rotate</button><button class="ghost" onclick="$('bDup').click()">⧉ Duplicate</button></div><div class="row" style="margin-top:6px"><button class="ghost" onclick="$('bLock').click()">${[...selSet].every(i=>(U(i)||{}).locked)?'⚓ Unanchor all':'⚓ Anchor all'}</button><button class="ghost" onclick="select(null)">✕ Clear</button></div><h2>Align</h2><div class="row"><button class="ghost" data-al="l">⇤ Left</button><button class="ghost" data-al="r">Right ⇥</button></div><div class="row" style="margin-top:6px"><button class="ghost" data-al="t">⤒ Top</button><button class="ghost" data-al="b">Bottom ⤓</button></div><div style="margin-top:12px"><button class="bad" onclick="$('bDel').click()">Delete ${selSet.size}</button></div>`;
-  el.querySelectorAll('[data-al]').forEach(b=>b.onclick=()=>alignSel(b.dataset.al));return}
+ if(selSet.size>1){if(soft)return;el.innerHTML=`<h2>${selSet.size} pieces selected</h2><p class="hint">Drag any of them to move them together. Shift- or Ctrl-click to add or remove; drag on empty floor to box-select. Esc clears. Ctrl+G groups them so they always move together; Ctrl+C / Ctrl+V copies them to any room.</p><div class="row"><button class="ghost" onclick="$('bRot').click()">⟳ Rotate</button><button class="ghost" onclick="$('bDup').click()">⧉ Duplicate</button></div><div class="row" style="margin-top:6px"><button class="ghost" onclick="$('bLock').click()">${[...selSet].every(i=>(U(i)||{}).locked)?'⚓ Unanchor all':'⚓ Anchor all'}</button><button class="ghost" onclick="select(null)">✕ Clear</button></div><div class="row" style="margin-top:6px">${(()=>{const L=[...selSet].map(U).filter(Boolean),g=L[0]&&L[0].grp,one=g&&L.every(u=>u.grp===g)&&P.units.filter(u=>u.grp===g).length===L.length;return one?'<button class="ghost" id="bUngroup" onclick="ungroupSel()">⊟ Ungroup</button>':'<button class="ghost" id="bGroup" onclick="groupSel()">⊞ Group</button>'+(L.some(u=>u.grp)?'<button class="ghost" onclick="ungroupSel()">⊟ Ungroup</button>':'')})()}<button class="ghost" onclick="copySel()" title="Ctrl+C, then Ctrl+V in any room">⎘ Copy</button></div>${colorRow([...selSet].map(U).filter(Boolean))}<h2>Align</h2><div class="row"><button class="ghost" data-al="l">⇤ Left</button><button class="ghost" data-al="r">Right ⇥</button></div><div class="row" style="margin-top:6px"><button class="ghost" data-al="t">⤒ Top</button><button class="ghost" data-al="b">Bottom ⤓</button></div><div style="margin-top:12px"><button class="bad" onclick="$('bDel').click()">Delete ${selSet.size}</button></div>`;
+  el.querySelectorAll('[data-al]').forEach(b=>b.onclick=()=>alignSel(b.dataset.al));bindColor(el,[...selSet].map(U).filter(Boolean));return}
  if(soft&&u){['px','py'].forEach(k=>{const i=$(k);if(i)i.value=toL(k==='px'?u.x:u.y)});return}
- if(!u){el.innerHTML=`<h2>How it works</h2><ol class="hint" style="padding-left:18px;line-height:1.5"><li>Set the room size or draw its walls.</li><li>Drag furniture, machines and fixtures from the library onto the plan.</li><li>Click a piece to rename it, change its drawers/shelves, or add machines on top.</li><li>Switch to <b>📦 Inventory</b> to start tracking what's in each drawer. Use <b>＋ Room</b> to add more rooms, or <b>Export</b> a room as a standalone file.</li></ol><h2>Shortcuts</h2><p class="hint" style="line-height:1.6">Ctrl+Z / Ctrl+Shift+Z undo/redo · Shift-click or drag a box to multi-select · arrows nudge (Shift = 1 ft) · R rotate · L anchor · Del delete · hold Alt while dragging to skip wall snapping</p>
+ if(!u){el.innerHTML=`<h2>How it works</h2><ol class="hint" style="padding-left:18px;line-height:1.5"><li>Set the room size or draw its walls.</li><li>Drag furniture, machines and fixtures from the library onto the plan.</li><li>Click a piece to rename it, change its drawers/shelves, or add machines on top.</li><li>Switch to <b>📦 Inventory</b> to start tracking what's in each drawer. Use <b>＋ Room</b> to add more rooms, or <b>Export</b> a room as a standalone file.</li></ol><h2>Shortcuts</h2><p class="hint" style="line-height:1.6">Ctrl+Z / Ctrl+Shift+Z undo/redo · Shift-click or drag a box to multi-select · arrows nudge (Shift = 1 ft) · R rotate · L anchor · M measure · Ctrl+C / Ctrl+V copy to any room · Ctrl+D duplicate · Ctrl+G group · Del delete · hold Alt while dragging to skip wall snapping</p>
   <h2>Checks</h2>${(P._warn||[]).length?P._warn.map(w=>`<div class="warn">⚠ ${esc(w)}</div>`).join(''):'<p class="hint">✓ Everything is inside the walls and nothing overlaps.</p>'}`;return}
  const isSt=!!u.front,F=(lab,id,val,type='text',ex='')=>`<label class="f">${lab}<input id="${id}" type="${type}" value="${esc(val??'')}" ${ex}></label>`;
  let h=`<h2>${u.kind==='zone'?'Room':u.kind==='desk'?'Desk':u.kind==='wall'?'Wall':u.kind==='furn'?'Furniture':u.kind==='door'?'Door':isSt?'Storage unit':u.style==='fixture'?'Fixture group':'Machine spot'}</h2>${F('Name','pn',u.name)}`;
  if(!u.mapOnly)h+=`<div class="row">${F('Tab label','ptab',u.tab,'text','placeholder="(uses name)"')}${F('Map label','pmt',u.mapText,'text','placeholder="(uses name)"')}</div>`;
- if(isAsg(u))h+=`<label class="f">This ${u.kind==='zone'?'room':'desk'} is<select id="pasg">${Object.entries(ASG).map(([k,v])=>`<option value="${k}" ${(u.assign||'shared')===k?'selected':''}>${k==='ours'?(u.kind==='zone'?'Strictly ours (not shared)':'Ours only'):k==='shared'?(u.kind==='zone'?'Shared with others':'Shared / hot desk'):k==='assigned'?'Assigned to someone':'Vacant'}</option>`).join('')}</select></label>${(u.assign||'shared')==='assigned'?F('Assigned to','powner',u.owner,'text','placeholder="Person or startup"')+F('Since','psince',u.since,'date'):''}${F('Notes','pnote',u.note)}`;
+ if(isAsg(u))h+=`<label class="f">This ${u.kind==='zone'?'room':'desk'} is<select id="pasg">${Object.entries(ASG).filter(([k])=>k!=='blocked'||u.kind==='zone').map(([k,v])=>`<option value="${k}" ${(u.assign||'shared')===k?'selected':''}>${k==='ours'?(u.kind==='zone'?'Strictly ours (not shared)':'Ours only'):k==='shared'?(u.kind==='zone'?'Shared with others':'Shared / hot desk'):k==='assigned'?'Assigned to someone':k==='blocked'?'Blocked off (no access)':'Vacant'}</option>`).join('')}</select></label>${(u.assign||'shared')==='assigned'?F('Assigned to','powner',u.owner,'text','placeholder="Person or startup"')+F('Since','psince',u.since,'date'):''}${F('Notes','pnote',u.note)}`;
  h+=`<div class="row">${F(`X (${LU()})`,'px',toL(u.x),'number',MET()?'step="0.05"':'step="0.25"')}${F(`Y (${LU()})`,'py',toL(u.y),'number',MET()?'step="0.05"':'step="0.25"')}</div><div class="row">${F(`Footprint W (${LU()})`,'pw',toL(u.w),'number','step="0.05"')}${F(`Footprint D (${LU()})`,'pd',toL(u.d),'number','step="0.05"')}</div>`;
  if(u.kind==='door')h+=`<label class="f">Doorway<select id="pdt">${[['swing','Single swing door'],['double','Double doors'],['slide','Sliding door'],['open','Open doorway (no door)']].map(([k,v])=>`<option value="${k}" ${(u.dtype||'swing')===k?'selected':''}>${v}</option>`).join('')}</select></label>${F(`Width (${LU()})`,'pdw',+toL(Math.max(u.w,u.d)).toFixed(3),'number','step="0.05"')}<div class="row"><button class="ghost" id="bHinge">⇆ Hinge side</button><button class="ghost" id="bSwing">⇅ Swing in / out</button></div><p class="hint">Drag a doorway onto a wall and it snaps in. Hold Alt to place it freely.</p>`;
- if(!u.mapOnly)h+=`<label class="f">Map color<input id="pc" type="color" value="${u.mapColor||'#bbbbbb'}"></label>`;
+ h+=colorRow([u]);
  if(isSt){h+=`<h2>Front view</h2><div class="row">${F(`Width (${SU()})`,'pfw',toS(u.front.W),'number')}${F(`Height (${SU()})`,'pfh',toS(u.front.H),'number')}</div>
   <label class="f">Style<select id="pst">${['uline','husky','chem','cabinet','shelf','cart','bins','maple','oak','black'].map(s=>`<option ${u.style===s?'selected':''}>${s}</option>`).join('')}</select></label>
   <div class="row"><label class="f"><input type="checkbox" id="psurf" ${u.surf?'checked':''} style="width:auto"> Worktop storage</label><label class="f"><input type="checkbox" id="punder" ${u.under?'checked':''} style="width:auto"> Space underneath</label></div>
@@ -2646,7 +2698,7 @@ function renderProps(soft){const el=$('props'),u=U(selId);
  {const bl=$('bLib');if(bl)bl.onclick=()=>{const n=$('plib').value.trim()||u.name;const pc=pieceFromUnit(u,n);CUSTOM.push(pc);P.customLib=(P.customLib||[]).concat([pc]);saveCustom();save();renderLib();toast('Saved “'+n+'” to My pieces')}}
  const on=(id,f,ev='change')=>{const i=$(id);if(i)i.addEventListener(ev,()=>{f(i);commit()})};
  on('pn',i=>{u.name=i.value},'input');on('pasg',i=>{u.assign=i.value;if(i.value!=='assigned'){delete u.owner;delete u.since}renderProps()});on('powner',i=>{u.owner=i.value},'input');on('psince',i=>{u.since=i.value});on('pnote',i=>{u.note=i.value},'input');lastTag='';on('ptab',i=>{u.tab=i.value},'input');on('pmt',i=>{u.mapText=i.value||undefined},'input');
- on('px',i=>u.x=frL(+i.value));on('py',i=>u.y=frL(+i.value));on('pw',i=>u.w=Math.max(.1,frL(+i.value)));on('pd',i=>u.d=Math.max(.1,frL(+i.value)));on('pc',i=>u.mapColor=i.value,'input');
+ on('px',i=>u.x=frL(+i.value));on('py',i=>u.y=frL(+i.value));on('pw',i=>u.w=Math.max(.1,frL(+i.value)));on('pd',i=>u.d=Math.max(.1,frL(+i.value)));bindColor(el,[u]);
  on('pfw',i=>u.front.W=frS(+i.value));on('pfh',i=>u.front.H=frS(+i.value));on('pst',i=>u.style=i.value);on('pel',i=>u.eqLen=+i.value);
  if(u.locked)['px','py','pw','pd','pdw'].forEach(id=>{const i=$(id);if(i){i.disabled=true;i.title='Anchored'}});
  on('pdt',i=>{u.dtype=i.value});on('pdw',i=>{const L=frL(+i.value);if(L>0){if(u.w>=u.d)u.w=L;else u.d=L;snapDoor(u,u.x,u.y)}renderProps()});
@@ -2672,7 +2724,7 @@ $('bFil').onclick=()=>{const r=parseLen($('frad').value||'0');if(r==null||r<0){t
 
 /* ---------- export ---------- */
 const slug=t=>(t||'lab').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'lab';
-function toConfig(){const units=P.units.map(u=>{const c=JSON.parse(JSON.stringify(u));if(u.kind==='zone'){c.mapColor=c.mapColor||asgColor(u);c.mapText=asgLabel(u)}delete c.lib;delete c.custom;delete c.preset;delete c.pn;delete c.pc;if(!c.tab)delete c.tab;return c});
+function toConfig(){const units=P.units.map(u=>{const c=JSON.parse(JSON.stringify(u));if(u.kind==='zone'){c.mapColor=u.assign==='blocked'?asgColor(u):c.mapColor||asgColor(u);c.mapText=asgLabel(u);c.mapTextColor=zTx(u)}if(u.kind==='desk')c.mapColor=u.deskColor||asgColor(u);delete c.lib;delete c.custom;delete c.preset;delete c.pn;delete c.pc;if(!c.tab)delete c.tab;return c});
  const id=P.exampleKey||P.storeKey||'lablayout-'+slug(P.title);return{id:slug(P.title),title:P.title||'Lab Storage Organizer',storageKey:id,sample:!!P.sample,...(MET()?{metric:true}:{}),room:P.room,units,...(P.sync&&P.sync.url&&P.sync.key?{sync:{url:P.sync.url,key:P.sync.key}}:{})}}
 function buildTracker(){if(!TEMPLATE){toast('Tracker template missing');return null}const j=JSON.stringify(toConfig()).replace(/<\//g,'<\\/');return TEMPLATE.replace(CFG_RE,()=>'/*LABLAYOUT_CONFIG*/'+j+'/*END_CONFIG*/')}
 $('mClose').onclick=()=>$('modal').classList.remove('on');document.querySelectorAll('.devw button').forEach(b=>b.onclick=()=>$('pv').style.width=b.dataset.w.includes('%')?b.dataset.w:b.dataset.w+'px');

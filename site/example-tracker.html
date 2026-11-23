@@ -216,7 +216,7 @@ function drawerEl(d){const e=document.createElement('div');e.className='drawer '
  e.innerHTML=`<div class="lbl"><span contenteditable="true" data-n="${d.id}"></span><b data-c="${d.id}"></b></div><div class="zone" data-z="${d.id}"></div>`;
  e.querySelector('[data-n]').textContent=S.names[d.id];return e}
 
-const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly}));
+const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly,blk:u.assign==='blocked'}));
 // real front dimensions in inches (W x H); bench tops are 60" long
 const EQ=Object.fromEntries(UNITS.filter(u=>(u.eq||[]).length).map(u=>[u.id,{len:u.front?u.front.W:(u.eqLen||48),items:u.eq}]));
 
@@ -270,7 +270,7 @@ const outlinePath=P0=>'M'+roomOutline(P0).map(p=>(+p[0].toFixed(4))+' '+(+p[1].t
 /* marked rooms / areas: rectangle or polygon (corners stored as fractions of the box) */
 const pcen=P=>{let A=0,x=0,y=0;P.forEach((p,i)=>{const q=P[(i+1)%P.length],k=p[0]*q[1]-q[0]*p[1];A+=k;x+=(p[0]+q[0])*k;y+=(p[1]+q[1])*k});return Math.abs(A)<1e-9?P[0]:[x/(3*A),y/(3*A)]};
 function zoneSvg(f,sz){const pts=f.poly?f.poly.map(([a,b])=>[f.x+a*f.w,f.y+b*f.h]):[[f.x,f.y],[f.x+f.w,f.y],[f.x+f.w,f.y+f.h],[f.x,f.y+f.h]],c=pcen(pts);
- return `<path d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity=".45" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="#2f5d3a">${esc(f.t)}</text>`}
+ return `<path d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity="${f.blk?.88:.45}" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="${f.tc||'#2f5d3a'}">${esc(f.t)}</text>`}
 function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',sw=sz/400,o=[];
  const A=H?[f.x,f.y+f.h/2]:[f.x+f.w/2,f.y],B=H?[f.x+f.w,f.y+f.h/2]:[f.x+f.w/2,f.y+f.h],n=H?[0,1]:[1,0];
  const inside=(x,y)=>{let k=false;for(let i=0,j=OL.length-1;i<OL.length;j=i++){const p=OL[i],q=OL[j];if(((p[1]>y)!=(q[1]>y))&&(x<(q[0]-p[0])*(y-p[1])/(q[1]-p[1])+p[0]))k=!k}return k};
@@ -549,5 +549,5 @@ document.getElementById('bSync').onclick=()=>{const m=document.getElementById('m
 
 drawMap();build();buildTabs();syncStart();
 
-{const b=document.getElementById('bCB');const upd=()=>{b.textContent=cbOn()?'👁 Colour-blind: on':'👁 Colour-blind';};upd();if(cbOn())cbApply(true);b.onclick=()=>{try{localStorage.setItem('lablayout-cb',cbOn()?'0':'1')}catch(e){}cbApply(cbOn());upd();if(!cbOn())location.reload()}}
+{const b=document.getElementById('bCB');if(window.parent!==window)b.style.display='none';const upd=()=>{b.textContent=cbOn()?'👁 Colour-blind: on':'👁 Colour-blind';};upd();if(cbOn())cbApply(true);b.onclick=()=>{try{localStorage.setItem('lablayout-cb',cbOn()?'0':'1')}catch(e){}cbApply(cbOn());upd();if(!cbOn())location.reload()}}
 </script></body></html>
