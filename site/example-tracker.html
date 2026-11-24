@@ -100,12 +100,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .panel h2{font-size:13px;font-weight:650}
 input:not([type=checkbox]):not([type=radio]):not([type=color]),select{border:1px solid var(--line2)!important;border-radius:8px!important}
 input:focus,select:focus{outline:0;border-color:var(--blue)!important;box-shadow:0 0 0 3px #2d6cdf22}
-</style></head><body>
+.crumb{background:none;border:none;color:#e8590c;font-weight:600;cursor:pointer;padding:2px 4px}#map .zgo{cursor:pointer}#map path.zgo:hover{fill-opacity:.7}</style></head><body>
 <header><h1 id="apptitle">Lab Storage Organizer</h1><span id="syncst"></span><button class="alt" id="seed">Test data</button><button class="alt" id="bCB" title="Colour-blind friendly colours">👁 Colour-blind</button><button class="alt" id="reset">Reset</button><button class="alt" id="bPeople">👥 People</button><button class="alt" id="bBackup">💾 Backup</button><button class="alt" id="bRestore">📂 Restore</button><button class="alt" id="bSync">☁ Sync</button><input type="file" id="restoref" accept=".json" hidden><datalist id="peoplelist"></datalist><button id="copy">Copy list</button></header>
 <div id="modal" onclick="if(event.target===this)closeDrawer()"><div class="mcard"><button class="alt mclose" onclick="closeDrawer()">Close</button><div class="mbody"></div></div></div>
 <div id="toast"></div><div class="sbar"><div class="merow"><label>👤 <input id="me" placeholder="Your name (for logs)"></label><span class="legend"><i style="background:#2d6cdf"></i>Formlabs <i style="background:#f26b1d"></i>Prusa <i style="background:#d4a017"></i>Hakko <i style="background:#14a3a3"></i>Glowforge </span></div><input id="find" placeholder="🔍 Search everything — tools, equipment, drawers…"><div id="results"></div></div><nav id="tabs" style="padding:8px 14px"></nav>
 <main>
  <section id="v-map" class="panel"><h2>Room map (top-down) — tap a section</h2>
+  <div id="crumbs" style="font-size:13px;margin:0 0 6px"></div>
   <svg id="map" viewBox="-1 -1 16 22" style="width:100%;max-height:62vh;display:block;margin:auto"></svg>
   <div id="info" class="hint">Tap a section on the map, or use the tabs above.</div></section>
  <div id="units"></div>
@@ -216,7 +217,7 @@ function drawerEl(d){const e=document.createElement('div');e.className='drawer '
  e.innerHTML=`<div class="lbl"><span contenteditable="true" data-n="${d.id}"></span><b data-c="${d.id}"></b></div><div class="zone" data-z="${d.id}"></div>`;
  e.querySelector('[data-n]').textContent=S.names[d.id];return e}
 
-const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly,blk:u.assign==='blocked'}));
+const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly,blk:u.assign==='blocked',go:u.go||null}));
 // real front dimensions in inches (W x H); bench tops are 60" long
 const EQ=Object.fromEntries(UNITS.filter(u=>(u.eq||[]).length).map(u=>[u.id,{len:u.front?u.front.W:(u.eqLen||48),items:u.eq}]));
 
@@ -270,7 +271,7 @@ const outlinePath=P0=>'M'+roomOutline(P0).map(p=>(+p[0].toFixed(4))+' '+(+p[1].t
 /* marked rooms / areas: rectangle or polygon (corners stored as fractions of the box) */
 const pcen=P=>{let A=0,x=0,y=0;P.forEach((p,i)=>{const q=P[(i+1)%P.length],k=p[0]*q[1]-q[0]*p[1];A+=k;x+=(p[0]+q[0])*k;y+=(p[1]+q[1])*k});return Math.abs(A)<1e-9?P[0]:[x/(3*A),y/(3*A)]};
 function zoneSvg(f,sz){const pts=f.poly?f.poly.map(([a,b])=>[f.x+a*f.w,f.y+b*f.h]):[[f.x,f.y],[f.x+f.w,f.y],[f.x+f.w,f.y+f.h],[f.x,f.y+f.h]],c=pcen(pts);
- return `<path d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity="${f.blk?.88:.45}" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="${f.tc||'#2f5d3a'}">${esc(f.t)}</text>`}
+ return `<path ${f.go?`class="zgo" data-go="${f.go}" `:''}d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity="${f.blk?.88:.45}" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="${f.tc||'#2f5d3a'}"${f.go?` class="zgo" data-go="${f.go}"`:''}>${esc(f.t)}${f.go?' ›':''}</text>`}
 function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',sw=sz/400,o=[];
  const A=H?[f.x,f.y+f.h/2]:[f.x+f.w/2,f.y],B=H?[f.x+f.w,f.y+f.h/2]:[f.x+f.w/2,f.y+f.h],n=H?[0,1]:[1,0];
  const inside=(x,y)=>{let k=false;for(let i=0,j=OL.length-1;i<OL.length;j=i++){const p=OL[i],q=OL[j];if(((p[1]>y)!=(q[1]>y))&&(x<(q[0]-p[0])*(y-p[1])/(q[1]-p[1])+p[0]))k=!k}return k};
@@ -285,12 +286,16 @@ function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',s
  return o.join('')}
 function drawMap(){const m=document.getElementById('map');const P=CONFIG.room.poly,OL=roomOutline(P);const FB=FP.filter(f=>f.kind!=='door'),xs=OL.map(p=>p[0]).concat(FB.flatMap(f=>[f.x,f.x+f.w])),ys=OL.map(p=>p[1]).concat(FB.flatMap(f=>[f.y,f.y+f.h]));
  const x0=Math.min(...xs),y0=Math.min(...ys),x1=Math.max(...xs),y1=Math.max(...ys),sz=Math.max(x1-x0,y1-y0);m.setAttribute('viewBox',`${x0-1} ${y0-1} ${x1-x0+2} ${y1-y0+2}`);m.style.setProperty('--fs',(sz/30).toFixed(3)+'px');
- let h=`<path d="${outlinePath(P)}" fill="#f7f7f2" stroke="#111" stroke-width="${(sz/160).toFixed(3)}"/>`;
+ let h=`<path class="floor" d="${outlinePath(P)}" fill="#f7f7f2" stroke="#111" stroke-width="${(sz/160).toFixed(3)}"/>`;
  h+=`<text x="${(x0+x1)/2}" y="${y0-.4}" style="font-size:${(sz/45).toFixed(3)}px" fill="#777">${CONFIG.metric?`${+((x1-x0)*.3048).toFixed(2)} m × ${+((y1-y0)*.3048).toFixed(2)} m`:`${+(x1-x0).toFixed(2)} ft × ${+(y1-y0).toFixed(2)} ft`}</text>`;
  FP.forEach((f,i)=>{const v=f.h>f.w*1.3;if(f.mapOnly){h+=f.kind==='door'?doorSvg(f,sz,OL):f.kind==='zone'?zoneSvg(f,sz):`<rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" fill="${f.f}" opacity=".6"/>`;return}
   h+=`<rect class="fp" data-i="${i}" x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".08" fill="${f.f}"/><text x="${f.x+f.w/2}" y="${f.y+f.h/2}" fill="${f.tc||'#111'}" style="font-size:${Math.max(.15,Math.min(sz/34,Math.min(f.w,f.h)*.55,Math.max(f.w,f.h)*.9/Math.max(3,String(f.t).length*.6))).toFixed(3)}px" ${v?`transform="rotate(-90 ${f.x+f.w/2} ${f.y+f.h/2})"`:''}>${esc(f.t)}</text>`});
  m.innerHTML=h;
- m.querySelectorAll('.fp').forEach(r=>r.addEventListener('click',()=>showFP(+r.dataset.i)))}
+ m.querySelectorAll('.fp').forEach(r=>r.addEventListener('click',()=>showFP(+r.dataset.i)));
+ const NAV=CONFIG.nav,emb=window.parent!==window,cr=document.getElementById('crumbs');
+ if(cr){cr.innerHTML=NAV&&emb&&NAV.crumbs.length>1?NAV.crumbs.map((c,i)=>i<NAV.crumbs.length-1?`<button class="crumb" data-go="${c.rid}">${esc(c.t)}</button> › `:`<b>${esc(c.t)}</b>`).join(''):'';cr.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>parent.postMessage({lablayout:'go',rid:b.dataset.go},'*'))}
+ if(NAV&&emb){m.querySelectorAll('.zgo').forEach(z=>z.addEventListener('click',e=>{e.stopPropagation();parent.postMessage({lablayout:'go',rid:z.dataset.go},'*')}));
+  m.onclick=e=>{if(e.target===m&&NAV.up)parent.postMessage({lablayout:'up'},'*')};m.style.cursor=NAV.up?'zoom-out':'';m.querySelectorAll('.floor,.fp,.zgo').forEach(x=>x.style.cursor='pointer')}}
 let selFP=null;
 let tab='map';
 function buildTabs(){const n=document.getElementById('tabs');const T=[['map','🗺 Map'],...FP.map((f,i)=>[i,f.tab||f.t||f.lab]).filter(([i])=>!FP[i].mapOnly),['out','Checked out'],['reorder','🛒 Reorder'],['log','📋 Log']];

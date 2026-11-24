@@ -22,7 +22,7 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 #plan{width:100%;height:100%;display:block;touch-action:none}
 #plan .u{cursor:move}#plan .u.sel .b{stroke:#f26b1d;stroke-width:.08}
 #plan text{pointer-events:none;font-family:system-ui,sans-serif;text-anchor:middle;dominant-baseline:middle}
-#plan .vtx{fill:#fff;stroke:#2d6cdf;cursor:move}#plan .vtx:hover{fill:#2d6cdf}#plan .wl{cursor:text;pointer-events:all;text-decoration:underline dotted}#plan .wseg{cursor:copy}#plan .wdrag{cursor:move}#plan .zh{cursor:grab}.unitsw{display:inline-flex!important;gap:2px;padding:3px!important;border-radius:9px!important;background:#22262b!important}.unitsw span{padding:4px 9px;border-radius:6px;color:#aeb4ba;font-size:12.5px}.unitsw:not(.met) .uft,.unitsw.met .um{background:#f26b1d;color:#fff}.swatches{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.sw{width:24px;height:24px;padding:0!important;border-radius:6px!important;border:1px solid #0003!important;box-shadow:none!important;cursor:pointer}.sw.on{outline:2px solid #2d6cdf;outline-offset:2px}.swc{display:grid;place-items:center;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);color:#fff;font-weight:700;font-size:13px;position:relative;text-shadow:0 0 2px #000}.swc input{position:absolute;inset:0;opacity:0;cursor:pointer}.swr{padding:2px 8px!important;font-size:12px!important}#bMeasure.on{background:#2d6cdf!important;color:#fff!important}#stage.zrect #plan{cursor:crosshair}#plan .u.locked{cursor:default}#plan .u.locked .b{stroke:#2d6cdf;stroke-width:.09}#plan .u.locked.sel .b{stroke:#2d6cdf;stroke-width:.12;stroke-dasharray:none}#bLock.on{background:#2d6cdf;color:#fff}#plan .wdrag:hover{stroke:rgba(45,108,223,.25)}#plan .mh{cursor:ew-resize}
+#plan .vtx{fill:#fff;stroke:#2d6cdf;cursor:move}#plan .vtx:hover{fill:#2d6cdf}#plan .wl{cursor:text;pointer-events:all;text-decoration:underline dotted}#plan .wseg{cursor:copy}#plan .wdrag{cursor:move}#plan .zh{cursor:grab}.crumbs{display:inline-flex;gap:4px;align-items:center;color:#8a9;margin-right:6px}.crumb{background:none!important;border:none!important;color:#f26b1d!important;padding:4px 6px!important;font-weight:600}.unitsw{display:inline-flex!important;gap:2px;padding:3px!important;border-radius:9px!important;background:#22262b!important}.unitsw span{padding:4px 9px;border-radius:6px;color:#aeb4ba;font-size:12.5px}.unitsw:not(.met) .uft,.unitsw.met .um{background:#f26b1d;color:#fff}.swatches{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.sw{width:24px;height:24px;padding:0!important;border-radius:6px!important;border:1px solid #0003!important;box-shadow:none!important;cursor:pointer}.sw.on{outline:2px solid #2d6cdf;outline-offset:2px}.swc{display:grid;place-items:center;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);color:#fff;font-weight:700;font-size:13px;position:relative;text-shadow:0 0 2px #000}.swc input{position:absolute;inset:0;opacity:0;cursor:pointer}.swr{padding:2px 8px!important;font-size:12px!important}#bMeasure.on{background:#2d6cdf!important;color:#fff!important}#stage.zrect #plan{cursor:crosshair}#plan .u.locked{cursor:default}#plan .u.locked .b{stroke:#2d6cdf;stroke-width:.09}#plan .u.locked.sel .b{stroke:#2d6cdf;stroke-width:.12;stroke-dasharray:none}#bLock.on{background:#2d6cdf;color:#fff}#plan .wdrag:hover{stroke:rgba(45,108,223,.25)}#plan .mh{cursor:ew-resize}
 #dimin{position:absolute;display:none;z-index:5;width:110px;padding:5px 7px;border:2px solid #f26b1d;border-radius:6px;font:inherit;font-size:13px;box-shadow:0 3px 10px #0003}
 #stage.sketch #plan{cursor:crosshair}
 .tb{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}.tb button{font-size:12px;padding:6px 9px}
@@ -257,12 +257,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .panel h2{font-size:13px;font-weight:650}
 input:not([type=checkbox]):not([type=radio]):not([type=color]),select{border:1px solid var(--line2)!important;border-radius:8px!important}
 input:focus,select:focus{outline:0;border-color:var(--blue)!important;box-shadow:0 0 0 3px #2d6cdf22}
-</style></head><body>
+.crumb{background:none;border:none;color:#e8590c;font-weight:600;cursor:pointer;padding:2px 4px}#map .zgo{cursor:pointer}#map path.zgo:hover{fill-opacity:.7}</style></head><body>
 <header><h1 id="apptitle">Lab Storage Organizer</h1><span id="syncst"></span><button class="alt" id="seed">Test data</button><button class="alt" id="bCB" title="Colour-blind friendly colours">👁 Colour-blind</button><button class="alt" id="reset">Reset</button><button class="alt" id="bPeople">👥 People</button><button class="alt" id="bBackup">💾 Backup</button><button class="alt" id="bRestore">📂 Restore</button><button class="alt" id="bSync">☁ Sync</button><input type="file" id="restoref" accept=".json" hidden><datalist id="peoplelist"></datalist><button id="copy">Copy list</button></header>
 <div id="modal" onclick="if(event.target===this)closeDrawer()"><div class="mcard"><button class="alt mclose" onclick="closeDrawer()">Close</button><div class="mbody"></div></div></div>
 <div id="toast"></div><div class="sbar"><div class="merow"><label>👤 <input id="me" placeholder="Your name (for logs)"></label><span class="legend"><i style="background:#2d6cdf"></i>Formlabs <i style="background:#f26b1d"></i>Prusa <i style="background:#d4a017"></i>Hakko <i style="background:#14a3a3"></i>Glowforge </span></div><input id="find" placeholder="🔍 Search everything — tools, equipment, drawers…"><div id="results"></div></div><nav id="tabs" style="padding:8px 14px"></nav>
 <main>
  <section id="v-map" class="panel"><h2>Room map (top-down) — tap a section</h2>
+  <div id="crumbs" style="font-size:13px;margin:0 0 6px"></div>
   <svg id="map" viewBox="-1 -1 16 22" style="width:100%;max-height:62vh;display:block;margin:auto"></svg>
   <div id="info" class="hint">Tap a section on the map, or use the tabs above.</div></section>
  <div id="units"></div>
@@ -373,7 +374,7 @@ function drawerEl(d){const e=document.createElement('div');e.className='drawer '
  e.innerHTML=`<div class="lbl"><span contenteditable="true" data-n="${d.id}"></span><b data-c="${d.id}"></b></div><div class="zone" data-z="${d.id}"></div>`;
  e.querySelector('[data-n]').textContent=S.names[d.id];return e}
 
-const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly,blk:u.assign==='blocked'}));
+const FP=CONFIG.units.map(u=>({u:u.mapOnly?[]:[u.id],mapOnly:!!u.mapOnly,kind:u.kind,x:u.x,y:u.y,w:u.w,h:u.d,f:u.mapColor||'#bbb',t:u.mapText??u.name,tab:u.tab||u.name,tc:u.mapTextColor,dt:u.dtype||'swing',hinge:u.hinge,out:!!u.out,poly:u.poly,blk:u.assign==='blocked',go:u.go||null}));
 // real front dimensions in inches (W x H); bench tops are 60" long
 const EQ=Object.fromEntries(UNITS.filter(u=>(u.eq||[]).length).map(u=>[u.id,{len:u.front?u.front.W:(u.eqLen||48),items:u.eq}]));
 
@@ -427,7 +428,7 @@ const outlinePath=P0=>'M'+roomOutline(P0).map(p=>(+p[0].toFixed(4))+' '+(+p[1].t
 /* marked rooms / areas: rectangle or polygon (corners stored as fractions of the box) */
 const pcen=P=>{let A=0,x=0,y=0;P.forEach((p,i)=>{const q=P[(i+1)%P.length],k=p[0]*q[1]-q[0]*p[1];A+=k;x+=(p[0]+q[0])*k;y+=(p[1]+q[1])*k});return Math.abs(A)<1e-9?P[0]:[x/(3*A),y/(3*A)]};
 function zoneSvg(f,sz){const pts=f.poly?f.poly.map(([a,b])=>[f.x+a*f.w,f.y+b*f.h]):[[f.x,f.y],[f.x+f.w,f.y],[f.x+f.w,f.y+f.h],[f.x,f.y+f.h]],c=pcen(pts);
- return `<path d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity="${f.blk?.88:.45}" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="${f.tc||'#2f5d3a'}">${esc(f.t)}</text>`}
+ return `<path ${f.go?`class="zgo" data-go="${f.go}" `:''}d="M${pts.map(p=>p.join(' ')).join('L')}Z" fill="${f.f}" fill-opacity="${f.blk?.88:.45}" stroke="#7a9" stroke-width="${(sz/300).toFixed(3)}" stroke-dasharray=".4 .2"/><text x="${c[0]}" y="${c[1]}" style="font-size:${(sz/55).toFixed(3)}px;font-weight:600" fill="${f.tc||'#2f5d3a'}"${f.go?` class="zgo" data-go="${f.go}"`:''}>${esc(f.t)}${f.go?' ›':''}</text>`}
 function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',sw=sz/400,o=[];
  const A=H?[f.x,f.y+f.h/2]:[f.x+f.w/2,f.y],B=H?[f.x+f.w,f.y+f.h/2]:[f.x+f.w/2,f.y+f.h],n=H?[0,1]:[1,0];
  const inside=(x,y)=>{let k=false;for(let i=0,j=OL.length-1;i<OL.length;j=i++){const p=OL[i],q=OL[j];if(((p[1]>y)!=(q[1]>y))&&(x<(q[0]-p[0])*(y-p[1])/(q[1]-p[1])+p[0]))k=!k}return k};
@@ -442,12 +443,16 @@ function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',s
  return o.join('')}
 function drawMap(){const m=document.getElementById('map');const P=CONFIG.room.poly,OL=roomOutline(P);const FB=FP.filter(f=>f.kind!=='door'),xs=OL.map(p=>p[0]).concat(FB.flatMap(f=>[f.x,f.x+f.w])),ys=OL.map(p=>p[1]).concat(FB.flatMap(f=>[f.y,f.y+f.h]));
  const x0=Math.min(...xs),y0=Math.min(...ys),x1=Math.max(...xs),y1=Math.max(...ys),sz=Math.max(x1-x0,y1-y0);m.setAttribute('viewBox',`${x0-1} ${y0-1} ${x1-x0+2} ${y1-y0+2}`);m.style.setProperty('--fs',(sz/30).toFixed(3)+'px');
- let h=`<path d="${outlinePath(P)}" fill="#f7f7f2" stroke="#111" stroke-width="${(sz/160).toFixed(3)}"/>`;
+ let h=`<path class="floor" d="${outlinePath(P)}" fill="#f7f7f2" stroke="#111" stroke-width="${(sz/160).toFixed(3)}"/>`;
  h+=`<text x="${(x0+x1)/2}" y="${y0-.4}" style="font-size:${(sz/45).toFixed(3)}px" fill="#777">${CONFIG.metric?`${+((x1-x0)*.3048).toFixed(2)} m × ${+((y1-y0)*.3048).toFixed(2)} m`:`${+(x1-x0).toFixed(2)} ft × ${+(y1-y0).toFixed(2)} ft`}</text>`;
  FP.forEach((f,i)=>{const v=f.h>f.w*1.3;if(f.mapOnly){h+=f.kind==='door'?doorSvg(f,sz,OL):f.kind==='zone'?zoneSvg(f,sz):`<rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" fill="${f.f}" opacity=".6"/>`;return}
   h+=`<rect class="fp" data-i="${i}" x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".08" fill="${f.f}"/><text x="${f.x+f.w/2}" y="${f.y+f.h/2}" fill="${f.tc||'#111'}" style="font-size:${Math.max(.15,Math.min(sz/34,Math.min(f.w,f.h)*.55,Math.max(f.w,f.h)*.9/Math.max(3,String(f.t).length*.6))).toFixed(3)}px" ${v?`transform="rotate(-90 ${f.x+f.w/2} ${f.y+f.h/2})"`:''}>${esc(f.t)}</text>`});
  m.innerHTML=h;
- m.querySelectorAll('.fp').forEach(r=>r.addEventListener('click',()=>showFP(+r.dataset.i)))}
+ m.querySelectorAll('.fp').forEach(r=>r.addEventListener('click',()=>showFP(+r.dataset.i)));
+ const NAV=CONFIG.nav,emb=window.parent!==window,cr=document.getElementById('crumbs');
+ if(cr){cr.innerHTML=NAV&&emb&&NAV.crumbs.length>1?NAV.crumbs.map((c,i)=>i<NAV.crumbs.length-1?`<button class="crumb" data-go="${c.rid}">${esc(c.t)}</button> › `:`<b>${esc(c.t)}</b>`).join(''):'';cr.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>parent.postMessage({lablayout:'go',rid:b.dataset.go},'*'))}
+ if(NAV&&emb){m.querySelectorAll('.zgo').forEach(z=>z.addEventListener('click',e=>{e.stopPropagation();parent.postMessage({lablayout:'go',rid:z.dataset.go},'*')}));
+  m.onclick=e=>{if(e.target===m&&NAV.up)parent.postMessage({lablayout:'up'},'*')};m.style.cursor=NAV.up?'zoom-out':'';m.querySelectorAll('.floor,.fp,.zgo').forEach(x=>x.style.cursor='pointer')}}
 let selFP=null;
 let tab='map';
 function buildTabs(){const n=document.getElementById('tabs');const T=[['map','🗺 Map'],...FP.map((f,i)=>[i,f.tab||f.t||f.lab]).filter(([i])=>!FP[i].mapOnly),['out','Checked out'],['reorder','🛒 Reorder'],['log','📋 Log']];
@@ -2350,7 +2355,8 @@ function bindColor(el,L){el.querySelectorAll('[data-col]').forEach(b=>b.onclick=
 const zOp=u=>u.assign==='blocked'?.88:.45,zTx=u=>u.assign==='blocked'?'#ffffff':'#2f5d3a';
 const isAsg=u=>u&&(u.kind==='zone'||u.kind==='desk');
 function asgColor(u){return (ASG[u.assign||'shared']||ASG.shared)[1]}
-function asgLabel(u){const a=u.assign||'shared';return (u.mapText??u.name)+(a==='assigned'?' · '+(u.owner||'(who?)'):a==='vacant'?' · vacant':a==='blocked'?' · blocked off':a==='ours'?' · ours only':u.kind==='zone'?' · shared':'')}
+function asgLabel(u){return asgLabel0(u)+(u.kind==='zone'&&u.link&&typeof PROJ!=='undefined'&&PROJ&&roomByRid(u.link)?' ↗':'')}
+function asgLabel0(u){const a=u.assign||'shared';return (u.mapText??u.name)+(a==='assigned'?' · '+(u.owner||'(who?)'):a==='vacant'?' · vacant':a==='blocked'?' · blocked off':a==='ours'?' · ours only':u.kind==='zone'?' · shared':'')}
 
 /* room outline: corners [x,y,filletRadius?,arcDepth?]; arcDepth curves the wall to the next corner (+ = bulges left of travel) */
 function roomOutline(P0){const n=P0.length,at=i=>P0[((i%n)+n)%n],B=i=>+(at(i)[3]||0),R=i=>+(at(i)[2]||0),out=[];if(n<3)return P0.map(p=>[p[0],p[1]]);
@@ -2723,6 +2729,7 @@ function renderProps(soft){const el=$('props'),u=U(selId);
  const isSt=!!u.front,F=(lab,id,val,type='text',ex='')=>`<label class="f">${lab}<input id="${id}" type="${['px','py','pw','pd','pdw'].includes(id)?'text" inputmode="decimal':type}" value="${esc(val??'')}" ${ex}></label>`;
  let h=`<h2>${u.kind==='zone'?'Room':u.kind==='desk'?'Desk':u.kind==='wall'?'Wall':u.kind==='furn'?'Furniture':u.kind==='door'?'Door':isSt?'Storage unit':u.style==='fixture'?'Fixture group':'Machine spot'}</h2>${F('Name','pn',u.name)}`;
  if(!u.mapOnly)h+=`<div class="row">${F('Tab label','ptab',u.tab,'text','placeholder="(uses name)"')}${F('Map label','pmt',u.mapText,'text','placeholder="(uses name)"')}</div>`;
+ if(u.kind==='zone')h+=linkRow(u);
  if(isAsg(u))h+=`<label class="f">This ${u.kind==='zone'?'room':'desk'} is<select id="pasg">${Object.entries(ASG).filter(([k])=>k!=='blocked'||u.kind==='zone').map(([k,v])=>`<option value="${k}" ${(u.assign||'shared')===k?'selected':''}>${k==='ours'?(u.kind==='zone'?'Strictly ours (not shared)':'Ours only'):k==='shared'?(u.kind==='zone'?'Shared with others':'Shared / hot desk'):k==='assigned'?'Assigned to someone':k==='blocked'?'Blocked off (no access)':'Vacant'}</option>`).join('')}</select></label>${(u.assign||'shared')==='assigned'?F('Assigned to','powner',u.owner,'text','placeholder="Person or startup"')+F('Since','psince',u.since,'date'):''}${F('Notes','pnote',u.note)}`;
  h+=`<div class="row">${F(`X (${LU()})`,'px',toL(u.x),'number',MET()?'step="0.05"':'step="0.25"')}${F(`Y (${LU()})`,'py',toL(u.y),'number',MET()?'step="0.05"':'step="0.25"')}</div><div class="row">${F(`Footprint W (${LU()})`,'pw',toL(u.w),'number','step="0.05"')}${F(`Footprint D (${LU()})`,'pd',toL(u.d),'number','step="0.05"')}</div>`;
  if(u.kind==='door')h+=`<label class="f">Doorway<select id="pdt">${[['swing','Single swing door'],['double','Double doors'],['slide','Sliding door'],['open','Open doorway (no door)']].map(([k,v])=>`<option value="${k}" ${(u.dtype||'swing')===k?'selected':''}>${v}</option>`).join('')}</select></label>${F(`Width (${LU()})`,'pdw',+toL(Math.max(u.w,u.d)).toFixed(3),'number','step="0.05"')}<div class="row"><button class="ghost" id="bHinge">⇆ Hinge side</button><button class="ghost" id="bSwing">⇅ Swing in / out</button></div><p class="hint">Drag a doorway onto a wall and it snaps in. Hold Alt to place it freely.</p>`;
@@ -2742,7 +2749,7 @@ function renderProps(soft){const el=$('props'),u=U(selId);
  {const bd=$('bDes');if(bd)bd.onclick=()=>openDesigner(u)}
  {const bl=$('bLib');if(bl)bl.onclick=()=>{const n=$('plib').value.trim()||u.name;const pc=pieceFromUnit(u,n);CUSTOM.push(pc);P.customLib=(P.customLib||[]).concat([pc]);saveCustom();save();renderLib();toast('Saved “'+n+'” to My pieces')}}
  const on=(id,f,ev='change')=>{const i=$(id);if(i)i.addEventListener(ev,()=>{f(i);commit()})};
- on('pn',i=>{u.name=i.value},'input');on('pasg',i=>{u.assign=i.value;if(i.value!=='assigned'){delete u.owner;delete u.since}renderProps()});on('powner',i=>{u.owner=i.value},'input');on('psince',i=>{u.since=i.value});on('pnote',i=>{u.note=i.value},'input');lastTag='';on('ptab',i=>{u.tab=i.value},'input');on('pmt',i=>{u.mapText=i.value||undefined},'input');
+ on('pn',i=>{u.name=i.value},'input');if(u.kind==='zone')bindLink(el,u);on('pasg',i=>{u.assign=i.value;if(i.value!=='assigned'){delete u.owner;delete u.since}renderProps()});on('powner',i=>{u.owner=i.value},'input');on('psince',i=>{u.since=i.value});on('pnote',i=>{u.note=i.value},'input');lastTag='';on('ptab',i=>{u.tab=i.value},'input');on('pmt',i=>{u.mapText=i.value||undefined},'input');
  on('px',i=>{u.x=lenOf(i)??u.x;i.value=toL(u.x)});on('py',i=>{u.y=lenOf(i)??u.y;i.value=toL(u.y)});on('pw',i=>{u.w=Math.max(.1,lenOf(i)??u.w);i.value=toL(u.w)});on('pd',i=>{u.d=Math.max(.1,lenOf(i)??u.d);i.value=toL(u.d)});bindColor(el,[u]);
  on('pfw',i=>u.front.W=frS(+i.value));on('pfh',i=>u.front.H=frS(+i.value));on('pst',i=>u.style=i.value);on('pel',i=>u.eqLen=+i.value);
  if(u.locked)['px','py','pw','pd','pdw'].forEach(id=>{const i=$(id);if(i){i.disabled=true;i.title='Anchored'}});
@@ -2771,9 +2778,9 @@ $('bFil').onclick=()=>{const r=parseLen($('frad').value||'0');if(r==null||r<0){t
 
 /* ---------- export ---------- */
 const slug=t=>(t||'lab').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'lab';
-function toConfig(){const units=P.units.map(u=>{const c=JSON.parse(JSON.stringify(u));if(u.kind==='zone'){c.mapColor=u.assign==='blocked'?asgColor(u):c.mapColor||asgColor(u);c.mapText=asgLabel(u);c.mapTextColor=zTx(u)}if(u.kind==='desk')c.mapColor=u.deskColor||asgColor(u);delete c.lib;delete c.custom;delete c.preset;delete c.pn;delete c.pc;if(!c.tab)delete c.tab;return c});
- const id=P.exampleKey||P.storeKey||'lablayout-'+slug(P.title);return{id:slug(P.title),title:P.title||'Lab Storage Organizer',storageKey:id,sample:!!P.sample,...(MET()?{metric:true}:{}),room:P.room,units,...(P.sync&&P.sync.url&&P.sync.key?{sync:{url:P.sync.url,key:P.sync.key}}:{})}}
-function buildTracker(){if(!TEMPLATE){toast('Tracker template missing');return null}const j=JSON.stringify(toConfig()).replace(/<\//g,'<\\/');return TEMPLATE.replace(CFG_RE,()=>'/*LABLAYOUT_CONFIG*/'+j+'/*END_CONFIG*/')}
+function toConfig(nav){const units=P.units.map(u=>{const c=JSON.parse(JSON.stringify(u));delete c.link;if(nav&&u.kind==='zone'&&u.link&&roomByRid(u.link))c.go=u.link;if(u.kind==='zone'){c.mapColor=u.assign==='blocked'?asgColor(u):c.mapColor||asgColor(u);c.mapText=asgLabel0(u);c.mapTextColor=zTx(u)}if(u.kind==='desk')c.mapColor=u.deskColor||asgColor(u);delete c.lib;delete c.custom;delete c.preset;delete c.pn;delete c.pc;if(!c.tab)delete c.tab;return c});
+ const id=P.exampleKey||P.storeKey||'lablayout-'+slug(P.title);return{id:slug(P.title),title:P.title||'Lab Storage Organizer',storageKey:id,sample:!!P.sample,...(MET()?{metric:true}:{}),room:P.room,units,...(P.sync&&P.sync.url&&P.sync.key?{sync:{url:P.sync.url,key:P.sync.key}}:{}),...(nav?{nav:{crumbs:chainOf(P).map(r=>({rid:ridOf(r),t:r.title||'Room'})),up:(parentOf(P)||{}).rid||null}}:{})}}
+function buildTracker(nav){if(!TEMPLATE){toast('Tracker template missing');return null}const j=JSON.stringify(toConfig(nav)).replace(/<\//g,'<\\/');return TEMPLATE.replace(CFG_RE,()=>'/*LABLAYOUT_CONFIG*/'+j+'/*END_CONFIG*/')}
 $('mClose').onclick=()=>$('modal').classList.remove('on');document.querySelectorAll('.devw button').forEach(b=>b.onclick=()=>$('pv').style.width=b.dataset.w.includes('%')?b.dataset.w:b.dataset.w+'px');
 function download(name,text,type){const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 $('bExport').onclick=()=>{if((P._warn||[]).length&&!confirmBtn($('bExport'))){toast('There are layout warnings — tap again to export anyway');return}const h=buildTracker();if(!h)return;download(slug(P.title)+'-tracker.html',h,'text/html');toast('Exported '+slug(P.title)+'-tracker.html')};
@@ -2785,13 +2792,25 @@ function gridLabel(){const L=MET()?GRID_M:GRID_FT,v=L[Math.min(GI,L.length-1)];$
 $('bGrid').onclick=()=>{const L=MET()?GRID_M:GRID_FT;GI=(Math.min(GI,L.length-1)+1)%L.length;try{localStorage.setItem('lablayout-grid',GI)}catch(e){}gridLabel();draw();toast($('bGrid').textContent)};
 function applyUnits(){gridLabel();$('bUnits').classList.toggle('met',MET());$('frad').placeholder=MET()?'Fillet all corners, e.g. 15 cm':'Fillet all corners, e.g. 6"';syncPoly();renderLib();renderProps();draw()}
 /* ---------- rooms ---------- */
-function renderRooms(){const R=PROJ.rooms;$('rooms').innerHTML=R.map((r,i)=>`<button class="${i===PROJ.cur?'on':''}" data-room="${i}" title="${i===PROJ.cur?'Rename it with the name box above':'Switch to this room'}">${esc(r.title||'Room '+(i+1))}</button>`).join('')+`<button class="add" id="bRoomAdd" title="Add another room to this project">＋ Room</button><button class="add" id="bRoomDup" title="Copy this room">⧉ Copy room</button><button class="add" id="bRoomIn" title="Add a room from a .room.json file (also takes project files and AI layout specs)">⬆ Import room</button><button class="add" id="bRoomOut" title="Download this room as a .room.json file">⬇ Room JSON</button>`+(R.length>1?`<button class="rx" id="bRoomDel" title="Delete this room (tap twice)">🗑 Delete room</button>`:'');
- $('rooms').querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>goRoom(+b.dataset.room));
+function renderRooms(){const R=PROJ.rooms,ch=chainOf(P);$('rooms').innerHTML=(ch.length>1?`<span class="crumbs">${ch.slice(0,-1).map(r=>`<button class="crumb" data-rid="${r.rid}" title="Back to this layout">${esc(r.title||'Layout')}</button> ›`).join(' ')}</span>`:'')+R.map((r,i)=>`<button class="${i===PROJ.cur?'on':''}" data-room="${i}" title="${i===PROJ.cur?'Rename it with the name box above':'Switch to this room'}">${esc(r.title||'Room '+(i+1))}</button>`).join('')+`<button class="add" id="bRoomAdd" title="Add another room to this project">＋ Room</button><button class="add" id="bRoomDup" title="Copy this room">⧉ Copy room</button><button class="add" id="bRoomIn" title="Add a room from a .room.json file (also takes project files and AI layout specs)">⬆ Import room</button><button class="add" id="bRoomOut" title="Download this room as a .room.json file">⬇ Room JSON</button>`+(R.length>1?`<button class="rx" id="bRoomDel" title="Delete this room (tap twice)">🗑 Delete room</button>`:'');
+ $('rooms').querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>goRoom(+b.dataset.room));$('rooms').querySelectorAll('[data-rid]').forEach(b=>b.onclick=()=>goRid(b.dataset.rid));
  $('bRoomAdd').onclick=()=>{save();const n=PROJ.rooms.length+1;PROJ.rooms.push(blank('Room '+n));goRoom(PROJ.rooms.length-1);toast('Added Room '+n)};
  $('bRoomDup').onclick=()=>{save();const c=JSON.parse(JSON.stringify(P));c.title=(P.title||'Room')+' copy';delete c.storeKey;delete c.exampleKey;delete c.sample;PROJ.rooms.push(c);goRoom(PROJ.rooms.length-1);toast('Copied room')};
  $('bRoomIn').onclick=()=>$('fRoom').click();$('bRoomOut').onclick=exportRoom;
  const d=$('bRoomDel');if(d)d.onclick=()=>{if(!confirmBtn(d))return;const t=P.title;PROJ.rooms.splice(PROJ.cur,1);PROJ.cur=Math.max(0,PROJ.cur-1);P=PROJ.rooms[PROJ.cur];init();toast('Deleted '+t)}}
 function goRoom(i){save();PROJ.cur=i;P=PROJ.rooms[i];init()}
+/* nested layouts: a room area in one layout can open another room (which can hold its own linked areas) */
+const ridOf=r=>r.rid||(r.rid='r'+Math.random().toString(36).slice(2,9));
+const roomByRid=id=>PROJ.rooms.find(r=>r.rid===id);
+const parentOf=r=>r.rid&&PROJ.rooms.find(x=>x!==r&&x.units.some(u=>u.kind==='zone'&&u.link===r.rid));
+function chainOf(r){const c=[r],seen=new Set([r]);let q=parentOf(r);while(q&&!seen.has(q)){c.unshift(q);seen.add(q);q=parentOf(q)}return c}
+function goRid(id){const i=PROJ.rooms.findIndex(r=>r.rid===id);if(i>=0&&i!==PROJ.cur)goRoom(i)}
+function linkRow(u){const anc=new Set(chainOf(P)),opts=PROJ.rooms.filter(r=>!anc.has(r)),t=u.link&&roomByRid(u.link);
+ return `<label class="f">Opens room<select id="plink"><option value="">— none —</option>${opts.map(r=>`<option value="${ridOf(r)}"${u.link===r.rid?' selected':''}>${esc(r.title||'Room')}</option>`).join('')}</select></label><div class="row" style="margin:-4px 0 10px">${t?`<button class="ghost" id="bLinkGo">Open ${esc(t.title||'room')} →</button>`:`<button class="ghost" id="bLinkNew" title="Make a new room shaped like this area, linked to it">＋ Make it its own room</button>`}</div>`}
+function bindLink(el,u){const s=el.querySelector('#plink');if(s)s.onchange=()=>{if(s.value)u.link=s.value;else delete u.link;commit('Room link changed');renderRooms();renderProps()};
+ const g=el.querySelector('#bLinkGo');if(g)g.onclick=()=>goRid(u.link);
+ const n=el.querySelector('#bLinkNew');if(n)n.onclick=()=>{const pts=zonePts(u),x=Math.min(...pts.map(p=>p[0])),y=Math.min(...pts.map(p=>p[1]));
+  const c=blank(u.name||'Room');c.room.poly=pts.map(p=>[+(p[0]-x).toFixed(4),+(p[1]-y).toFixed(4)]);u.link=ridOf(c);ridOf(P);PROJ.rooms.push(c);commit('Made “'+c.title+'” its own room');renderRooms();renderProps()}}
 /* ---------- single-room JSON ---------- */
 function exportRoom(){save();const r=JSON.parse(JSON.stringify(P));download(slug(P.title||'room')+'.room.json',JSON.stringify({lablayout_room:1,exported:new Date().toISOString(),room:r},null,1),'application/json');toast('Downloaded '+slug(P.title||'room')+'.room.json')}
 function importRooms(j){let rooms;
@@ -2806,9 +2825,10 @@ $('fRoom').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)
 let MODE='edit',useSrc='';
 function setMode(m){MODE=m;try{localStorage.setItem('lablayout-mode',m)}catch(e){}$('mEdit').classList.toggle('on',m==='edit');$('mUse').classList.toggle('on',m==='use');
  $('editv').style.display=m==='edit'?'':'none';$('usev').hidden=m!=='use';document.querySelectorAll('.editonly').forEach(e=>e.style.display=m==='edit'?'':'none');
- if(m==='use'){save();const h=buildTracker();if(!h){setMode('edit');return}if(h!==useSrc){useSrc=h;$('usef').srcdoc=h}}}
+ if(m==='use'){save();const h=buildTracker(true);if(!h){setMode('edit');return}if(h!==useSrc){useSrc=h;$('usef').srcdoc=h}}}
 document.addEventListener('click',e=>{document.querySelectorAll('details.menu[open]').forEach(m=>{if(!m.contains(e.target)||e.target.closest('.mlist button'))m.open=false})});
-$('mEdit').onclick=()=>setMode('edit');$('mUse').onclick=()=>setMode('use');
+$('mEdit').onclick=()=>setMode('edit');
+window.addEventListener('message',e=>{const d=e.data;if(!d||e.source!==$('usef').contentWindow||MODE!=='use')return;if(d.lablayout==='go'&&d.rid)goRid(d.rid);if(d.lablayout==='up'){const q=parentOf(P);if(q)goRid(q.rid)}});$('mUse').onclick=()=>setMode('use');
 $('bEx').onclick=()=>{const c=exampleConfig();if(!c){toast('Example unavailable');return}if(P.units.length&&!confirmBtn($('bEx')))return;P={v:1,title:c.title,room:c.room,units:c.units,sample:true,exampleKey:c.storageKey};init();toast('Loaded HatchBridge example')};
 $('title').oninput=e=>{P.title=e.target.value;save();const b=$('rooms').querySelector('.on');if(b)b.textContent=P.title||'Room'};
 ['syu','syk'].forEach(k=>$(k).oninput=()=>{P.sync={url:$('syu').value.trim(),key:$('syk').value.trim()};if(!P.sync.url&&!P.sync.key)delete P.sync;save()});

@@ -286,6 +286,17 @@ def main():
             check(b.evaluate("(z=>z&&z.x===0&&z.w===7&&z.d===20)(P.units.find(u=>u.kind==='zone'))"), "clicking a space bounded by walls makes it a room")
             b.click("#bZFill")
             b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);P.autoSig=null;draw()")
+            # nested layouts: an area opens its own room; inventory clicks go in and back out
+            b.evaluate("P.units=[];P.autoSig='x';zoneFromPts([[1,1],[7,1],[7,9],[1,9]]);P.units[0].name='Lab A';select(P.units[0].id);renderProps()")
+            b.click("#bLinkNew")
+            check(b.evaluate("(t=>t&&t.title==='Lab A'&&JSON.stringify(t.room.poly)==='[[0,0],[6,0],[6,8],[0,8]]')(roomByRid(P.units[0].link))"), "an area can become its own room, shaped like the area")
+            b.click("#bLinkGo"); b.click("#mUse"); b.wait_for_timeout(500)
+            check(b.evaluate("P.title")=="Lab A" and "Lab A" in b.frame_locator("#usef").locator("#crumbs").inner_text(), "inside a linked room the breadcrumb shows the layout above it")
+            bx = b.frame_locator("#usef").locator("#map").bounding_box(); b.mouse.click(bx["x"]+3, bx["y"]+3); b.wait_for_timeout(600)
+            check(b.evaluate("P.title")!="Lab A", "clicking outside the room in inventory goes back to the layout")
+            b.frame_locator("#usef").locator("#map path.zgo").first.click(); b.wait_for_timeout(600)
+            check(b.evaluate("P.title")=="Lab A", "clicking an area in inventory goes into its room")
+            b.click("#mEdit"); b.evaluate("const i=PROJ.rooms.findIndex(r=>r.title==='Lab A');PROJ.rooms.splice(i,1);goRoom(0);select(null);P.room.poly=P0;P.units=JSON.parse(U0);P.autoSig=null;draw()")
             # mark rooms / areas: drag a box, or draw a polygon like walls
             b.evaluate("P0=JSON.parse(JSON.stringify(P.room.poly));U0=JSON.stringify(P.units);P.room.poly=[[0,0],[20,0],[20,14],[0,14]];P.units=[];syncPoly();fit()")
             def zs(x, y):
