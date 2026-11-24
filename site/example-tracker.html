@@ -276,12 +276,13 @@ function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',s
  const A=H?[f.x,f.y+f.h/2]:[f.x+f.w/2,f.y],B=H?[f.x+f.w,f.y+f.h/2]:[f.x+f.w/2,f.y+f.h],n=H?[0,1]:[1,0];
  const inside=(x,y)=>{let k=false;for(let i=0,j=OL.length-1;i<OL.length;j=i++){const p=OL[i],q=OL[j];if(((p[1]>y)!=(q[1]>y))&&(x<(q[0]-p[0])*(y-p[1])/(q[1]-p[1])+p[0]))k=!k}return k};
  let sg=inside((A[0]+B[0])/2+n[0]*.6,(A[1]+B[1])/2+n[1]*.6)?1:-1;if(f.out)sg=-sg;const tw=sz/110;
- o.push(H?`<rect x="${f.x}" y="${A[1]-tw/2}" width="${f.w}" height="${tw}" fill="#f7f7f2"/>`:`<rect x="${A[0]-tw/2}" y="${f.y}" width="${tw}" height="${f.h}" fill="#f7f7f2"/>`);
+ o.push(`<rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" fill="#f7f7f2"/>`);
  [A,B].forEach(e=>o.push(`<line x1="${e[0]-n[0]*T/2}" y1="${e[1]-n[1]*T/2}" x2="${e[0]+n[0]*T/2}" y2="${e[1]+n[1]*T/2}" stroke="#111" stroke-width="${sz/250}"/>`));
+ const sh=()=>{const k=sg*T/2;A[0]+=n[0]*k;A[1]+=n[1]*k;B[0]+=n[0]*k;B[1]+=n[1]*k};
  const leaf=(h,e,len)=>{const tp=[h[0]+n[0]*sg*len,h[1]+n[1]*sg*len],z=(tp[0]-h[0])*(e[1]-h[1])-(tp[1]-h[1])*(e[0]-h[0]);
   o.push(`<line x1="${h[0]}" y1="${h[1]}" x2="${tp[0]}" y2="${tp[1]}" stroke="${c}" stroke-width="${sw*1.6}"/><path class="swing" d="M${tp[0]} ${tp[1]}A${len} ${len} 0 0 ${z>0?1:0} ${e[0]} ${e[1]}" fill="none" stroke="${c}" stroke-width="${sw}"/>`)};
- if(f.dt==='swing'){const h=f.hinge==='b'?B:A,e=f.hinge==='b'?A:B;leaf(h,e,L)}
- else if(f.dt==='double'){const M=[(A[0]+B[0])/2,(A[1]+B[1])/2];leaf(A,M,L/2);leaf(B,M,L/2)}
+ if(f.dt==='swing'){sh();const h=f.hinge==='b'?B:A,e=f.hinge==='b'?A:B;leaf(h,e,L)}
+ else if(f.dt==='double'){sh();const M=[(A[0]+B[0])/2,(A[1]+B[1])/2];leaf(A,M,L/2);leaf(B,M,L/2)}
  else if(f.dt==='slide'){const k=T*.22*sg;o.push(`<line x1="${A[0]+n[0]*k}" y1="${A[1]+n[1]*k}" x2="${A[0]+(B[0]-A[0])*.6+n[0]*k}" y2="${A[1]+(B[1]-A[1])*.6+n[1]*k}" stroke="${c}" stroke-width="${sw*2}"/><line x1="${B[0]-n[0]*k}" y1="${B[1]-n[1]*k}" x2="${B[0]-(B[0]-A[0])*.6-n[0]*k}" y2="${B[1]-(B[1]-A[1])*.6-n[1]*k}" stroke="${c}" stroke-width="${sw*2}"/>`)}
  return o.join('')}
 function drawMap(){const m=document.getElementById('map');const P=CONFIG.room.poly,OL=roomOutline(P);const FB=FP.filter(f=>f.kind!=='door'),xs=OL.map(p=>p[0]).concat(FB.flatMap(f=>[f.x,f.x+f.w])),ys=OL.map(p=>p[1]).concat(FB.flatMap(f=>[f.y,f.y+f.h]));

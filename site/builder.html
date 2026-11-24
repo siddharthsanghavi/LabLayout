@@ -433,12 +433,13 @@ function doorSvg(f,sz,OL){const H=f.w>=f.h,L=H?f.w:f.h,T=H?f.h:f.w,c='#8a6d3b',s
  const A=H?[f.x,f.y+f.h/2]:[f.x+f.w/2,f.y],B=H?[f.x+f.w,f.y+f.h/2]:[f.x+f.w/2,f.y+f.h],n=H?[0,1]:[1,0];
  const inside=(x,y)=>{let k=false;for(let i=0,j=OL.length-1;i<OL.length;j=i++){const p=OL[i],q=OL[j];if(((p[1]>y)!=(q[1]>y))&&(x<(q[0]-p[0])*(y-p[1])/(q[1]-p[1])+p[0]))k=!k}return k};
  let sg=inside((A[0]+B[0])/2+n[0]*.6,(A[1]+B[1])/2+n[1]*.6)?1:-1;if(f.out)sg=-sg;const tw=sz/110;
- o.push(H?`<rect x="${f.x}" y="${A[1]-tw/2}" width="${f.w}" height="${tw}" fill="#f7f7f2"/>`:`<rect x="${A[0]-tw/2}" y="${f.y}" width="${tw}" height="${f.h}" fill="#f7f7f2"/>`);
+ o.push(`<rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" fill="#f7f7f2"/>`);
  [A,B].forEach(e=>o.push(`<line x1="${e[0]-n[0]*T/2}" y1="${e[1]-n[1]*T/2}" x2="${e[0]+n[0]*T/2}" y2="${e[1]+n[1]*T/2}" stroke="#111" stroke-width="${sz/250}"/>`));
+ const sh=()=>{const k=sg*T/2;A[0]+=n[0]*k;A[1]+=n[1]*k;B[0]+=n[0]*k;B[1]+=n[1]*k};
  const leaf=(h,e,len)=>{const tp=[h[0]+n[0]*sg*len,h[1]+n[1]*sg*len],z=(tp[0]-h[0])*(e[1]-h[1])-(tp[1]-h[1])*(e[0]-h[0]);
   o.push(`<line x1="${h[0]}" y1="${h[1]}" x2="${tp[0]}" y2="${tp[1]}" stroke="${c}" stroke-width="${sw*1.6}"/><path class="swing" d="M${tp[0]} ${tp[1]}A${len} ${len} 0 0 ${z>0?1:0} ${e[0]} ${e[1]}" fill="none" stroke="${c}" stroke-width="${sw}"/>`)};
- if(f.dt==='swing'){const h=f.hinge==='b'?B:A,e=f.hinge==='b'?A:B;leaf(h,e,L)}
- else if(f.dt==='double'){const M=[(A[0]+B[0])/2,(A[1]+B[1])/2];leaf(A,M,L/2);leaf(B,M,L/2)}
+ if(f.dt==='swing'){sh();const h=f.hinge==='b'?B:A,e=f.hinge==='b'?A:B;leaf(h,e,L)}
+ else if(f.dt==='double'){sh();const M=[(A[0]+B[0])/2,(A[1]+B[1])/2];leaf(A,M,L/2);leaf(B,M,L/2)}
  else if(f.dt==='slide'){const k=T*.22*sg;o.push(`<line x1="${A[0]+n[0]*k}" y1="${A[1]+n[1]*k}" x2="${A[0]+(B[0]-A[0])*.6+n[0]*k}" y2="${A[1]+(B[1]-A[1])*.6+n[1]*k}" stroke="${c}" stroke-width="${sw*2}"/><line x1="${B[0]-n[0]*k}" y1="${B[1]-n[1]*k}" x2="${B[0]-(B[0]-A[0])*.6-n[0]*k}" y2="${B[1]-(B[1]-A[1])*.6-n[1]*k}" stroke="${c}" stroke-width="${sw*2}"/>`)}
  return o.join('')}
 function drawMap(){const m=document.getElementById('map');const P=CONFIG.room.poly,OL=roomOutline(P);const FB=FP.filter(f=>f.kind!=='door'),xs=OL.map(p=>p[0]).concat(FB.flatMap(f=>[f.x,f.x+f.w])),ys=OL.map(p=>p[1]).concat(FB.flatMap(f=>[f.y,f.y+f.h]));
@@ -2336,7 +2337,7 @@ function addFromLib(it,x,y){if(it.kind==='custom')return addCustomPiece(it,x,y);
  const u={id,name:it.n,tab:'',x:snap(x-w/2),y:snap(y-d/2),w,d,lib:it.k};
  if(it.kind==='storage'){Object.assign(u,{style:it.style,mapColor:it.color,mapTextColor:it.tc,front:{W:it.front[0],H:it.front[1]},preset:it.preset,pn:it.pn,pc:it.pc,eq:[]});if(it.surf)u.surf=[id+'-surf','Worktop'];u.grid=makeGrid(id,it.preset,it.pn,it.pc)}
  else if(it.kind==='wall'){Object.assign(u,{mapOnly:true,kind:'wall',mapColor:'#555555',name:'Wall'})}
- else if(it.kind==='door'){Object.assign(u,{mapOnly:true,kind:'door',mapColor:'#fff',name:it.n.replace(/ \d+"$/,''),dtype:it.dt||'swing'});if(SNAPON)snapDoor(u,u.x,u.y)}
+ else if(it.kind==='door'){Object.assign(u,{mapOnly:true,kind:'door',mapColor:'#fff',name:it.n.replace(/ \d+"$/,''),dtype:it.dt||'swing'});if(!snapDoor(u,x-w/2,y-d/2)){toast('Draw the walls first. Doors go in a wall');return}}
  else{const e=JSON.parse(JSON.stringify(it.eq));(e.slots||[]).forEach(s=>s.id=id+'-'+e.a+'-'+(seq++));Object.assign(u,{style:it.kind==='fixture'?'fixture':'plain',mapColor:it.kind==='fixture'?'#cfe8f5':'#d8c3a5',eqLen:Math.max(24,Math.round(e.w*1.4)),eq:[e]})}
  const n=P.units.filter(v=>v.lib===it.k).length;if(n)u.name+=' '+(n+1);
  P.units.push(u);select(id);commit('Added '+u.name)}
@@ -2381,19 +2382,24 @@ function fit(){const P0=roomOutline(P.room.poly),xs=P0.map(p=>p[0]).concat(P.uni
  const x0=Math.min(...xs)-1.5,y0=Math.min(...ys)-1.5,x1=Math.max(...xs)+1.5,y1=Math.max(...ys)+1.5;VB={x:x0,y:y0,w:x1-x0,h:y1-y0};draw()}
 /* doorways: sit in a straight wall, cut a gap in it and show how the door opens */
 function inRoom(x,y){const p=roomOutline(P.room.poly);let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if(((p[i][1]>y)!=(p[j][1]>y))&&(x<(p[j][0]-p[i][0])*(y-p[i][1])/(p[j][1]-p[i][1])+p[i][0]))c=!c}return c}
-function snapDoor(u,nx,ny){const L=Math.max(u.w,u.d),T=Math.min(u.w,u.d),cx=nx+u.w/2,cy=ny+u.d/2;let best=null;
- wallSegs().forEach(w=>{const along=w.v?cy:cx,d=Math.abs((w.v?cx:cy)-w.c);if(w.hi-w.lo<L-1e-6||along<w.lo-.5||along>w.hi+.5||d>3)return;if(!best||d<best.d)best={d,w}});
- if(!best){u.x=snap(nx);u.y=snap(ny);return false}const w=best.w,st=Math.max(w.lo,Math.min(w.hi-L,snap((w.v?cy:cx)-L/2)));
+/* doors live only in walls: the outer walls (drawn outside the room, so the door fills that width) or an interior wall's middle */
+function doorWalls(){const W=[],OL=roomOutline(P.room.poly),inside=(x,y)=>{let c=false;for(let i=0,j=OL.length-1;i<OL.length;j=i++){if(((OL[i][1]>y)!=(OL[j][1]>y))&&(x<(OL[j][0]-OL[i][0])*(y-OL[i][1])/(OL[j][1]-OL[i][1])+OL[i][0]))c=!c}return c};
+ wallSegs().forEach(w=>{const m=(w.lo+w.hi)/2,o=w.v?(inside(w.c+.05,m)?-1:1):(inside(m,w.c+.05)?-1:1);W.push({v:w.v,face:w.c,c:w.c+o*WT()/2,lo:w.lo,hi:w.hi,T:Math.max(WT(),.15)})});
+ P.units.filter(u=>u.kind==='wall').forEach(u=>{const v=u.d>u.w;W.push(v?{v:1,face:u.x+u.w/2,c:u.x+u.w/2,lo:u.y,hi:u.y+u.d,T:u.w}:{v:0,face:u.y+u.d/2,c:u.y+u.d/2,lo:u.x,hi:u.x+u.w,T:u.d})});return W}
+function snapDoor(u,nx,ny){const L=Math.max(u.w,u.d),cx=nx+u.w/2,cy=ny+u.d/2;let best=null;
+ doorWalls().forEach(w=>{if(w.hi-w.lo<L-1e-6)return;const along=w.v?cy:cx,a=Math.max(w.lo+L/2,Math.min(w.hi-L/2,along)),d=Math.hypot((w.v?cx:cy)-w.face,along-a);if(!best||d<best.d)best={d,w}});
+ if(!best)return false;const w=best.w,T=w.T,st=Math.max(w.lo,Math.min(w.hi-L,SNAPON?snap((w.v?cy:cx)-L/2):(w.v?cy:cx)-L/2));
  if(w.v){u.w=T;u.d=L;u.x=+(w.c-T/2).toFixed(4);u.y=+st.toFixed(4)}else{u.w=L;u.d=T;u.y=+(w.c-T/2).toFixed(4);u.x=+st.toFixed(4)}return true}
 function doorG(u,S){const H=u.w>=u.d,L=H?u.w:u.d,T=H?u.d:u.w,sw=S/400,c='#8a6d3b',t=u.dtype||'swing',o=[];
  const A=H?[u.x,u.y+u.d/2]:[u.x+u.w/2,u.y],B=H?[u.x+u.w,u.y+u.d/2]:[u.x+u.w/2,u.y+u.d],n=H?[0,1]:[1,0];
  let sg=inRoom((A[0]+B[0])/2+n[0]*.6,(A[1]+B[1])/2+n[1]*.6)?1:-1;if(u.out)sg=-sg;
- {const tw=S/100;o.push(H?`<rect x="${u.x}" y="${A[1]-tw/2}" width="${u.w}" height="${tw}" fill="#fbfbf7"/>`:`<rect x="${A[0]-tw/2}" y="${u.y}" width="${tw}" height="${u.d}" fill="#fbfbf7"/>`)}
+ o.push(`<rect x="${u.x}" y="${u.y}" width="${u.w}" height="${u.d}" fill="#fbfbf7"/>`);
  [A,B].forEach(e=>o.push(`<line x1="${e[0]-n[0]*T/2}" y1="${e[1]-n[1]*T/2}" x2="${e[0]+n[0]*T/2}" y2="${e[1]+n[1]*T/2}" stroke="#111" stroke-width="${S/250}"/>`));
+ const sh=()=>{const k=sg*T/2;A[0]+=n[0]*k;A[1]+=n[1]*k;B[0]+=n[0]*k;B[1]+=n[1]*k};
  const leaf=(h,e,len)=>{const tp=[h[0]+n[0]*sg*len,h[1]+n[1]*sg*len],z=(tp[0]-h[0])*(e[1]-h[1])-(tp[1]-h[1])*(e[0]-h[0]);
   o.push(`<line x1="${h[0]}" y1="${h[1]}" x2="${tp[0]}" y2="${tp[1]}" stroke="${c}" stroke-width="${sw*1.6}"/><path d="M${tp[0]} ${tp[1]}A${len} ${len} 0 0 ${z>0?1:0} ${e[0]} ${e[1]}" fill="none" stroke="${c}" stroke-width="${sw}"/>`)};
- if(t==='swing'){const h=u.hinge==='b'?B:A,e=u.hinge==='b'?A:B;leaf(h,e,L)}
- else if(t==='double'){const M=[(A[0]+B[0])/2,(A[1]+B[1])/2];leaf(A,M,L/2);leaf(B,M,L/2)}
+ if(t==='swing'){sh();const h=u.hinge==='b'?B:A,e=u.hinge==='b'?A:B;leaf(h,e,L)}
+ else if(t==='double'){sh();const M=[(A[0]+B[0])/2,(A[1]+B[1])/2];leaf(A,M,L/2);leaf(B,M,L/2)}
  else if(t==='slide'){const k=T*.22*sg;o.push(`<line x1="${A[0]+n[0]*k}" y1="${A[1]+n[1]*k}" x2="${A[0]+(B[0]-A[0])*.6+n[0]*k}" y2="${A[1]+(B[1]-A[1])*.6+n[1]*k}" stroke="${c}" stroke-width="${sw*2}"/><line x1="${B[0]-n[0]*k}" y1="${B[1]-n[1]*k}" x2="${B[0]-(B[0]-A[0])*.6-n[0]*k}" y2="${B[1]-(B[1]-A[1])*.6-n[1]*k}" stroke="${c}" stroke-width="${sw*2}"/>`)}
  o.push(`<rect class="b" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.d}" fill="transparent" stroke="none"/>`);return o.join('')}
 function draw(){svg.setAttribute('viewBox',`${VB.x} ${VB.y} ${VB.w} ${VB.h}`);const g=[];const S=Math.max(VB.w,VB.h);let GR='';
@@ -2404,7 +2410,7 @@ function draw(){svg.setAttribute('viewBox',`${VB.x} ${VB.y} ${VB.w} ${VB.h}`);co
  if(poly.length>2&&!editMode&&!drawMode)segsOf(poly,true).forEach(([a,b,i])=>{if(!a[3])g.push(`<line class="wseg wdrag" data-w="${i}" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="transparent" stroke-width="${S/70}"/>`)});
  // wall lengths
  if(poly.length>2&&!editMode)poly.forEach((p,i)=>{const q=poly[(i+1)%poly.length],L=Math.hypot(q[0]-p[0],q[1]-p[1]);if(L<1)return;g.push(`<text x="${(p[0]+q[0])/2}" y="${(p[1]+q[1])/2}" style="font-size:${S/60}px" fill="#2d6cdf" dy="${q[0]===p[0]?0:-S/80}" dx="${q[0]===p[0]?S/45:0}">${uL(L)}</text>`)});
- P.units.filter(u=>u.kind==='zone').concat(P.units.filter(u=>u.kind!=='zone')).forEach(u=>{const fs=Math.max(.15,Math.min(S/45,Math.min(u.w,u.d)*.45,Math.max(u.w,u.d)*.9/Math.max(3,(u.mapText??u.name).length*.6))),v=u.d>u.w*1.3;
+ P.units.filter(u=>u.kind==='zone').concat(P.units.filter(u=>u.kind!=='zone'&&u.kind!=='door'),P.units.filter(u=>u.kind==='door')).forEach(u=>{const fs=Math.max(.15,Math.min(S/45,Math.min(u.w,u.d)*.45,Math.max(u.w,u.d)*.9/Math.max(3,(u.mapText??u.name).length*.6))),v=u.d>u.w*1.3;
   if(u.kind==='door'){g.push(`<g class="u door${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}">${doorG(u,S)}</g>`);return}
   if(u.kind==='zone'){const ip=zoneInset(u),bx=pcen(ip);g.push(`<g class="u zonep${u.locked?' locked':''}${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}"><path class="b" clip-path="url(#zclip)" d="${ptsPath(ip)}" fill="${asgColor(u)}" fill-opacity="${zOp(u)}" stroke="#7a9" stroke-width="${S/500}" stroke-dasharray=".4 .2"/><text x="${bx[0]}" y="${bx[1]}" style="font-size:${Math.min(S/60,.9)}px;font-weight:600" fill="${zTx(u)}">${esc(asgLabel(u))}</text></g>`);return}
   g.push(`<g class="u${u.locked?' locked':''}${u.id===selId?' sel':selSet.has(u.id)?' msel':''}" data-id="${u.id}"><rect class="b" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.d}" rx="${u.kind==='wall'?0:.06}"${u.kind==='wall'?' clip-path="url(#zclip)"':''} fill="${u.kind==='desk'&&u.deskColor?u.deskColor:isAsg(u)?asgColor(u):u.mapColor||'#bbb'}" stroke="${u.kind==='zone'?'#7a9':'#333'}" stroke-width="${S/500}" ${u.kind==='door'?'stroke-dasharray=".2 .1" fill-opacity=".9"':u.kind==='zone'?`stroke-dasharray=".4 .2" fill-opacity="${zOp(u)}"`:''}/>${u.kind==='wall'?'':u.kind==='zone'?`<text x="${u.x+u.w/2}" y="${u.y+Math.min(S/45,1.2)}" style="font-size:${Math.min(S/60,.9)}px;font-weight:600" fill="${zTx(u)}">${esc(asgLabel(u))}</text>`:`<text x="${u.x+u.w/2}" y="${u.y+u.d/2}" style="font-size:${fs}px" fill="${u.mapTextColor||'#111'}" ${v?`transform="rotate(-90 ${u.x+u.w/2} ${u.y+u.d/2})"`:''}>${esc(u.kind==='desk'?asgLabel(u):(u.mapText??u.name))}</text>`}${(u.eq||[]).length&&u.grid?`<text x="${u.x+u.w-.15}" y="${u.y+.25}" style="font-size:${S/70}px;text-anchor:end">⚙${u.eq.length}</text>`:''}</g>`)});
@@ -2678,7 +2684,7 @@ function selChanged(){['bRot','bDup','bDel','bLock'].forEach(b=>$(b).disabled=!s
 function alignSel(how){const L=[...selSet].map(U).filter(Boolean);if(L.length<2)return;if(L.some(u=>u.locked))return lockedMsg();const v={l:Math.min(...L.map(u=>u.x)),r:Math.max(...L.map(u=>u.x+u.w)),t:Math.min(...L.map(u=>u.y)),b:Math.max(...L.map(u=>u.y+u.d))}[how];
  L.forEach(u=>{if(how==='l')u.x=v;if(how==='r')u.x=+(v-u.w).toFixed(3);if(how==='t')u.y=v;if(how==='b')u.y=+(v-u.d).toFixed(3)});commit('Aligned');renderProps()}
 svg.addEventListener('pointermove',e=>{if(sketchMove(e))return;const q=pt(e);if(marq){marq.x1=q.x;marq.y1=q.y;draw();return}if(!drag)return;if(drag.locked){if(!drag.warned&&Math.hypot(q.x-drag.q0.x,q.y-drag.q0.y)>.3){drag.warned=true;lockedMsg()}return}const u=U(drag.id),s0=drag.start.find(s=>s.id===drag.id);
- let nx=snap(s0.x+q.x-drag.q0.x),ny=snap(s0.y+q.y-drag.q0.y);if(u.kind==='door'&&drag.start.length===1&&!nosnap(e)){const ox=u.x,oy=u.y,ow=u.w;snapDoor(u,s0.x+q.x-drag.q0.x,s0.y+q.y-drag.q0.y);if(u.x!==ox||u.y!==oy||u.w!==ow){drag.moved=true;draw();renderProps(true)}return}if(!nosnap(e)){const w=snapWall(u,nx,ny);nx=w.x;ny=w.y}const dx=nx-s0.x,dy=ny-s0.y;
+ let nx=snap(s0.x+q.x-drag.q0.x),ny=snap(s0.y+q.y-drag.q0.y);if(u.kind==='door'&&drag.start.length===1){const ox=u.x,oy=u.y,ow=u.w;snapDoor(u,s0.x+q.x-drag.q0.x,s0.y+q.y-drag.q0.y);if(u.x!==ox||u.y!==oy||u.w!==ow){drag.moved=true;draw();renderProps(true)}return}if(!nosnap(e)){const w=snapWall(u,nx,ny);nx=w.x;ny=w.y}const dx=nx-s0.x,dy=ny-s0.y;
  if(nx!==u.x||ny!==u.y){drag.start.forEach(s=>{const v=U(s.id);v.x=+(s.x+dx).toFixed(3);v.y=+(s.y+dy).toFixed(3)});drag.moved=true;draw();renderProps(true)}});
 svg.addEventListener('pointerup',()=>{if(sketchUp())return;if(marq){const m=marq;marq=null;const x0=Math.min(m.x0,m.x1),x1=Math.max(m.x0,m.x1),y0=Math.min(m.y0,m.y1),y1=Math.max(m.y0,m.y1);
   if(x1-x0>.1||y1-y0>.1){if(!m.add)selSet.clear();P.units.forEach(u=>{if(u.kind==='zone'?(u.x>=x0&&u.x+u.w<=x1&&u.y>=y0&&u.y+u.d<=y1):(u.x<x1&&u.x+u.w>x0&&u.y<y1&&u.y+u.d>y0))selSet.add(u.id)});expandGroups();selId=[...selSet].pop()||null;selChanged()}else draw();return}
