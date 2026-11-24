@@ -273,6 +273,19 @@ def main():
             b.evaluate("selSet.add(P.units[1].id);selChanged()"); b.click(".swatches [data-col='#a5d6a7']")
             check(b.evaluate("P.units.every(u=>u.mapColor==='#a5d6a7')"), "colour applies to every selected piece")
             b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);draw()")
+            # interior walls enclose rooms automatically; click-a-space fills one
+            b.evaluate("P.units=[];P.autoSig=null;const w=allLib().flatMap(c=>c.items).find(i=>i.kind==='wall');addFromLib(w,3,3);const u=P.units[0];u.x=7;u.y=0;u.w=.5;u.d=20;commit('Wall')")
+            check(b.evaluate("P.units.filter(u=>u.kind==='zone').length===2"), "a wall splitting the floor makes two rooms automatically")
+            b.evaluate("P.units=[{id:'w1',kind:'wall',mapOnly:true,name:'W',x:7.1,y:0,w:.4,d:4},{id:'d1',kind:'door',mapOnly:true,name:'D',x:7.1,y:4,w:.4,d:3},{id:'w3',kind:'wall',mapOnly:true,name:'W',x:7.1,y:7,w:.4,d:3},{id:'w2',kind:'wall',mapOnly:true,name:'W',x:0,y:10,w:14,d:.5}];P.autoSig=null;commit('x')")
+            check(b.evaluate("JSON.stringify(P.units.filter(u=>u.kind==='zone').map(z=>[z.x,z.y,z.w,z.d]).sort())") == "[[0,0,7.1,10],[0,10.5,14,9.5],[7.5,0,6.5,10]]", "auto rooms follow wall faces and doorways keep rooms apart")
+            b.evaluate("P.units.find(u=>u.kind==='zone'&&u.x===0&&u.y===0).name='Office';P.units.find(u=>u.id==='w2').y=9;P.units.find(u=>u.id==='w3').d=2;commit('x')")
+            check(b.evaluate("(z=>z&&z.d===9)(P.units.find(u=>u.name==='Office'))"), "moving a wall reshapes its auto room and keeps the name")
+            b.evaluate("P.units=[{id:'w1',kind:'wall',mapOnly:true,name:'W',x:7,y:0,w:.5,d:20}];P.autoSig=null;commit('x')")
+            b.evaluate("P.units=P.units.filter(u=>u.kind!=='zone');draw()"); b.click("#bZFill")
+            b.mouse.click(*b.evaluate("(()=>{const a=toScreen(3,10),r=$('stage').getBoundingClientRect();return [a.x+r.left,a.y+r.top]})()"))
+            check(b.evaluate("(z=>z&&z.x===0&&z.w===7&&z.d===20)(P.units.find(u=>u.kind==='zone'))"), "clicking a space bounded by walls makes it a room")
+            b.click("#bZFill")
+            b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);P.autoSig=null;draw()")
             # mark rooms / areas: drag a box, or draw a polygon like walls
             b.evaluate("P0=JSON.parse(JSON.stringify(P.room.poly));U0=JSON.stringify(P.units);P.room.poly=[[0,0],[20,0],[20,14],[0,14]];P.units=[];syncPoly();fit()")
             def zs(x, y):

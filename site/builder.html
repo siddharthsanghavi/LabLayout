@@ -126,7 +126,7 @@ details{border:1px solid var(--line);border-radius:var(--r);background:#fff}summ
   <div class="row" style="margin-top:6px"><button class="ghost" id="bEdit">📐 Edit walls</button><button class="ghost" id="bGrid" title="Change the grid size (furniture and dragged walls snap to it)">▦ Grid</button></div>
   <div class="row" style="margin-top:6px"><input id="frad" placeholder="Fillet all corners, e.g. 6&quot;" style="padding:6px;border:1px solid #ccc;border-radius:6px;font:inherit;font-size:13px;min-width:0"><button class="ghost" id="bFil" style="flex:none">⌒ Fillet</button></div>
   <details style="margin-top:6px"><summary>Wall tool tips</summary><ul class="hint" style="padding:0 10px 6px 24px;margin:0;line-height:1.5"><li>Snaps to corners (□), wall midpoints (△), horizontal/vertical/45°, and lines up with other corners (dashed blue).</li><li>Type a length while drawing — <b>10</b>, <b>10.5</b>, <b>10' 6"</b>, <b>126"</b> — then Enter.</li><li>Backspace removes the last corner. Click the first corner, double-click, right-click or press Enter to finish. Esc cancels.</li><li>Hold <b>Alt</b> to place freely.</li><li><b>Stretch a wall</b>: drag any straight wall in or out; it snaps to the grid (Alt = free). Pick the grid size with <b>▦ Grid</b>.</li><li>In Edit walls: drag a wall to stretch it (it clicks into line with other walls), drag a corner onto another wall to join them, drag the floor to move the whole room, drag corners, double-click a wall to add one, right-click a corner to delete, click a length to type it.</li><li><b>Fillets</b>: click a corner (without dragging) and type a radius, or use <i>Fillet all corners</i>.</li><li><b>Curved walls</b>: drag the round handle in the middle of a wall sideways, or click it and type the curve depth (0 = straight).</li></ul></details>
-  <h2 style="margin-top:12px">Mark rooms &amp; areas</h2><div class="row"><button class="ghost" id="bZone" title="Click corners like walls; Enter or click the first corner to finish">⬠ Draw area</button><button class="ghost" id="bZRect" title="Drag a box on the plan">▭ Drag a box</button></div><p class="hint" style="margin:4px 0 8px">Mark offices, zones or areas inside the walls. Click one to name it and set who it belongs to.</p>
+  <h2 style="margin-top:12px">Mark rooms &amp; areas</h2><div class="row"><button class="ghost" id="bZone" title="Click corners like walls; Enter or click the first corner to finish">⬠ Draw room</button><button class="ghost" id="bZRect" title="Drag a box on the plan">▭ Drag a box</button></div><div class="row" style="margin-top:4px"><button class="ghost" id="bZFill" title="Click inside a space bounded by walls to make it a room">🪣 Click a space</button></div><p class="hint" style="margin:4px 0 8px">Mark offices, zones or areas inside the walls. Click one to name it and set who it belongs to.</p>
   <label class="f">Wall corners (x, y[, fillet radius][, arc depth] in <span class="lu">ft</span> — one per line)<textarea id="poly" rows="5"></textarea></label>
   <button class="ghost" id="bPoly" style="width:100%">Apply corners</button>
   <details><summary>☁ Shared inventory (optional)</summary><div style="padding:0 8px 8px"><p class="hint">Bake a Supabase connection into exported trackers so every device shares one inventory. See README for setup. The anon key ends up inside the HTML file — only share the file with people who should edit the inventory.</p><label class="f">Supabase URL<input id="syu" placeholder="https://xxxx.supabase.co"></label><label class="f">Anon key<input id="syk" placeholder="eyJ…"></label></div></details>
@@ -2263,7 +2263,8 @@ const LIB=[
   {kind:'door',a:'door30',n:'Door 30"',fp:[2.5,.4]},
   {kind:'door',a:'door2',n:'Double door 72"',fp:[6,.4],dt:'double'},
   {kind:'door',a:'slide',n:'Sliding door 36"',fp:[3,.4],dt:'slide'},
-  {kind:'door',a:'opening',n:'Open doorway 36"',fp:[3,.4],dt:'open'}]}];
+  {kind:'door',a:'opening',n:'Open doorway 36"',fp:[3,.4],dt:'open'},
+  {kind:'wall',k:'iwall',a:'iwall',n:'Interior wall 8 ft',fp:[8,.4]}]}];
 LIB.forEach(c=>{c.grp='Furniture';c.items.forEach(it=>{if(!it.k)it.k=it.a;it.cat=c.cat})});
 /* ---------- library packs: library/*.json is bundled at build time; more can be added in the app ---------- */
 const BUILTIN_PACKS=JSON.parse(document.getElementById('lib-packs').textContent);
@@ -2328,6 +2329,7 @@ function addFromLib(it,x,y){if(it.kind==='custom')return addCustomPiece(it,x,y);
  const [w,d]=it.fp;const id=nid(it.kind==='storage'?'u':it.kind==='door'?'door':'m');
  const u={id,name:it.n,tab:'',x:snap(x-w/2),y:snap(y-d/2),w,d,lib:it.k};
  if(it.kind==='storage'){Object.assign(u,{style:it.style,mapColor:it.color,mapTextColor:it.tc,front:{W:it.front[0],H:it.front[1]},preset:it.preset,pn:it.pn,pc:it.pc,eq:[]});if(it.surf)u.surf=[id+'-surf','Worktop'];u.grid=makeGrid(id,it.preset,it.pn,it.pc)}
+ else if(it.kind==='wall'){Object.assign(u,{mapOnly:true,kind:'wall',mapColor:'#555555',name:'Wall'})}
  else if(it.kind==='door'){Object.assign(u,{mapOnly:true,kind:'door',mapColor:'#fff',name:it.n.replace(/ \d+"$/,''),dtype:it.dt||'swing'});snapDoor(u,u.x,u.y)}
  else{const e=JSON.parse(JSON.stringify(it.eq));(e.slots||[]).forEach(s=>s.id=id+'-'+e.a+'-'+(seq++));Object.assign(u,{style:it.kind==='fixture'?'fixture':'plain',mapColor:it.kind==='fixture'?'#cfe8f5':'#d8c3a5',eqLen:Math.max(24,Math.round(e.w*1.4)),eq:[e]})}
  const n=P.units.filter(v=>v.lib===it.k).length;if(n)u.name+=' '+(n+1);
@@ -2373,8 +2375,8 @@ function fit(){const P0=roomOutline(P.room.poly),xs=P0.map(p=>p[0]).concat(P.uni
 /* doorways: sit in a straight wall, cut a gap in it and show how the door opens */
 function inRoom(x,y){const p=roomOutline(P.room.poly);let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if(((p[i][1]>y)!=(p[j][1]>y))&&(x<(p[j][0]-p[i][0])*(y-p[i][1])/(p[j][1]-p[i][1])+p[i][0]))c=!c}return c}
 function snapDoor(u,nx,ny){const L=Math.max(u.w,u.d),T=Math.min(u.w,u.d),cx=nx+u.w/2,cy=ny+u.d/2;let best=null;
- wallSegs().forEach(w=>{const along=w.v?cy:cx,d=Math.abs((w.v?cx:cy)-w.c);if(w.hi-w.lo<L-1e-6||along<w.lo-.5||along>w.hi+.5||d>1.5)return;if(!best||d<best.d)best={d,w}});
- if(!best){u.x=nx;u.y=ny;return false}const w=best.w,st=Math.max(w.lo,Math.min(w.hi-L,snap((w.v?cy:cx)-L/2)));
+ wallSegs().forEach(w=>{const along=w.v?cy:cx,d=Math.abs((w.v?cx:cy)-w.c);if(w.hi-w.lo<L-1e-6||along<w.lo-.5||along>w.hi+.5||d>3)return;if(!best||d<best.d)best={d,w}});
+ if(!best){u.x=snap(nx);u.y=snap(ny);return false}const w=best.w,st=Math.max(w.lo,Math.min(w.hi-L,snap((w.v?cy:cx)-L/2)));
  if(w.v){u.w=T;u.d=L;u.x=+(w.c-T/2).toFixed(4);u.y=+st.toFixed(4)}else{u.w=L;u.d=T;u.y=+(w.c-T/2).toFixed(4);u.x=+st.toFixed(4)}return true}
 function doorG(u,S){const H=u.w>=u.d,L=H?u.w:u.d,T=H?u.d:u.w,sw=S/400,c='#8a6d3b',t=u.dtype||'swing',o=[];
  const A=H?[u.x,u.y+u.d/2]:[u.x+u.w/2,u.y],B=H?[u.x+u.w,u.y+u.d/2]:[u.x+u.w/2,u.y+u.d],n=H?[0,1]:[1,0];
@@ -2435,7 +2437,7 @@ document.addEventListener('input',e=>{const i=e.target;if(i.dataset&&i.dataset.l
 document.addEventListener('change',e=>{const i=e.target;if(!i.dataset||!i.dataset.len||isNum(i.value)||!i.value.trim())return;if(!lenConv(i)){e.stopImmediatePropagation();return}const ev=new Event('input',{bubbles:true});ev.lenOK=1;i.dispatchEvent(ev)},true);
 function lenOf(i){const raw=i.value,v=parseLen(raw);if(v==null){toast('Couldn’t read “'+raw+'”. Try 45 in, 3 1/2 ft, 5\' 6", 30 cm or 1.2 m');return null}
  if(/[a-z'"\/]/i.test(raw))toast(raw.trim()+' → '+fmtBoth(v));return v}
-const r4=v=>Math.round(v*4)/4, near=(a,b)=>Math.abs(a-b)<1e-6;
+const clmp=(v,u,w)=>Math.max(Math.min(u,w),Math.min(Math.max(u,w),v)),r4=v=>Math.round(v*4)/4, near=(a,b)=>Math.abs(a-b)<1e-6;
 
 /* Sketch inference: endpoints > midpoints > H/V/45° from the last point > alignment with other corners > 3" grid. Alt = free. */
 function sketchSnap(q,o){o=o||{};const pts=o.pts||[],from=o.from,tol=tolFt(11),res={x:q.x,y:q.y,tag:'',kind:'',guides:[]};
@@ -2446,7 +2448,7 @@ function sketchSnap(q,o){o=o||{};const pts=o.pts||[],from=o.from,tol=tolFt(11),r
  // 2. wall midpoints
  (o.segs||[]).forEach(([a,b])=>{const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,d=Math.hypot(mx-q.x,my-q.y);if(d<tol&&(!best||d<best.d))best={d,x:mx,y:my}});
  if(best)return{x:best.x,y:best.y,tag:'Mid',kind:'mid',guides:[]};
- if(o.onSeg)(o.segs||[]).forEach(([a,b])=>{const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;if(!L2)return;const t=Math.max(0,Math.min(1,((q.x-a[0])*dx+(q.y-a[1])*dy)/L2)),px=a[0]+dx*t,py=a[1]+dy*t,d=Math.hypot(px-q.x,py-q.y);if(d<tol&&(!best||d<best.d))best={d,x:near(dx,0)?a[0]:px,y:near(dy,0)?a[1]:py}});
+ if(o.onSeg)(o.segs||[]).forEach(([a,b])=>{const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;if(!L2)return;const t=Math.max(0,Math.min(1,((q.x-a[0])*dx+(q.y-a[1])*dy)/L2)),px=a[0]+dx*t,py=a[1]+dy*t,d=Math.hypot(px-q.x,py-q.y);if(d<tol&&(!best||d<best.d))best={d,x:near(dx,0)?a[0]:near(dy,0)?clmp(snap(px),a[0],b[0]):px,y:near(dy,0)?a[1]:near(dx,0)?clmp(snap(py),a[1],b[1]):py}});
  if(best)return{x:+best.x.toFixed(4),y:+best.y.toFixed(4),tag:'On wall',kind:'mid',guides:[]};
  let x=q.x,y=q.y,lockX=false,lockY=false,ray=null;
  // 3. H / V / 45° relative to the previous point
@@ -2468,18 +2470,19 @@ function startDraw(target){exitEdit();zrStop();SK={pts:[],hover:null,typed:'',pr
 function zoneFromPts(pts){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x,d=Math.max(...ys)-y;if(w<.3||d<.3){toast('That area is too small');return null}
  const rect=pts.length===4&&pts.every(p=>(near(p[0],x)||near(p[0],x+w))&&(near(p[1],y)||near(p[1],y+d)));const id=nid('zone'),n=P.units.filter(u=>u.kind==='zone').length+1;
  const u={id,kind:'zone',mapOnly:true,name:'Room '+n,assign:'shared',x:+x.toFixed(4),y:+y.toFixed(4),w:+w.toFixed(4),d:+d.toFixed(4)};if(!rect)u.poly=pts.map(p=>[+((p[0]-x)/w).toFixed(5),+((p[1]-y)/d).toFixed(5)]);
- P.units.unshift(u);select(id);commit('Marked '+u.name);return u}
+ P.units.unshift(u);if(AUTOZ)return u;select(id);commit('Marked '+u.name);return u}
 const pcen=P=>{let A=0,x=0,y=0;P.forEach((p,i)=>{const q=P[(i+1)%P.length],k=p[0]*q[1]-q[0]*p[1];A+=k;x+=(p[0]+q[0])*k;y+=(p[1]+q[1])*k});return Math.abs(A)<1e-9?P[0]:[x/(3*A),y/(3*A)]};
 function zonePath(u){return 'M'+u.poly.map(([a,b])=>(+(u.x+a*u.w).toFixed(4))+' '+(+(u.y+b*u.d).toFixed(4))).join('L')+'Z'}
 let ZR=null;function zrStart(){if(SK)finishDraw(true);exitEdit();ZR={};$('stage').classList.add('zrect');$('bZRect').textContent='✕ Cancel';toast('Drag a box on the plan to mark an area');select(null)}
 function zrStop(){if(!ZR)return;ZR=null;$('stage').classList.remove('zrect');$('bZRect').textContent='▭ Drag a box';draw()}
-function finishDraw(cancel){if(!SK)return;const pts=SK.pts;drawMode=false;$('bDraw').textContent='✏️ Draw walls';$('bZone').textContent='⬠ Draw area';dimBox(null);
+function finishDraw(cancel){if(!SK)return;const pts=SK.pts;drawMode=false;$('bDraw').textContent='✏️ Draw walls';$('bZone').textContent='⬠ Draw room';dimBox(null);
  if(SK.target==='zone'){SK=null;if(!cancel&&pts.length>=3)zoneFromPts(pts);else{if(!cancel)toast('An area needs at least 3 corners');draw()}return}
  if(!cancel&&pts.length>=3){P.room.poly=pts.map(p=>[+p[0].toFixed(4),+p[1].toFixed(4)]);SK=null;syncPoly();fit();commit('Walls drawn')}
  else{P.room.poly=SK.prev;SK=null;if(!cancel)toast('Need at least 3 corners — kept the old walls');draw()}}
 function skPlace(p){const pts=SK.pts,l=pts[pts.length-1];if(l&&near(l[0],p[0])&&near(l[1],p[1]))return;
  if(pts.length>=3&&near(p[0],pts[0][0])&&near(p[1],pts[0][1])){finishDraw();return}pts.push([p[0],p[1]]);SK.typed='';draw()}
-function skHover(e){const q=pt(e),pts=SK.pts,Z=SK.target==='zone';SK.hover=sketchSnap(q,{pts:Z?pts.concat(P.room.poly.map(v=>[v[0],v[1]])):pts,from:pts[pts.length-1],closing:pts.length>=3,segs:Z?segsOf(pts,false).concat(segsOf(P.room.poly,true)):segsOf(pts,false),onSeg:Z,free:e.altKey});SK.raw=q;draw();dimFollow()}
+const iwPolys=()=>P.units.filter(u=>u.kind==='wall'||u.kind==='zone').map(u=>u.kind==='zone'?zonePts(u):[[u.x,u.y],[u.x+u.w,u.y],[u.x+u.w,u.y+u.d],[u.x,u.y+u.d]]);
+function skHover(e){const q=pt(e),pts=SK.pts,Z=SK.target==='zone',IW=Z?iwPolys():[];SK.hover=sketchSnap(q,{pts:Z?pts.concat(P.room.poly.map(v=>[v[0],v[1]]),...IW):pts,from:pts[pts.length-1],closing:pts.length>=3,segs:Z?segsOf(pts,false).concat(segsOf(P.room.poly,true),...IW.map(w=>segsOf(w,true))):segsOf(pts,false),onSeg:Z,free:e.altKey});SK.raw=q;draw();dimFollow()}
 function skTypedPoint(){const L=parseLen(SK.typed),pts=SK.pts,l=pts[pts.length-1];if(L==null||!l||!SK.hover)return null;
  let dx=SK.hover.x-l[0],dy=SK.hover.y-l[1],n=Math.hypot(dx,dy);if(n<1e-6){dx=1;dy=0;n=1}return[l[0]+dx/n*L,l[1]+dy/n*L]}
 
@@ -2564,7 +2567,7 @@ function tidyPoly(){const p=P.room.poly;let n=0,ch=true;while(ch&&p.length>3){ch
   if(dup||col){p.splice(i,1);n++;ch=true;break}}}if(n)syncPoly();return n}
 /* room areas: absolute corners, and writing them back */
 function zonePts(u){return u.poly?u.poly.map(([a,b])=>[u.x+a*u.w,u.y+b*u.d]):[[u.x,u.y],[u.x+u.w,u.y],[u.x+u.w,u.y+u.d],[u.x,u.y+u.d]]}
-function setZonePts(u,pts){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x||.01,d=Math.max(...ys)-y||.01;Object.assign(u,{x:+x.toFixed(4),y:+y.toFixed(4),w:+w.toFixed(4),d:+d.toFixed(4)});
+function setZonePts(u,pts){delete u.auto;const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x||.01,d=Math.max(...ys)-y||.01;Object.assign(u,{x:+x.toFixed(4),y:+y.toFixed(4),w:+w.toFixed(4),d:+d.toFixed(4)});
  const rect=pts.length===4&&pts.every(p=>(near(p[0],x)||near(p[0],x+w))&&(near(p[1],y)||near(p[1],y+d)))&&new Set(pts.map(p=>(near(p[0],x)?0:1)+','+(near(p[1],y)?0:1))).size===4;
  if(rect)delete u.poly;else u.poly=pts.map(p=>[+((p[0]-x)/w).toFixed(5),+((p[1]-y)/d).toFixed(5)])}
 function zoneHandles(u,S){if(!u||u.kind!=='zone'||u.locked||selSet.size!==1||drawMode||SK)return'';const mk=S/110,pts=zonePts(u);
@@ -2629,7 +2632,7 @@ function selChanged(){['bRot','bDup','bDel','bLock'].forEach(b=>$(b).disabled=!s
 function alignSel(how){const L=[...selSet].map(U).filter(Boolean);if(L.length<2)return;if(L.some(u=>u.locked))return lockedMsg();const v={l:Math.min(...L.map(u=>u.x)),r:Math.max(...L.map(u=>u.x+u.w)),t:Math.min(...L.map(u=>u.y)),b:Math.max(...L.map(u=>u.y+u.d))}[how];
  L.forEach(u=>{if(how==='l')u.x=v;if(how==='r')u.x=+(v-u.w).toFixed(3);if(how==='t')u.y=v;if(how==='b')u.y=+(v-u.d).toFixed(3)});commit('Aligned');renderProps()}
 svg.addEventListener('pointermove',e=>{if(sketchMove(e))return;const q=pt(e);if(marq){marq.x1=q.x;marq.y1=q.y;draw();return}if(!drag)return;if(drag.locked){if(!drag.warned&&Math.hypot(q.x-drag.q0.x,q.y-drag.q0.y)>.3){drag.warned=true;lockedMsg()}return}const u=U(drag.id),s0=drag.start.find(s=>s.id===drag.id);
- let nx=snap(s0.x+q.x-drag.q0.x),ny=snap(s0.y+q.y-drag.q0.y);if(u.kind==='door'&&drag.start.length===1&&!e.altKey){const ox=u.x,oy=u.y,ow=u.w;snapDoor(u,nx,ny);if(u.x!==ox||u.y!==oy||u.w!==ow){drag.moved=true;draw();renderProps(true)}return}if(!e.altKey){const w=snapWall(u,nx,ny);nx=w.x;ny=w.y}const dx=nx-s0.x,dy=ny-s0.y;
+ let nx=snap(s0.x+q.x-drag.q0.x),ny=snap(s0.y+q.y-drag.q0.y);if(u.kind==='door'&&drag.start.length===1&&!e.altKey){const ox=u.x,oy=u.y,ow=u.w;snapDoor(u,s0.x+q.x-drag.q0.x,s0.y+q.y-drag.q0.y);if(u.x!==ox||u.y!==oy||u.w!==ow){drag.moved=true;draw();renderProps(true)}return}if(!e.altKey){const w=snapWall(u,nx,ny);nx=w.x;ny=w.y}const dx=nx-s0.x,dy=ny-s0.y;
  if(nx!==u.x||ny!==u.y){drag.start.forEach(s=>{const v=U(s.id);v.x=+(s.x+dx).toFixed(3);v.y=+(s.y+dy).toFixed(3)});drag.moved=true;draw();renderProps(true)}});
 svg.addEventListener('pointerup',()=>{if(sketchUp())return;if(marq){const m=marq;marq=null;const x0=Math.min(m.x0,m.x1),x1=Math.max(m.x0,m.x1),y0=Math.min(m.y0,m.y1),y1=Math.max(m.y0,m.y1);
   if(x1-x0>.1||y1-y0>.1){if(!m.add)selSet.clear();P.units.forEach(u=>{if(u.kind==='zone'?(u.x>=x0&&u.x+u.w<=x1&&u.y>=y0&&u.y+u.d<=y1):(u.x<x1&&u.x+u.w>x0&&u.y<y1&&u.y+u.d>y0))selSet.add(u.id)});expandGroups();selId=[...selSet].pop()||null;selChanged()}else draw();return}
@@ -2643,7 +2646,34 @@ function record(tag){const s=JSON.stringify(P);if(s===HIST[HI])return;const now=
 function undoBtns(){$('bUndo').disabled=HI<=0;$('bRedo').disabled=HI>=HIST.length-1}
 function stepHist(d){const j=HI+d;if(j<0||j>=HIST.length)return;HI=j;P=JSON.parse(HIST[HI]);lastTag='';[...selSet].forEach(id=>{if(!U(id))selSet.delete(id)});if(selId&&!U(selId))selId=null;syncPoly();save();draw();renderProps();undoBtns();toast(d<0?'Undone':'Redone')}
 $('bUndo').onclick=()=>stepHist(-1);$('bRedo').onclick=()=>stepHist(1);
-function commit(msg){save();record(msg);draw();if(msg&&msg!=='Moved')toast(msg)}
+/* rooms from walls: flood-fill the floor between walls, trace each enclosed area into a room */
+function wallRegions(){const OL=roomOutline(P.room.poly);if(OL.length<3)return[];const g=.25,xs=OL.map(p=>p[0]),ys=OL.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys),nx=Math.ceil((Math.max(...xs)-x0)/g),ny=Math.ceil((Math.max(...ys)-y0)/g);
+ const W=P.units.filter(u=>u.kind==='wall'||u.kind==='door'),lab=new Int32Array(nx*ny).fill(-1),R=[];
+ const free=(i,j)=>{const cx=x0+(i+.5)*g,cy=y0+(j+.5)*g;return inRoom(cx,cy)&&!W.some(u=>cx>u.x-.05&&cx<u.x+u.w+.05&&cy>u.y-.05&&cy<u.y+u.d+.05)};
+ const ok=new Uint8Array(nx*ny);for(let j=0;j<ny;j++)for(let i=0;i<nx;i++)ok[j*nx+i]=free(i,j)?1:0;
+ for(let k=0;k<nx*ny;k++){if(!ok[k]||lab[k]>=0)continue;const id=R.length,st=[k],cells=[];lab[k]=id;
+  while(st.length){const c=st.pop();cells.push(c);const i=c%nx,j=(c-i)/nx;[[i+1,j],[i-1,j],[i,j+1],[i,j-1]].forEach(([a,b])=>{if(a<0||b<0||a>=nx||b>=ny)return;const q=b*nx+a;if(ok[q]&&lab[q]<0){lab[q]=id;st.push(q)}})}
+  R.push({cells,area:cells.length*g*g})}
+ const at=(x,y)=>{const i=Math.floor((x-x0)/g),j=Math.floor((y-y0)/g);return i<0||j<0||i>=nx||j>=ny?-1:lab[j*nx+i]};
+ const CX=OL.map(p=>p[0]).concat(W.flatMap(u=>[u.x,u.x+u.w])),CY=OL.map(p=>p[1]).concat(W.flatMap(u=>[u.y,u.y+u.d]));
+ R.forEach((reg,id)=>{const E=new Map();const key=(a,b)=>a+','+b;
+  reg.cells.forEach(c=>{const i=c%nx,j=(c-i)/nx,inR=(a,b)=>a>=0&&b>=0&&a<nx&&b<ny&&lab[b*nx+a]===id;
+   if(!inR(i,j-1))E.set(key(i,j),[i+1,j]);if(!inR(i+1,j))E.set(key(i+1,j),[i+1,j+1]);if(!inR(i,j+1))E.set(key(i+1,j+1),[i,j+1]);if(!inR(i-1,j))E.set(key(i,j+1),[i,j])});
+  let best=[];const seen=new Set();for(const k0 of E.keys()){if(seen.has(k0))continue;const loop=[];let k=k0;while(k&&!seen.has(k)){seen.add(k);const [a,b]=k.split(',').map(Number);loop.push([a,b]);const n=E.get(k);k=n&&key(...n)}if(loop.length>best.length)best=loop}
+  const pts=best.filter((p,i)=>{const a=best[(i-1+best.length)%best.length],b=best[(i+1)%best.length];return (b[0]-a[0])*(p[1]-a[1])-(b[1]-a[1])*(p[0]-a[0])!==0});
+  const sn=(v,C)=>{let b=v,d=g*.75;C.forEach(c=>{const e=Math.abs(c-v);if(e<d){d=e;b=c}});return +b.toFixed(4)};let q=pts.map(([a,b])=>[sn(x0+a*g,CX),sn(y0+b*g,CY)]);q=q.filter((p,i)=>{const a=q[(i-1+q.length)%q.length],b=q[(i+1)%q.length];return Math.abs((b[0]-a[0])*(p[1]-a[1])-(b[1]-a[1])*(p[0]-a[0]))>1e-6});reg.pts=q;const c=reg.cells[reg.cells.length>>1],i=c%nx;reg.c=[x0+(i+.5)*g,y0+((c-i)/nx+.5)*g]});
+ R.at=at;return R}
+function pip(p,x,y){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if(((p[i][1]>y)!=(p[j][1]>y))&&(x<(p[j][0]-p[i][0])*(y-p[i][1])/(p[j][1]-p[i][1])+p[i][0]))c=!c}return c}
+function zoneAt(x,y,skipAuto){return P.units.find(u=>u.kind==='zone'&&!(skipAuto&&u.auto)&&pip(zonePts(u),x,y))}
+let AUTOZ=false;
+function autoRooms(){const W=P.units.filter(u=>u.kind==='wall');const sig=P.units.filter(u=>u.kind==='wall'||u.kind==='door').map(u=>[u.x,u.y,u.w,u.d].join()).sort().join('|')+'#'+JSON.stringify(P.room.poly);if(P.autoSig===sig)return 0;P.autoSig=sig;
+ const old=P.units.filter(u=>u.kind==='zone'&&u.auto);if(!W.length&&!old.length)return 0;const R=W.length?wallRegions():[];const keep=R.length>=2?R.filter(reg=>reg.area>=4&&reg.pts.length>=4&&!zoneAt(...reg.c,true)):[];
+ const prev=new Map();old.forEach(z=>{const c=zonePts(z),cx=c.reduce((a,p)=>a+p[0],0)/c.length,cy=c.reduce((a,p)=>a+p[1],0)/c.length,id=R.at?R.at(cx,cy):-1;if(id>=0&&!prev.has(id))prev.set(id,z)});
+ P.units=P.units.filter(u=>!(u.kind==='zone'&&u.auto));const sel=selId;let n=0;AUTOZ=true;
+ keep.forEach(reg=>{const id=R.indexOf(reg),o=prev.get(id),z=zoneFromPts(reg.pts);if(!z)return;z.auto=1;if(o){const{x,y,w,d,poly,id:zid,...rest}=o;Object.assign(z,rest)}else n++});
+ AUTOZ=false;if(sel&&U(sel))select(sel);else select(null);if(n)toast(n+(n>1?' rooms':' room')+' made from the walls');return n}
+let FILLR=false;function roomAtClick(x,y){const R=wallRegions(),id=R.at?R.at(x,y):-1;if(id<0){toast('Click inside the floor, not on a wall');return}const reg=R[id];if(zoneAt(...reg.c)){toast('That space is already a room');return}const u=zoneFromPts(reg.pts);if(u){commit('Room added');select(u.id)}}
+function commit(msg){autoRooms();save();record(msg);draw();if(msg&&msg!=='Moved')toast(msg)}
 const anyLocked=()=>[...selSet].some(id=>(U(id)||{}).locked),lockedMsg=()=>toast('⚓ Anchored. Click ⚓ to unanchor first');
 $('bLock').onclick=()=>{const L=[...selSet].map(U).filter(Boolean);if(!L.length)return;const on=!L.every(u=>u.locked);L.forEach(u=>{if(on)u.locked=true;else delete u.locked});commit(on?(L.length>1?'Anchored '+L.length+' pieces':'Anchored '+L[0].name):'Unanchored');selChanged()};
 function rot1(u,cx,cy){if(u.poly)u.poly=u.poly.map(([a,b])=>[+(1-b).toFixed(5),a]);const ux=u.x+u.w/2,uy=u.y+u.d/2,nx=cx-(uy-cy),ny=cy+(ux-cx);[u.w,u.d]=[u.d,u.w];u.x=snap(nx-u.w/2);u.y=snap(ny-u.d/2)}
@@ -2732,6 +2762,8 @@ $('bRect').onclick=()=>{const w=(lenOf($('rw'))||10),d=lenOf($('rd'))||10;P.room
 $('bPoly').onclick=()=>{const pts=$('poly').value.split('\n').map(l=>l.split(/[ ,]+/).filter(Boolean).map(Number)).filter(p=>p.length>=2&&p.length<=4&&p.every(isFinite)).map(p=>p.map(frL));if(pts.length<3){toast('Need at least 3 corners');return}P.room.poly=pts;fit();commit('Walls updated')};
 $('bDraw').onclick=()=>SK?finishDraw():startDraw();
 $('bZone').onclick=()=>SK?finishDraw():startDraw('zone');
+$('bZFill').onclick=()=>{FILLR=!FILLR;$('bZFill').textContent=FILLR?'✓ Done':'🪣 Click a space';if(FILLR)toast('Click inside any space bounded by walls to make it a room')};
+$('stage').addEventListener('pointerdown',e=>{if(!FILLR||e.button)return;e.stopPropagation();e.preventDefault();const q=pt(e);roomAtClick(q.x,q.y)},true);
 $('bZRect').onclick=()=>ZR?zrStop():zrStart();
 document.addEventListener('keydown',e=>{if(ZR&&e.key==='Escape')zrStop()});
 $('bEdit').onclick=()=>editMode?exitEdit():startEdit();
