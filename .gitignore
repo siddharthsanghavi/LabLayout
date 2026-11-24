@@ -31,3 +31,6 @@ desktop.ini
 # Local-only examples and room exports (never committed)
 local/
 *.room.json
+
+# locked layouts live in Vercel Blob, not git
+site/layouts/*.json
