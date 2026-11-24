@@ -2542,7 +2542,7 @@ function snapMark(h,mk){const c=h.kind==='end'?'#f2a900':h.kind==='mid'?'#14a3a3
 
 /* events */
 function sketchDown(e,q){if(MS&&e.button===0){const h=msPoint(e),p=[h.x,h.y];if(!MS.a||MS.b){MS.a=p;MS.b=null}else MS.b=p;MS.h=h;draw();return true}
- {const zh=e.target.closest('.zh');if(zh&&e.button===0){const u=U(selId);dragZ={id:u.id,i:+zh.dataset.zv,pts:zonePts(u),moved:false};svg.setPointerCapture(e.pointerId);return true}}if(ZR&&e.button===0){ZR.a=zrSnap(e);ZR.b=ZR.a.slice();svg.setPointerCapture(e.pointerId);return true}if(e.button===2)return true;
+ {const zl=e.target.closest('.zcl');if(zl&&e.button===0){editZoneCorner(U(selId),+zl.dataset.zv);return true}const zh=e.target.closest('.zh');if(zh&&e.button===0){const u=U(selId);dragZ={id:u.id,i:+zh.dataset.zv,pts:zonePts(u),moved:false};svg.setPointerCapture(e.pointerId);return true}}if(ZR&&e.button===0){ZR.a=zrSnap(e);ZR.b=ZR.a.slice();svg.setPointerCapture(e.pointerId);return true}if(e.button===2)return true;
  if(SK){if(!SK.hover)skHover(e);if(SK.typed){const p=skTypedPoint();if(p){dimBox(null);skPlace(p);return true}}skPlace([SK.hover.x,SK.hover.y]);return true}
  if(editMode){const mh=e.target.closest('.mh');if(mh){dragM={i:+mh.dataset.m,moved:false};svg.setPointerCapture(e.pointerId);return true}
   const v=e.target.closest('.vtx');if(v){dragV={i:+v.dataset.v,moved:false};svg.setPointerCapture(e.pointerId);return true}
@@ -2563,7 +2563,7 @@ function sketchMove(e){if(MS){if(!MS.a||!MS.b){MS.h=msPoint(e);draw()}return tru
  if(editMode&&dragV){const p=P.room.poly,i=dragV.i;const h=sketchSnap(pt(e),{pts:p,skip:i,free:e.altKey,onSeg:true,segs:segsOf(p,true).filter(([,,k])=>k!==i&&(k+1)%p.length!==i)});dragV.h=h;if(!near(p[i][0],h.x)||!near(p[i][1],h.y)){p[i][0]=h.x;p[i][1]=h.y;dragV.moved=true;syncPoly()}draw();return true}
  if(editMode){const s=e.target.closest('.wseg');if(s){const i=+s.dataset.w,p=P.room.poly,a=p[i],b=p[(i+1)%p.length],q=pt(e),dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((q.x-a[0])*dx+(q.y-a[1])*dy)/(dx*dx+dy*dy||1)));hoverE={i,x:r4(a[0]+dx*t),y:r4(a[1]+dy*t)};if(near(dx,0))hoverE.x=a[0];if(near(dy,0))hoverE.y=a[1]}else hoverE=null;draw()}
  return false}
-function sketchUp(){if(MS)return true;if(dragZ){const d=dragZ;dragZ=null;if(d.moved)commit('Reshaped '+U(d.id).name);else draw();return true}if(ZR&&ZR.a){const[a,b]=[ZR.a,ZR.b];ZR.a=null;zrStop();zoneFromPts([[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]]);return true}if(ZR)return true;if(dragR){const d=dragR;dragR=null;if(d.moved)commit('Room moved');return true}if(dragW){const d=dragW;dragW=null;if(d.moved){const n=tidyPoly();commit('Wall moved '+fmtLen(Math.abs(d.s||0))+(n?' · merged '+n+' corner'+(n>1?'s':''):''))}else draw();return true}
+function sketchUp(){if(MS)return true;if(dragZ){const d=dragZ;dragZ=null;if(d.moved)commit('Reshaped '+U(d.id).name);else{draw();editZoneCorner(U(d.id),d.i)}return true}if(ZR&&ZR.a){const[a,b]=[ZR.a,ZR.b];ZR.a=null;zrStop();zoneFromPts([[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]]);return true}if(ZR)return true;if(dragR){const d=dragR;dragR=null;if(d.moved)commit('Room moved');return true}if(dragW){const d=dragW;dragW=null;if(d.moved){const n=tidyPoly();commit('Wall moved '+fmtLen(Math.abs(d.s||0))+(n?' · merged '+n+' corner'+(n>1?'s':''):''))}else draw();return true}
  if(dragM){const d=dragM;dragM=null;if(d.moved){commit('Wall curved');return true}askArc(d.i);return true}
  if(dragV){const d=dragV;dragV=null;if(d.moved){const n=tidyPoly();commit(n?'Corner merged into the wall':'Corner moved')}else askFillet(d.i);return true}return false}
 let dragM=null,dragW=null,dragR=null,dragZ=null,MS=null;
@@ -2590,7 +2590,14 @@ function setZonePts(u,pts){delete u.auto;const xs=pts.map(p=>p[0]),ys=pts.map(p=
  const rect=pts.length===4&&pts.every(p=>(near(p[0],x)||near(p[0],x+w))&&(near(p[1],y)||near(p[1],y+d)))&&new Set(pts.map(p=>(near(p[0],x)?0:1)+','+(near(p[1],y)?0:1))).size===4;
  if(rect)delete u.poly;else u.poly=pts.map(p=>[+((p[0]-x)/w).toFixed(5),+((p[1]-y)/d).toFixed(5)])}
 function zoneHandles(u,S){if(!u||u.kind!=='zone'||u.locked||selSet.size!==1||drawMode||SK)return'';const mk=S/110,pts=zonePts(u);
- return pts.map((p,i)=>`<rect class="zh" data-zv="${i}" x="${p[0]-mk}" y="${p[1]-mk}" width="${mk*2}" height="${mk*2}" fill="#fff" stroke="#2f7d4a" stroke-width="${S/500}"/>`).join('')+(dragZ&&dragZ.h?snapMark(dragZ.h,mk):'')}
+ return pts.map((p,i)=>`<rect class="zh" data-zv="${i}" x="${p[0]-mk}" y="${p[1]-mk}" width="${mk*2}" height="${mk*2}" fill="#fff" stroke="#2f7d4a" stroke-width="${S/500}"/>`).join('')+zoneCornerLabels(pts,S)+(dragZ&&dragZ.h?snapMark(dragZ.h,mk):'')}
+/* corner coordinates next to each handle, pushed away from the room's middle */
+function zoneCornerLabels(pts,S){const c=pcen(pts),fs=S/55;return pts.map((p,i)=>{const dx=p[0]-c[0],dy=p[1]-c[1],l=Math.hypot(dx,dy)||1,x=p[0]+dx/l*fs*1.6,y=p[1]+dy/l*fs*1.6+fs*.35;
+ return `<text class="zcl" data-zv="${i}" x="${x}" y="${y}" text-anchor="${dx<-1e-6?'end':dx>1e-6?'start':'middle'}" style="font-size:${fs}px;font-weight:600;cursor:pointer;paint-order:stroke;pointer-events:bounding-box" stroke="#fff" stroke-width="${fs/4}" fill="#2f7d4a">${uL(p[0])}, ${uL(p[1])}</text>`}).join('')}
+/* type an exact corner: x, y in any unit */
+function editZoneCorner(u,i){const p=zonePts(u)[i],a=toScreen(p[0],p[1]);
+ dimBox({x:a.x+8,y:a.y+8,value:uL(p[0])+', '+uL(p[1]),ph:'x, y  e.g. 6, 8 or 2 m, 3 m',focus:true,ok:v=>{const m=String(v).split(/[,;]/);const x=parseLen(m[0]),y=m.length>1?parseLen(m[1]):null;
+  if(x==null||y==null){toast('Type the corner as x, y. For example: 6, 8 or 1.8 m, 2.4 m');return}const pts=zonePts(u);pts[i]=[x,y];setZonePts(u,pts);dimBox(null);commit('Moved a corner of '+(u.name||'room'));renderProps()}})}
 /* measure tool */
 function msPoint(e){const q=pt(e),pts=P.room.poly.map(v=>[v[0],v[1]]);P.units.forEach(u=>{if(u.kind==='zone')zonePts(u).forEach(p=>pts.push(p));else pts.push([u.x,u.y],[u.x+u.w,u.y],[u.x+u.w,u.y+u.d],[u.x,u.y+u.d])});
  return sketchSnap(q,{pts,from:MS&&MS.a&&!MS.b?MS.a:null,segs:segsOf(P.room.poly,true),onSeg:true,free:e.altKey})}
