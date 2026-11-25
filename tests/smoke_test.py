@@ -266,7 +266,7 @@ def main():
             b.mouse.move(*h); b.mouse.down(); b.mouse.move((h[0]+t2[0])/2, (h[1]+t2[1])/2); b.mouse.move(*t2); b.mouse.up()
             check(b.evaluate("(u=>u.poly&&u.w===9&&Math.abs(zonePts(u)[2][0]-11)<.01&&Math.abs(zonePts(u)[2][1]-6)<.01)(P.units[0])"), "dragging a room-area corner reshapes it")
             b.evaluate("select(P.units[0].id);renderProps()"); b.select_option("#pasg","blocked")
-            check(b.evaluate("(u=>u.assign==='blocked'&&asgLabel(u).endsWith('blocked off')&&document.querySelector('.u.zonep path.b').getAttribute('fill-opacity')==='0.88')(P.units[0])"), "a room area can be blocked off (blacked out)")
+            check(b.evaluate("(u=>u.assign==='blocked'&&!/blocked/.test(asgLabel(u))&&document.querySelector('.u.zonep path.b').getAttribute('fill-opacity')==='0.88')(P.units[0])"), "a room area can be blocked off (blacked out)")
             b.evaluate("select(P.units[0].id);draw()")
             check(b.evaluate("document.querySelectorAll('.zcl').length===zonePts(P.units[0]).length"), "a selected room shows its corner coordinates")
             b.click(".zcl[data-zv='1']"); b.fill("#dimin", "9, 3"); b.press("#dimin", "Enter")
@@ -342,7 +342,7 @@ def main():
             check(b.evaluate("(u=>u.kind==='zone'&&u.poly.length===6&&u.x===10&&u.w===10&&u.d===14)(P.units[0])"), "draw area makes an L-shaped zone snapped to the walls")
             check(b.evaluate("document.querySelectorAll('.u.zonep path.b').length===P.units.filter(u=>u.kind==='zone').length"), "room areas render as shapes")
             b.evaluate("select(P.units[0].id);renderProps()"); b.select_option("#pasg","ours")
-            check(b.evaluate("P.units[0].assign==='ours'&&asgColor(P.units[0])==='#cfe0f7'&&asgLabel(P.units[0]).endsWith('ours only')"), "a room can be marked strictly ours")
+            check(b.evaluate("P.units[0].assign==='ours'&&asgColor(P.units[0])==='#cfe0f7'&&!/ours/.test(asgLabel(P.units[0]))"), "a room can be marked strictly ours")
             b.evaluate("select(null);P.room.poly=P0;P.units=JSON.parse(U0);syncPoly();draw()")
             # colour-blind mode
             b.click("#bCB")

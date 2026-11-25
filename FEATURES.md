@@ -30,6 +30,8 @@ LabLayout is one HTML file (`site/builder.html`) that lays out labs and tool cri
 - **Fit rooms to walls** pulls room edges onto the walls' inner faces.
 - **Room corners**: rooms show their corners when clicked, and you can edit them by typing. Rooms have a corners list and square up like walls do.
 - **Room edges snap** to other rooms.
+- **Room labels**: rooms show just their name (plus ↗ or › when they open another room); colour shows who a room belongs to. Labels shrink to fit their room and are hidden when they can't fit.
+- **One room per piece**: each piece belongs to the room its centre is in. A piece that hangs over into another room is nudged fully inside its own. Anchored pieces are left alone.
 
 ## Doors
 
@@ -60,6 +62,9 @@ LabLayout is one HTML file (`site/builder.html`) that lays out labs and tool cri
 
 - **Creating events**: give each event a name, a start, an end and notes. Events are saved with the room.
 - **Booking furniture**: pick an event, then click pieces on the plan to book or release them.
+- **Event layouts**: each event can have its own furniture arrangement. In Events mode, drag unanchored pieces to set them up for that event. The room's own layout doesn't change, and **Reset to room layout** puts the event back.
+- **Layout presets per room**: save an event's arrangement as a named preset (for example Class or Party). Other events in the same room can start from it with **Start from**, and changes made for one event don't alter the preset. Each room keeps its own presets, listed in the Events panel.
+- **Upcoming events on each piece**: in Edit layout, selecting a piece lists the upcoming events it's booked for, with a button to open each one in Events mode.
 - **Colours on the plan**:
   - Orange: booked for this event.
   - Red: also booked by another event at the same time (a clash).

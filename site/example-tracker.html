@@ -292,7 +292,7 @@ function drawMap(){const m=document.getElementById('map');const P=CONFIG.room.po
  FP.forEach((f,i)=>{const v=f.h>f.w*1.3;if(f.mapOnly){h+=f.kind==='door'?doorSvg(f,sz,OL):f.kind==='zone'?zoneSvg(f,sz):`<rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" fill="${f.f}" opacity=".6"/>`;return}
   h+=`<rect class="fp" data-i="${i}" x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".08" fill="${f.f}"/><text x="${f.x+f.w/2}" y="${f.y+f.h/2}" fill="${f.tc||'#111'}" style="font-size:${Math.max(.15,Math.min(sz/34,Math.min(f.w,f.h)*.55,Math.max(f.w,f.h)*.9/Math.max(3,String(f.t).length*.6))).toFixed(3)}px" ${v?`transform="rotate(-90 ${f.x+f.w/2} ${f.y+f.h/2})"`:''}>${esc(f.t)}</text>`});
  (CONFIG.ghosts||[]).forEach(g=>{h+=`<g opacity=".7" style="pointer-events:none"><rect x="${g.x}" y="${g.y}" width="${g.w}" height="${g.h}" rx="${g.t?.06:0}" fill="${g.f}"/>${g.t?`<text x="${g.x+g.w/2}" y="${g.y+g.h/2}" fill="${g.tc||'#222'}" style="font-size:${Math.max(.12,Math.min(sz/40,Math.min(g.w,g.h)*.45,g.w*.9/Math.max(3,String(g.t).length*.6))).toFixed(3)}px">${esc(g.t)}</text>`:''}</g>`});
- m.innerHTML=h;
+ m.innerHTML=h;fitLabels(m);
  m.querySelectorAll('.fp').forEach(r=>r.addEventListener('click',()=>showFP(+r.dataset.i)));
  const NAV=CONFIG.nav,emb=window.parent!==window,cr=document.getElementById('crumbs');
  if(cr){cr.innerHTML=NAV&&emb&&NAV.crumbs.length>1?NAV.crumbs.map((c,i)=>i<NAV.crumbs.length-1?`<button class="crumb" data-go="${c.rid}">${esc(c.t)}</button> › `:`<b>${esc(c.t)}</b>`).join(''):'';cr.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>parent.postMessage({lablayout:'go',rid:b.dataset.go},'*'))}
@@ -517,6 +517,10 @@ document.getElementById('restoref').onchange=async e=>{const f=e.target.files[0]
  b.innerHTML=`<h3>Restore backup?</h3><p>${esc(f.name)}<br><span class="hint">${j.exported?'Saved '+new Date(j.exported).toLocaleString()+' · ':''}${cnt} items · ${(data.out||[]).length} checked out · ${(data.log||[]).length} log entries</span></p>${j.room&&j.room!==CONFIG.id?`<div class="mvq">This backup is from a different room (<b>${esc(j.title||j.room)}</b>). Items in drawers this room doesn't have will go to Unsorted.</div>`:''}<p class="hint">This replaces everything currently in this tracker${syncCfg()?' — and on every synced device':''}. Download a backup first if you're unsure.</p><div class="acts"><button class="bad" id="rsOk">Replace current data</button><button class="alt" onclick="closeDrawer()">Cancel</button></div>`;
  m.classList.add('on');b.querySelector('#rsOk').onclick=()=>{const rev=S._rev;S=data;S._rev=rev;normalize();syncDirty=true;save();build();buildTabs();closeDrawer();toast('Backup restored')}};
 
+function fitLabels(root){root.querySelectorAll('text').forEach(t=>{const sh=t.previousElementSibling;if(!sh||sh.tagName!=='path'||!/fill-opacity/.test(sh.outerHTML))return;
+ let b;try{b=sh.getBBox()}catch(e){return}const base=parseFloat(t.style.fontSize)||1;t.style.display='';let f=base;
+ for(let i=0;i<8;i++){const tb=t.getBBox();if(tb.width<=b.width*.9&&tb.height<=b.height*.8)return;f*=Math.min(.85,Math.max(.5,b.width*.9/tb.width));if(f<base*.4)break;t.style.fontSize=f+'px'}
+ t.style.display='none'})}
 /* ===== shared sync (Supabase table) ===== */
 let syncDirty=false,syncT=null,syncBusy=false,syncTimer=null;
 const SYNC_KEY='lablayout-sync-'+(CONFIG.storageKey||CONFIG.id);

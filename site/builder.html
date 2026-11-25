@@ -25,7 +25,7 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 #plan .vtx{fill:#fff;stroke:#2d6cdf;cursor:move}#plan .vtx:hover{fill:#2d6cdf}#plan .wl{cursor:text;pointer-events:all;text-decoration:underline dotted}#plan .wseg{cursor:copy}#plan .wdrag{cursor:move}#plan .zh{cursor:grab}.crumbs{display:inline-flex;gap:4px;align-items:center;color:#8a9;margin-right:6px}.crumb{background:none!important;border:none!important;color:#f26b1d!important;padding:4px 6px!important;font-weight:600}#bSnap.off{opacity:.6;text-decoration:line-through}.unitsw{display:inline-flex!important;gap:2px;padding:3px!important;border-radius:9px!important;background:#22262b!important}.unitsw span{padding:4px 9px;border-radius:6px;color:#aeb4ba;font-size:12.5px}.unitsw:not(.met) .uft,.unitsw.met .um{background:#f26b1d;color:#fff}.swatches{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.sw{width:24px;height:24px;padding:0!important;border-radius:6px!important;border:1px solid #0003!important;box-shadow:none!important;cursor:pointer}.sw.on{outline:2px solid #2d6cdf;outline-offset:2px}.swc{display:grid;place-items:center;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);color:#fff;font-weight:700;font-size:13px;position:relative;text-shadow:0 0 2px #000}.swc input{position:absolute;inset:0;opacity:0;cursor:pointer}.swr{padding:2px 8px!important;font-size:12px!important}#bMeasure.on{background:#2d6cdf!important;color:#fff!important}#stage.zrect #plan{cursor:crosshair}#plan .u.locked{cursor:default}#plan .u.locked .b{stroke:#2d6cdf;stroke-width:.09}#plan .u.locked.sel .b{stroke:#2d6cdf;stroke-width:.12;stroke-dasharray:none}#bLock.on{background:#2d6cdf;color:#fff}#plan .wdrag:hover{stroke:rgba(45,108,223,.25)}#plan .mh{cursor:ew-resize}
 #evside{display:none}body.evm #editv>aside:first-child>*:not(#evside){display:none!important}body.evm #evside{display:block}body.evm #stage .tb{display:none}
 .evlist{display:flex;flex-direction:column;gap:6px}.evitem{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:#fff!important;color:#222!important;border:1px solid #dde!important;border-radius:8px!important;padding:8px 10px!important;font-size:12px}.evitem span{color:#667}.evitem em{color:#c92a2a;font-style:normal;font-weight:600}.evitem.on{border-color:#f26b1d!important;box-shadow:0 0 0 2px #f26b1d33}
-.evunits{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}.evunits li{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13px;padding:4px 6px;border-radius:6px;background:#f6f6f2}.evunits li.clash{background:#fff0f0}.evunits small{display:block;color:#c92a2a;font-size:11px}.evunits button{padding:2px 7px!important;flex:none}
+.evnote{margin:0 0 12px;padding:8px 10px;border:1px solid #f26b1d55;border-radius:8px;background:#fff8f2}.evnote h2{margin-top:0}.evunits{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}.evunits li{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13px;padding:4px 6px;border-radius:6px;background:#f6f6f2}.evunits li.clash{background:#fff0f0}.evunits small{display:block;color:#c92a2a;font-size:11px}.evunits button{padding:2px 7px!important;flex:none}
 body.evm #plan .evu{cursor:pointer}body.evm #plan .evu:not(.evon){opacity:.55}body.evm #plan .evu:hover{opacity:1}
 #plan .evhl{fill:#f26b1d;fill-opacity:.28;stroke:#f26b1d;stroke-width:.08;pointer-events:none}#plan .evhl.c{fill:#e03131;stroke:#e03131;fill-opacity:.35}#plan .evhl.b{fill:none;stroke:#868e96;stroke-dasharray:.25 .2;stroke-width:.06}
 #hxy{position:absolute;right:10px;bottom:10px;z-index:4;pointer-events:none;display:none;background:#fffe;border:1px solid #ccd;border-radius:6px;padding:3px 8px;font-size:12px;font-variant-numeric:tabular-nums;color:#333;box-shadow:0 2px 6px #0002}#dimin{position:absolute;display:none;z-index:5;width:110px;padding:5px 7px;border:2px solid #f26b1d;border-radius:6px;font:inherit;font-size:13px;box-shadow:0 3px 10px #0003}
@@ -455,7 +455,7 @@ function drawMap(){const m=document.getElementById('map');const P=CONFIG.room.po
  FP.forEach((f,i)=>{const v=f.h>f.w*1.3;if(f.mapOnly){h+=f.kind==='door'?doorSvg(f,sz,OL):f.kind==='zone'?zoneSvg(f,sz):`<rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" fill="${f.f}" opacity=".6"/>`;return}
   h+=`<rect class="fp" data-i="${i}" x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx=".08" fill="${f.f}"/><text x="${f.x+f.w/2}" y="${f.y+f.h/2}" fill="${f.tc||'#111'}" style="font-size:${Math.max(.15,Math.min(sz/34,Math.min(f.w,f.h)*.55,Math.max(f.w,f.h)*.9/Math.max(3,String(f.t).length*.6))).toFixed(3)}px" ${v?`transform="rotate(-90 ${f.x+f.w/2} ${f.y+f.h/2})"`:''}>${esc(f.t)}</text>`});
  (CONFIG.ghosts||[]).forEach(g=>{h+=`<g opacity=".7" style="pointer-events:none"><rect x="${g.x}" y="${g.y}" width="${g.w}" height="${g.h}" rx="${g.t?.06:0}" fill="${g.f}"/>${g.t?`<text x="${g.x+g.w/2}" y="${g.y+g.h/2}" fill="${g.tc||'#222'}" style="font-size:${Math.max(.12,Math.min(sz/40,Math.min(g.w,g.h)*.45,g.w*.9/Math.max(3,String(g.t).length*.6))).toFixed(3)}px">${esc(g.t)}</text>`:''}</g>`});
- m.innerHTML=h;
+ m.innerHTML=h;fitLabels(m);
  m.querySelectorAll('.fp').forEach(r=>r.addEventListener('click',()=>showFP(+r.dataset.i)));
  const NAV=CONFIG.nav,emb=window.parent!==window,cr=document.getElementById('crumbs');
  if(cr){cr.innerHTML=NAV&&emb&&NAV.crumbs.length>1?NAV.crumbs.map((c,i)=>i<NAV.crumbs.length-1?`<button class="crumb" data-go="${c.rid}">${esc(c.t)}</button> › `:`<b>${esc(c.t)}</b>`).join(''):'';cr.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>parent.postMessage({lablayout:'go',rid:b.dataset.go},'*'))}
@@ -680,6 +680,10 @@ document.getElementById('restoref').onchange=async e=>{const f=e.target.files[0]
  b.innerHTML=`<h3>Restore backup?</h3><p>${esc(f.name)}<br><span class="hint">${j.exported?'Saved '+new Date(j.exported).toLocaleString()+' · ':''}${cnt} items · ${(data.out||[]).length} checked out · ${(data.log||[]).length} log entries</span></p>${j.room&&j.room!==CONFIG.id?`<div class="mvq">This backup is from a different room (<b>${esc(j.title||j.room)}</b>). Items in drawers this room doesn't have will go to Unsorted.</div>`:''}<p class="hint">This replaces everything currently in this tracker${syncCfg()?' — and on every synced device':''}. Download a backup first if you're unsure.</p><div class="acts"><button class="bad" id="rsOk">Replace current data</button><button class="alt" onclick="closeDrawer()">Cancel</button></div>`;
  m.classList.add('on');b.querySelector('#rsOk').onclick=()=>{const rev=S._rev;S=data;S._rev=rev;normalize();syncDirty=true;save();build();buildTabs();closeDrawer();toast('Backup restored')}};
 
+function fitLabels(root){root.querySelectorAll('text').forEach(t=>{const sh=t.previousElementSibling;if(!sh||sh.tagName!=='path'||!/fill-opacity/.test(sh.outerHTML))return;
+ let b;try{b=sh.getBBox()}catch(e){return}const base=parseFloat(t.style.fontSize)||1;t.style.display='';let f=base;
+ for(let i=0;i<8;i++){const tb=t.getBBox();if(tb.width<=b.width*.9&&tb.height<=b.height*.8)return;f*=Math.min(.85,Math.max(.5,b.width*.9/tb.width));if(f<base*.4)break;t.style.fontSize=f+'px'}
+ t.style.display='none'})}
 /* ===== shared sync (Supabase table) ===== */
 let syncDirty=false,syncT=null,syncBusy=false,syncTimer=null;
 const SYNC_KEY='lablayout-sync-'+(CONFIG.storageKey||CONFIG.id);
@@ -2365,8 +2369,13 @@ function bindColor(el,L){el.querySelectorAll('[data-col]').forEach(b=>b.onclick=
 const zOp=u=>u.assign==='blocked'?.88:.45,zTx=u=>u.assign==='blocked'?'#ffffff':'#2f5d3a';
 const isAsg=u=>u&&(u.kind==='zone'||u.kind==='desk');
 function asgColor(u){return (ASG[u.assign||'shared']||ASG.shared)[1]}
+/* rooms show just their name; colour shows who they belong to */
 function asgLabel(u){return asgLabel0(u)+(u.kind==='zone'&&u.link&&typeof PROJ!=='undefined'&&PROJ&&roomByRid(u.link)?' ↗':'')}
-function asgLabel0(u){const a=u.assign||'shared';return (u.mapText??u.name)+(a==='assigned'?' · '+(u.owner||'(who?)'):a==='vacant'?' · vacant':a==='blocked'?' · blocked off':a==='ours'?' · ours only':u.kind==='zone'?' · shared':'')}
+function asgLabel0(u){return String(u.mapText??u.name??'')}
+function fitLabels(root){root.querySelectorAll('text').forEach(t=>{const sh=t.previousElementSibling;if(!sh||sh.tagName!=='path'||!/fill-opacity/.test(sh.outerHTML))return;
+ let b;try{b=sh.getBBox()}catch(e){return}const base=parseFloat(t.style.fontSize)||1;t.style.display='';let f=base;
+ for(let i=0;i<8;i++){const tb=t.getBBox();if(tb.width<=b.width*.9&&tb.height<=b.height*.8)return;f*=Math.min(.85,Math.max(.5,b.width*.9/tb.width));if(f<base*.4)break;t.style.fontSize=f+'px'}
+ t.style.display='none'})}
 
 /* room outline: corners [x,y,filletRadius?,arcDepth?]; arcDepth curves the wall to the next corner (+ = bulges left of travel) */
 function roomOutline(P0){const n=P0.length,at=i=>P0[((i%n)+n)%n],B=i=>+(at(i)[3]||0),R=i=>+(at(i)[2]||0),out=[];if(n<3)return P0.map(p=>[p[0],p[1]]);
@@ -2741,7 +2750,19 @@ function autoRooms(){const W=P.units.filter(u=>u.kind==='wall'&&!u._from);const 
  keep.forEach(reg=>{const id=R.indexOf(reg),o=prev.get(id),z=zoneFromPts(reg.pts);if(!z)return;z.auto=1;if(o){const{x,y,w,d,poly,id:zid,...rest}=o;Object.assign(z,rest);if(!z.name)z.name='Room'}else n++});
  AUTOZ=false;if(sel&&U(sel))select(sel);else select(null);if(n)toast(n+(n>1?' rooms':' room')+' made from the walls');return n}
 let FILLR=false;function roomAtClick(x,y){const R=wallRegions(),id=R.at?R.at(x,y):-1;if(id<0){toast('Click inside the floor, not on a wall');return}const reg=R[id];if(zoneAt(...reg.c)){toast('That space is already a room');return}const u=zoneFromPts(reg.pts);if(u){commit('Room added');select(u.id)}}
-function commit(msg){autoRooms();syncLinks();save();record(msg);draw();if(msg&&msg!=='Moved')toast(msg)}
+/* every piece sits in one room: the room holding its centre (the smallest, for rooms inside rooms). A piece that hangs over into another room is nudged fully inside its own */
+function oneRoom(){const Z=P.units.filter(u=>u.kind==='zone').map(z=>{const p=zonePts(z),xs=p.map(q=>q[0]),ys=p.map(q=>q[1]);return{z,p,x0:Math.min(...xs),x1:Math.max(...xs),y0:Math.min(...ys),y1:Math.max(...ys)}});if(!Z.length)return 0;
+ const ar=r=>(r.x1-r.x0)*(r.y1-r.y0),e=.02,hit=(r,u)=>u.x<r.x1-e&&r.x0<u.x+u.w-e&&u.y<r.y1-e&&r.y0<u.y+u.d-e;let n=0;
+ P.units.forEach(u=>{if(['zone','wall','door'].includes(u.kind)||u.mapOnly||u.locked)return;const cx=u.x+u.w/2,cy=u.y+u.d/2;
+  const home=Z.filter(r=>pip(r.p,cx,cy)).sort((a,b)=>ar(a)-ar(b))[0];
+  const inside=r=>[[u.x+e,u.y+e],[u.x+u.w-e,u.y+e],[u.x+e,u.y+u.d-e],[u.x+u.w-e,u.y+u.d-e]].every(q=>pip(r.p,...q));
+  if(home){if(inside(home))return;if(u.w>home.x1-home.x0+1e-6||u.d>home.y1-home.y0+1e-6)return;
+   const x=Math.min(Math.max(u.x,home.x0),home.x1-u.w),y=Math.min(Math.max(u.y,home.y0),home.y1-u.d),ox=u.x,oy=u.y;u.x=+x.toFixed(4);u.y=+y.toFixed(4);
+   if(!inside(home)){u.x=ox;u.y=oy;return}if(u.x!==ox||u.y!==oy)n++;return}
+  /* centre in no room: keep it out of rooms it overlaps */
+  Z.filter(r=>hit(r,u)&&!Z.some(o=>o!==r&&pip(o.p,cx,cy))).forEach(r=>{const m=[[r.x0-u.w-u.x,0],[r.x1-u.x,0],[0,r.y0-u.d-u.y],[0,r.y1-u.y]].sort((a,b)=>Math.abs(a[0]+a[1])-Math.abs(b[0]+b[1]))[0];u.x=+(u.x+m[0]).toFixed(4);u.y=+(u.y+m[1]).toFixed(4);n++})});
+ return n}
+function commit(msg){autoRooms();const moved=oneRoom();if(EVBASE)evSync();syncLinks();save();record(msg);draw();if(MODE==='event'&&msg==='Moved')renderEvents();if(moved&&MODE!=='event')toast(moved>1?moved+' pieces moved so each sits in one room':'Moved it so it sits in one room');else if(msg&&msg!=='Moved')toast(msg)}
 const anyLocked=()=>[...selSet].some(id=>(U(id)||{}).locked),lockedMsg=()=>toast('⚓ Anchored. Click ⚓ to unanchor first');
 $('bLock').onclick=()=>{const L=[...selSet].map(U).filter(Boolean);if(!L.length)return;const on=!L.every(u=>u.locked);L.forEach(u=>{if(on)u.locked=true;else delete u.locked});commit(on?(L.length>1?'Anchored '+L.length+' pieces':'Anchored '+L[0].name):'Unanchored');selChanged()};
 function rot1(u,cx,cy){if(u.poly)u.poly=u.poly.map(([a,b])=>[+(1-b).toFixed(5),a]);const ux=u.x+u.w/2,uy=u.y+u.d/2,nx=cx-(uy-cy),ny=cy+(ux-cx);[u.w,u.d]=[u.d,u.w];u.x=snap(nx-u.w/2);u.y=snap(ny-u.d/2)}
@@ -2940,13 +2961,29 @@ $('fRoom').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)
 /* ---------- Edit layout / Inventory modes ---------- */
 let MODE='edit',useSrc='';
 function setMode(m){MODE=m;try{localStorage.setItem('lablayout-mode',m)}catch(e){}$('mEdit').classList.toggle('on',m==='edit');$('mEv').classList.toggle('on',m==='event');document.body.classList.toggle('evm',m==='event');$('mUse').classList.toggle('on',m==='use');
- $('editv').style.display=m==='edit'||m==='event'?'':'none';$('usev').hidden=m!=='use';document.querySelectorAll('.editonly').forEach(e=>e.style.display=m==='edit'?'':'none');if(m==='event'){select(null);renderEvents()}else if(m==='edit'){renderProps()}if(typeof draw==='function'&&m!=='use')draw();
+ $('editv').style.display=m==='edit'||m==='event'?'':'none';$('usev').hidden=m!=='use';document.querySelectorAll('.editonly').forEach(e=>e.style.display=m==='edit'?'':'none');if(m!=='event')evLeave();if(m==='event'){select(null);if(EVSEL)evApply(evById(EVSEL));renderEvents()}else if(m==='edit'){renderProps()}if(typeof draw==='function'&&m!=='use')draw();
  if(m==='use'){save();const h=buildTracker(true);if(!h){setMode('edit');return}if(h!==useSrc){useSrc=h;$('usef').srcdoc=h}}}
 document.addEventListener('click',e=>{document.querySelectorAll('details.menu[open]').forEach(m=>{if(!m.contains(e.target)||e.target.closest('.mlist button'))m.open=false})});
 $('mEdit').onclick=()=>setMode('edit');
 window.addEventListener('message',e=>{const d=e.data;if(!d||e.source!==$('usef').contentWindow||MODE!=='use')return;if(d.lablayout==='go'&&d.rid)goRid(d.rid);if(d.lablayout==='up'){const q=parentOf(P);if(q)goRid(q.rid)}});$('mUse').onclick=()=>setMode('use');$('mEv').onclick=()=>setMode('event');
 /* ---------- Events: book furniture for calendar events ---------- */
-let EVSEL=null;
+let EVSEL=null,EVBASE=null;
+/* layout presets: named furniture arrangements saved per room (e.g. Class, Party) that events can use */
+const PRE=()=>P.presets||(P.presets=[]);
+const preById=id=>PRE().find(q=>q.id===id);
+const samePos=(a,b)=>{a=a||{};b=b||{};const k=new Set([...Object.keys(a),...Object.keys(b)].filter(id=>U(id)));for(const id of k){const x=a[id],y=b[id];if(!x||!y||Math.abs(x[0]-y[0])>1e-6||Math.abs(x[1]-y[1])>1e-6)return false}return true};
+function usePreset(v,id){evLeave();const q=preById(id);if(q){v.pos=JSON.parse(JSON.stringify(q.pos||{}));v.preset=q.id}else{delete v.pos;delete v.preset}evApply(v);commit(q?'Using the '+q.name+' layout':'Back to the room layout');renderEvents();draw()}
+function savePreset(v,name){evSync();name=(name||'').trim()||'Layout '+(PRE().length+1);let q=PRE().find(x=>x.name.toLowerCase()===name.toLowerCase());
+ if(q)q.pos=JSON.parse(JSON.stringify(v.pos||{}));else{q={id:'pl'+Math.random().toString(36).slice(2,8),name,pos:JSON.parse(JSON.stringify(v.pos||{}))};PRE().push(q)}v.preset=q.id;commit('Saved the '+q.name+' layout');renderEvents()}
+const evMovable=u=>u&&canBook(u)&&!u.locked&&!u._from&&!u.mapOnly;
+/* switch the plan to an event's furniture positions (EVBASE keeps the room's own positions) */
+function evApply(v){evLeave();if(!v)return;EVBASE={};P.units.forEach(u=>{if(!evMovable(u))return;EVBASE[u.id]=[u.x,u.y];const q=v.pos&&v.pos[u.id];if(q){u.x=q[0];u.y=q[1]}})}
+/* write what moved into the event, then put the room back */
+function evSync(){const v=evById(EVSEL);if(!EVBASE||!v)return;const pos={};Object.entries(EVBASE).forEach(([id,b])=>{const u=U(id);if(u&&(Math.abs(u.x-b[0])>1e-6||Math.abs(u.y-b[1])>1e-6))pos[id]=[u.x,u.y]});if(Object.keys(pos).length)v.pos=pos;else delete v.pos}
+function evSwap(){if(!EVBASE)return;Object.entries(EVBASE).forEach(([id,b])=>{const u=U(id);if(!u)return;const c=[u.x,u.y];u.x=b[0];u.y=b[1];EVBASE[id]=c})}
+function evLeave(){if(!EVBASE)return;evSync();evSwap();EVBASE=null}
+/* save and undo history always hold the room's own layout */
+function withBase(f){if(!EVBASE)return f();evSync();evSwap();try{return f()}finally{evSwap()}}
 const EVS=()=>P.events||(P.events=[]);
 const evById=id=>EVS().find(v=>v.id===id);
 const canBook=u=>u&&!['zone','wall','door'].includes(u.kind);
@@ -2959,17 +2996,19 @@ function evWhen(v){const a=new Date(v.start),b=new Date(v.end);if(isNaN(a))retur
  return isNaN(b)?d(a)+' '+t(a):a.toDateString()===b.toDateString()?`${d(a)} · ${t(a)}–${t(b)}`:`${d(a)} ${t(a)} – ${d(b)} ${t(b)}`}
 const pad2=n=>String(n).padStart(2,'0'),localDT=x=>`${x.getFullYear()}-${pad2(x.getMonth()+1)}-${pad2(x.getDate())}T${pad2(x.getHours())}:${pad2(x.getMinutes())}`;
 function newEvent(){const a=new Date();a.setMinutes(0,0,0);a.setHours(a.getHours()+1);const b=new Date(a.getTime()+36e5);
- const v={id:'ev'+Math.random().toString(36).slice(2,8),name:'New event',start:localDT(a),end:localDT(b),notes:'',units:[]};EVS().push(v);EVSEL=v.id;commit('Event added');renderEvents();draw()}
+ const v={id:'ev'+Math.random().toString(36).slice(2,8),name:'New event',start:localDT(a),end:localDT(b),notes:'',units:[]};evLeave();EVS().push(v);EVSEL=v.id;evApply(v);commit('Event added');renderEvents();draw()}
 let EVSHOW='upcoming';
 function renderEvents(){const L=$('evside'),R=$('props');if(!L||!R)return;const now=Date.now();
  let list=EVS().slice().sort((a,b)=>evT(a)[0]-evT(b)[0]);if(EVSHOW==='upcoming')list=list.filter(v=>evT(v)[1]>=now||!evT(v)[0]);
  L.innerHTML=`<h2>Events</h2><button id="evNew" style="width:100%;margin-bottom:8px">＋ New event</button>
  <div class="row" style="margin-bottom:8px"><button class="ghost${EVSHOW==='upcoming'?' on':''}" data-evshow="upcoming">Upcoming</button><button class="ghost${EVSHOW==='all'?' on':''}" data-evshow="all">All</button></div>
  <div class="evlist">${list.map(v=>{const cl=v.units.some(id=>evClashes(v,id).length);return `<button class="evitem${v.id===EVSEL?' on':''}" data-ev="${v.id}"><b>${esc(v.name||'Event')}</b><span>${esc(evWhen(v))}</span><span>${v.units.length} piece${v.units.length===1?'':'s'}${cl?' · <em>clash</em>':''}</span></button>`}).join('')||'<p class="hint">No events yet. Make one, then click furniture on the plan to book it.</p>'}</div>
+ <h2 style="margin-top:14px">Layout presets for ${esc(P.title||'this room')}</h2>${PRE().length?`<ul class="evunits">${PRE().map(q=>{const n=EVS().filter(v=>v.preset===q.id).length;return `<li><span><b>${esc(q.name)}</b><small style="color:#667">${Object.keys(q.pos||{}).length} piece${Object.keys(q.pos||{}).length===1?'':'s'} moved · used by ${n} event${n===1?'':'s'}</small></span><button class="ghost" data-prdel="${q.id}" title="Delete preset">✕</button></li>`}).join('')}</ul>`:'<p class="hint">None yet. Arrange an event, then <b>💾 Save preset</b> to reuse it, e.g. Class or Party.</p>'}
  <p class="hint">Pick an event, then click pieces on the plan to book or release them. Orange = booked for this event, red = also booked by another event at the same time.</p>`;
  L.querySelector('#evNew').onclick=newEvent;
+ L.querySelectorAll('[data-prdel]').forEach(b=>b.onclick=()=>{if(!confirmBtn(b))return;P.presets=PRE().filter(q=>q.id!==b.dataset.prdel);EVS().forEach(v=>{if(v.preset===b.dataset.prdel)delete v.preset});commit('Preset deleted');renderEvents()});
  L.querySelectorAll('[data-evshow]').forEach(b=>b.onclick=()=>{EVSHOW=b.dataset.evshow;renderEvents()});
- L.querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{EVSEL=EVSEL===b.dataset.ev?null:b.dataset.ev;renderEvents();draw()});
+ L.querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{evLeave();EVSEL=EVSEL===b.dataset.ev?null:b.dataset.ev;evApply(evById(EVSEL));select(null);renderEvents();draw()});
  const v=evById(EVSEL);
  if(!v){R.innerHTML=`<h2>Events</h2><p class="hint">Choose an event on the left, or make a new one. Furniture booked for an event shows highlighted on the plan.</p>`;return}
  const rows=v.units.map(id=>{const u=U(id),c=evClashes(v,id);return `<li${c.length?' class="clash"':''}><span>${esc(u?(u.name||u.kind):'(removed piece)')}${c.length?`<small>also in ${c.map(o=>esc(o.name)).join(', ')}</small>`:''}</span><button class="ghost" data-evrm="${id}" title="Release">✕</button></li>`}).join('');
@@ -2978,6 +3017,11 @@ function renderEvents(){const L=$('evside'),R=$('props');if(!L||!R)return;const 
  <div class="row"><label class="f">Starts<input id="evStart" type="datetime-local" value="${esc(v.start)}"></label></div>
  <div class="row"><label class="f">Ends<input id="evEnd" type="datetime-local" value="${esc(v.end)}"></label></div>
  <label class="f">Notes<textarea id="evNotes" rows="3">${esc(v.notes||'')}</textarea></label>
+ <h2>Layout for this event</h2>
+ <label class="f">Start from<select id="evPre"><option value="">Room layout</option>${PRE().map(q=>`<option value="${q.id}"${v.preset===q.id?' selected':''}>${esc(q.name)}${v.preset===q.id&&!samePos(v.pos,q.pos)?' (edited)':''}</option>`).join('')}</select></label>
+ <p class="hint">Drag unanchored pieces to set them up for this event; click a piece to book it. The room's own layout doesn't change.</p>
+ <div class="row" style="margin:-2px 0 10px"><span class="hint" style="flex:1;align-self:center">${Object.keys(v.pos||{}).length} piece${Object.keys(v.pos||{}).length===1?'':'s'} moved</span><button class="ghost" id="evReset"${Object.keys(v.pos||{}).length?'':' disabled'}>↺ Reset to room layout</button></div>
+ <div class="row" style="margin:-4px 0 10px"><input id="evPreName" placeholder="Preset name, e.g. Party" value="${esc((preById(v.preset)||{}).name||'')}" style="flex:1;min-width:0;padding:6px;border:1px solid #ccc;border-radius:6px;font:inherit;font-size:13px"><button class="ghost" id="evPreSave" style="flex:none" title="Save this arrangement so other events in this room can use it">💾 Save preset</button></div>
  <h2>Booked furniture (${v.units.length})</h2><ul class="evunits">${rows||'<li class="hint">Click pieces on the plan to book them.</li>'}</ul>
  <div class="row" style="margin-top:8px"><button class="ghost" id="evIcs" title="Add to Google Calendar, Outlook or Apple Calendar">📅 Download .ics</button><button class="ghost" id="evClear"${v.units.length?'':' disabled'}>Release all</button></div>
  <div class="row" style="margin-top:6px"><button class="ghost" id="evDup">⧉ Duplicate</button><button class="ghost danger" id="evDel">Delete event</button></div>`;
@@ -2987,24 +3031,39 @@ function renderEvents(){const L=$('evside'),R=$('props');if(!L||!R)return;const 
  R.querySelector('#evEnd').onchange=e=>{if(Date.parse(e.target.value)<=Date.parse(v.start)){toast('The event has to end after it starts');e.target.value=v.end;return}upd('end',e.target)};
  R.querySelector('#evNotes').oninput=e=>{v.notes=e.target.value;save()};R.querySelector('#evNotes').onchange=()=>commit('');
  R.querySelectorAll('[data-evrm]').forEach(b=>b.onclick=()=>{v.units=v.units.filter(i=>i!==b.dataset.evrm);commit('Released');renderEvents();draw()});
+ R.querySelector('#evPre').onchange=e=>usePreset(v,e.target.value);
+ R.querySelector('#evPreSave').onclick=()=>savePreset(v,R.querySelector('#evPreName').value);
+ R.querySelector('#evPreName').onkeydown=e=>{if(e.key==='Enter')savePreset(v,e.target.value)};
+ R.querySelector('#evReset').onclick=()=>{evSwap();EVBASE=null;delete v.pos;delete v.preset;evApply(v);commit('Back to the room layout');renderEvents();draw()};
  R.querySelector('#evClear').onclick=()=>{v.units=[];commit('Released all');renderEvents();draw()};
- R.querySelector('#evDup').onclick=()=>{const c=JSON.parse(JSON.stringify(v));c.id='ev'+Math.random().toString(36).slice(2,8);c.name=v.name+' (copy)';EVS().push(c);EVSEL=c.id;commit('Event duplicated');renderEvents();draw()};
- R.querySelector('#evDel').onclick=()=>{if(!confirmBtn(R.querySelector('#evDel')))return;P.events=EVS().filter(o=>o!==v);EVSEL=null;commit('Event deleted');renderEvents();draw()};
+ R.querySelector('#evDup').onclick=()=>{evSync();const c=JSON.parse(JSON.stringify(v));evLeave();c.id='ev'+Math.random().toString(36).slice(2,8);c.name=v.name+' (copy)';EVS().push(c);EVSEL=c.id;evApply(c);commit('Event duplicated');renderEvents();draw()};
+ R.querySelector('#evDel').onclick=()=>{if(!confirmBtn(R.querySelector('#evDel')))return;evLeave();P.events=EVS().filter(o=>o!==v);EVSEL=null;commit('Event deleted');renderEvents();draw()};
  R.querySelector('#evIcs').onclick=()=>download((v.name||'event').replace(/[^\w-]+/g,'_')+'.ics',evIcs(v),'text/calendar')}
 function evIcs(v){const f=x=>{const d=new Date(x);return isNaN(d)?'':d.toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'')},e=t=>String(t).replace(/[\\;,]/g,m=>'\\'+m).replace(/\n/g,'\\n');
  const items=v.units.map(id=>{const u=U(id);return u?(u.name||u.kind):''}).filter(Boolean);
  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//LabLayout//Events//EN','BEGIN:VEVENT','UID:'+v.id+'@lablayout','DTSTAMP:'+f(Date.now()),'DTSTART:'+f(v.start),'DTEND:'+f(v.end||v.start),'SUMMARY:'+e(v.name||'Event'),'LOCATION:'+e(P.title||''),'DESCRIPTION:'+e((v.notes?v.notes+'\n\n':'')+(items.length?'Booked: '+items.join(', '):'')),'END:VEVENT','END:VCALENDAR'].join('\r\n')}
 /* clicking a piece in event mode books or releases it for the chosen event */
-svg.addEventListener('pointerdown',e=>{if(MODE!=='event')return;e.stopImmediatePropagation();e.preventDefault();const g=e.target.closest('.u'),u=g&&U(g.dataset.id);
- if(!u||!canBook(u))return;let v=evById(EVSEL);if(!v){toast('Pick or make an event first');return}
+svg.addEventListener('pointerdown',e=>{if(MODE!=='event')return;const g=e.target.closest('.u'),u=g&&U(g.dataset.id),v=evById(EVSEL);
+ /* in an event's layout, unanchored pieces can be dragged; a click without moving still books it */
+ if(v&&u&&evMovable(u)&&!e.shiftKey&&!e.ctrlKey&&!e.metaKey){const x0=e.clientX,y0=e.clientY;const up=ev=>{removeEventListener('pointerup',up,true);if(Math.hypot(ev.clientX-x0,ev.clientY-y0)<4)setTimeout(()=>evToggle(u),0)};addEventListener('pointerup',up,true);return}
+ e.stopImmediatePropagation();e.preventDefault();if(!u||!canBook(u))return;if(!v){toast('Pick or make an event first');return}evToggle(u)},true);
+function evToggle(u){const v=evById(EVSEL);if(!v||!canBook(u))return;
  const i=v.units.indexOf(u.id);if(i>=0)v.units.splice(i,1);else{v.units.push(u.id);const c=evClashes(v,u.id);if(c.length)toast(`${u.name||'That piece'} is also booked for ${c.map(o=>o.name).join(', ')} at the same time`)}
- commit(i>=0?'Released':'Booked');renderEvents();draw()},true);
+ commit(i>=0?'Released':'Booked');renderEvents();draw()}
 function evOverlay(){if(MODE!=='event')return;const v=evById(EVSEL);
  svg.querySelectorAll('.u').forEach(g=>{const u=U(g.dataset.id);if(!canBook(u))return;const on=v&&v.units.includes(u.id),cl=on&&evClashes(v,u.id).length,busy=!on&&v&&EVS().some(o=>o!==v&&o.units.includes(u.id)&&evOverlap(o,v));
   g.classList.add('evu');g.classList.toggle('evon',!!on);g.classList.toggle('evclash',!!cl);g.classList.toggle('evbusy',!!busy);
   if(on||busy){let b;try{b=g.getBBox()}catch(e){return}if(!b.width)return;g.insertAdjacentHTML('beforeend',`<rect class="evhl${cl?' c':busy?' b':''}" x="${b.x}" y="${b.y}" width="${b.width}" height="${b.height}" rx="${Math.min(b.width,b.height)*.08}"/>`)}})}
-{const d0=draw;draw=function(){d0.apply(this,arguments);evOverlay()}}
-{const r0=renderProps;renderProps=function(){if(MODE==='event'){renderEvents();return}return r0.apply(this,arguments)}}
+{const d0=draw;draw=function(){d0.apply(this,arguments);fitLabels(svg);evOverlay()}}
+{const s0=save;save=function(){return withBase(()=>s0.apply(this,arguments))}}
+{const r0=record;record=function(){return withBase(()=>r0.apply(this,arguments))}}
+{const g0=goRoom;goRoom=function(){evLeave();EVSEL=null;return g0.apply(this,arguments)}}
+{const r0=renderProps;renderProps=function(soft){if(MODE==='event'){if(!soft)renderEvents();return}const out=r0.apply(this,arguments);if(!soft)evPropsNote();return out}}
+/* layout view: a selected piece lists its upcoming events */
+function evPropsNote(){const u=selSet.size===1&&U(selId),el=$('props');if(!u||!canBook(u)||!el)return;const now=Date.now();
+ const L=EVS().filter(v=>v.units.includes(u.id)&&(evT(v)[1]>=now||!evT(v)[0])).sort((a,b)=>evT(a)[0]-evT(b)[0]);
+ const d=document.createElement('div');d.className='evnote';d.innerHTML=`<h2>Upcoming events</h2>${L.length?`<ul class="evunits">${L.map(v=>`<li><span><b>${esc(v.name||'Event')}</b><small style="color:#667">${esc(evWhen(v))}${v.pos&&v.pos[u.id]?' · moved for this event':''}</small></span><button class="ghost" data-evgo="${v.id}" title="Open in Events">📅</button></li>`).join('')}</ul>`:'<p class="hint">Not booked for any upcoming event.</p>'}`;
+ const at=el.querySelector('label.f');if(at)at.after(d);else el.appendChild(d);d.querySelectorAll('[data-evgo]').forEach(b=>b.onclick=()=>{EVSEL=b.dataset.evgo;setMode('event')})}
 
 $('bEx').onclick=()=>{const c=exampleConfig();if(!c){toast('Example unavailable');return}if(P.units.length&&!confirmBtn($('bEx')))return;P={v:1,title:c.title,room:c.room,units:c.units,sample:true,exampleKey:c.storageKey};init();toast('Loaded HatchBridge example')};
 $('title').oninput=e=>{P.title=e.target.value;save();const b=$('rooms').querySelector('.on');if(b)b.textContent=P.title||'Room'};
