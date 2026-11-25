@@ -14,10 +14,11 @@ Lay out your labs and tool cribs and run their inventory in the same app. One HT
 
 ## Using LabLayout
 
-Open `site/builder.html`. The switch at the top has two modes:
+Open `site/builder.html`. The switch at the top has three modes (full list in [FEATURES.md](FEATURES.md)):
 
 - **✏️ Edit layout**: draw the room and arrange furniture (steps below).
 - **📦 Inventory**: use the room's tracker in the same window: check items in and out, consumables, reorder list, activity log. Inventory is stored in the browser, so switching back to Edit and changing the layout keeps it. Drawers you keep keep their items, and items from deleted drawers move to *Unsorted*. The app reopens in whichever mode you used last.
+- **📅 Events**: make calendar events (name, start, end, notes) and click furniture on the plan to book it for the selected event. Pieces booked by two events at the same time show red. Each event downloads as an `.ics` file.
 
 **Rooms**: a project can hold several rooms, shown as tabs under the header. **＋ Room** adds an empty room, **⧉ Copy room** duplicates the current one, and the name box renames it. Each room keeps its own inventory. There are two file formats:
 

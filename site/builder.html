@@ -23,6 +23,11 @@ details{border:1px solid #e3e6e5;border-radius:8px;margin-bottom:6px}summary{pad
 #plan .u{cursor:move}#plan .u.sel .b{stroke:#f26b1d;stroke-width:.08}
 #plan text{pointer-events:none;font-family:system-ui,sans-serif;text-anchor:middle;dominant-baseline:middle}
 #plan .vtx{fill:#fff;stroke:#2d6cdf;cursor:move}#plan .vtx:hover{fill:#2d6cdf}#plan .wl{cursor:text;pointer-events:all;text-decoration:underline dotted}#plan .wseg{cursor:copy}#plan .wdrag{cursor:move}#plan .zh{cursor:grab}.crumbs{display:inline-flex;gap:4px;align-items:center;color:#8a9;margin-right:6px}.crumb{background:none!important;border:none!important;color:#f26b1d!important;padding:4px 6px!important;font-weight:600}#bSnap.off{opacity:.6;text-decoration:line-through}.unitsw{display:inline-flex!important;gap:2px;padding:3px!important;border-radius:9px!important;background:#22262b!important}.unitsw span{padding:4px 9px;border-radius:6px;color:#aeb4ba;font-size:12.5px}.unitsw:not(.met) .uft,.unitsw.met .um{background:#f26b1d;color:#fff}.swatches{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.sw{width:24px;height:24px;padding:0!important;border-radius:6px!important;border:1px solid #0003!important;box-shadow:none!important;cursor:pointer}.sw.on{outline:2px solid #2d6cdf;outline-offset:2px}.swc{display:grid;place-items:center;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);color:#fff;font-weight:700;font-size:13px;position:relative;text-shadow:0 0 2px #000}.swc input{position:absolute;inset:0;opacity:0;cursor:pointer}.swr{padding:2px 8px!important;font-size:12px!important}#bMeasure.on{background:#2d6cdf!important;color:#fff!important}#stage.zrect #plan{cursor:crosshair}#plan .u.locked{cursor:default}#plan .u.locked .b{stroke:#2d6cdf;stroke-width:.09}#plan .u.locked.sel .b{stroke:#2d6cdf;stroke-width:.12;stroke-dasharray:none}#bLock.on{background:#2d6cdf;color:#fff}#plan .wdrag:hover{stroke:rgba(45,108,223,.25)}#plan .mh{cursor:ew-resize}
+#evside{display:none}body.evm #editv>aside:first-child>*:not(#evside){display:none!important}body.evm #evside{display:block}body.evm #stage .tb{display:none}
+.evlist{display:flex;flex-direction:column;gap:6px}.evitem{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:#fff!important;color:#222!important;border:1px solid #dde!important;border-radius:8px!important;padding:8px 10px!important;font-size:12px}.evitem span{color:#667}.evitem em{color:#c92a2a;font-style:normal;font-weight:600}.evitem.on{border-color:#f26b1d!important;box-shadow:0 0 0 2px #f26b1d33}
+.evunits{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}.evunits li{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13px;padding:4px 6px;border-radius:6px;background:#f6f6f2}.evunits li.clash{background:#fff0f0}.evunits small{display:block;color:#c92a2a;font-size:11px}.evunits button{padding:2px 7px!important;flex:none}
+body.evm #plan .evu{cursor:pointer}body.evm #plan .evu:not(.evon){opacity:.55}body.evm #plan .evu:hover{opacity:1}
+#plan .evhl{fill:#f26b1d;fill-opacity:.28;stroke:#f26b1d;stroke-width:.08;pointer-events:none}#plan .evhl.c{fill:#e03131;stroke:#e03131;fill-opacity:.35}#plan .evhl.b{fill:none;stroke:#868e96;stroke-dasharray:.25 .2;stroke-width:.06}
 #hxy{position:absolute;right:10px;bottom:10px;z-index:4;pointer-events:none;display:none;background:#fffe;border:1px solid #ccd;border-radius:6px;padding:3px 8px;font-size:12px;font-variant-numeric:tabular-nums;color:#333;box-shadow:0 2px 6px #0002}#dimin{position:absolute;display:none;z-index:5;width:110px;padding:5px 7px;border:2px solid #f26b1d;border-radius:6px;font:inherit;font-size:13px;box-shadow:0 3px 10px #0003}
 #stage.sketch #plan{cursor:crosshair}
 .tb{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}.tb button{font-size:12px;padding:6px 9px}
@@ -115,11 +120,12 @@ details{border:1px solid var(--line);border-radius:var(--r);background:#fff}summ
 @media(max-width:1180px){header{flex-wrap:wrap}header input{width:160px}}
 @media(max-width:900px){main{grid-template-columns:1fr}}
 </style></head><body>
-<header><h1><span class="logo">▦</span>LabLayout</h1><div class="seg" id="modes"><button id="mEdit">✏️ Edit layout</button><button id="mUse">📦 Inventory</button></div><input id="title" placeholder="Room name"><span class="grow"></span><button class="alt" id="bCB" title="Colour-blind friendly colours (Okabe-Ito palette)">👁 Colour-blind</button><details class="menu"><summary>📁 File</summary><div class="mlist"><button class="alt editonly" id="bEx">Load example</button><button class="alt" id="bOpen" title="Open a full layout (all rooms). A room JSON opens as a one-room layout">⬆ Import layout JSON</button><button class="alt" id="bSave" title="Download the full layout with every room">⬇ Export layout JSON</button><button class="alt" id="bPwLock" title="Make an encrypted copy that opens only with a password">🔒 Lock with password…</button><button class="alt" id="bPwOpen" title="Open a layout someone locked with a password">🔑 Open with password…</button><button class="alt" id="bPwBack" hidden title="Go back to your own layout">↩ Back to my layout</button></div></details><button class="alt editonly" id="bAI" title="Let ChatGPT, Claude or another AI generate the layout">🤖 AI layout</button><button id="bExport" title="Download this room as a standalone offline tracker file">⬇ Export tracker HTML</button><button class="alt editonly unitsw" id="bUnits" title="Units: feet/inches or metres/centimetres. You can type any unit in a length box, e.g. 45 in, 3 1/2 ft, 30 cm"><span class="uft">ft · in</span><span class="um">m · cm</span></button>
+<header><h1><span class="logo">▦</span>LabLayout</h1><div class="seg" id="modes"><button id="mEdit">✏️ Edit layout</button><button id="mUse">📦 Inventory</button><button id="mEv" title="Book furniture for calendar events">📅 Events</button></div><input id="title" placeholder="Room name"><span class="grow"></span><button class="alt" id="bCB" title="Colour-blind friendly colours (Okabe-Ito palette)">👁 Colour-blind</button><details class="menu"><summary>📁 File</summary><div class="mlist"><button class="alt editonly" id="bEx">Load example</button><button class="alt" id="bOpen" title="Open a full layout (all rooms). A room JSON opens as a one-room layout">⬆ Import layout JSON</button><button class="alt" id="bSave" title="Download the full layout with every room">⬇ Export layout JSON</button><button class="alt" id="bPwLock" title="Make an encrypted copy that opens only with a password">🔒 Lock with password…</button><button class="alt" id="bPwOpen" title="Open a layout someone locked with a password">🔑 Open with password…</button><button class="alt" id="bPwBack" hidden title="Go back to your own layout">↩ Back to my layout</button></div></details><button class="alt editonly" id="bAI" title="Let ChatGPT, Claude or another AI generate the layout">🤖 AI layout</button><button id="bExport" title="Download this room as a standalone offline tracker file">⬇ Export tracker HTML</button><button class="alt editonly unitsw" id="bUnits" title="Units: feet/inches or metres/centimetres. You can type any unit in a length box, e.g. 45 in, 3 1/2 ft, 30 cm"><span class="uft">ft · in</span><span class="um">m · cm</span></button>
 <input type="file" id="file" accept=".json,.lablayout,.cribops" hidden><input type="file" id="fRoom" accept=".json,application/json" hidden></header>
 <nav id="rooms"></nav>
 <main id="editv">
  <aside>
+  <div id="evside"></div>
   <h2>Room</h2>
   <div class="row"><label class="f">Width (<span class="lu">ft</span>)<input id="rw" type="text" inputmode="decimal" value="14"></label><label class="f">Depth (<span class="lu">ft</span>)<input id="rd" type="text" inputmode="decimal" value="20"></label></div>
   <div class="row"><button class="ghost" id="bRect">Rectangle</button><button class="ghost" id="bDraw">✏️ Draw walls</button></div>
@@ -2745,7 +2751,7 @@ function dup1(u,dx,dy=0){const c=JSON.parse(JSON.stringify(u));const id=nid(u.ma
  if(c.grid)c.grid.cells.forEach(x=>x.id=x.id.replace(re,id+'-'));if(c.surf)c.surf[0]=id+'-surf';if(c.under)c.under[0]=id+'-under';(c.eq||[]).forEach(e=>(e.slots||[]).forEach(s=>s.id=id+'-'+e.a+'-'+(seq++)));if(c.kind==='zone')P.units.unshift(c);else P.units.push(c);return id}
 $('bDup').onclick=()=>{const L=[...selSet].map(U).filter(Boolean);if(!L.length)return;if(L.length===1){const id=dup1(L[0],L[0].w+.25);delete U(id).grp;select(id);commit('Duplicated');return}const x0=Math.min(...L.map(u=>u.x)),x1=Math.max(...L.map(u=>u.x+u.w)),gm={},ids=L.map(u=>{const id=dup1(u,x1-x0+.5);if(u.grp){gm[u.grp]=gm[u.grp]||'g'+Date.now().toString(36)+(seq++);U(id).grp=gm[u.grp]}return id});selSet.clear();ids.forEach(i=>selSet.add(i));selId=ids[ids.length-1];selChanged();commit('Duplicated '+L.length+' pieces')};
 function confirmBtn(b){if(b._c){b._c=0;b.textContent=b._t;return true}b._t=b.textContent;b._c=1;b.textContent='Tap again';setTimeout(()=>{if(b._c){b._c=0;b.textContent=b._t}},2000);return false}
-document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select'))return;const mod=e.ctrlKey||e.metaKey;
+document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select'))return;if(MODE==='event')return;const mod=e.ctrlKey||e.metaKey;
  if(mod&&e.key.toLowerCase()==='z'){e.preventDefault();stepHist(e.shiftKey?1:-1);return}if(mod&&e.key.toLowerCase()==='y'){e.preventDefault();stepHist(1);return}
  if(mod&&e.key.toLowerCase()==='a'){e.preventDefault();P.units.forEach(u=>selSet.add(u.id));selId=[...selSet].pop()||null;selChanged();return}
  if(mod&&e.key.toLowerCase()==='c'&&selSet.size){e.preventDefault();copySel();return}if(mod&&e.key.toLowerCase()==='x'&&selSet.size){e.preventDefault();if(anyLocked())return lockedMsg();copySel();P.units=P.units.filter(v=>!selSet.has(v.id));select(null);commit('Cut');return}if(mod&&e.key.toLowerCase()==='v'){e.preventDefault();pasteClip();return}
@@ -2933,12 +2939,73 @@ function importRooms(j){let rooms;
 $('fRoom').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const n=importRooms(JSON.parse(await f.text()));toast(n>1?`Added ${n} rooms from ${f.name}`:`Added room “${P.title}”`)}catch(err){toast('Couldn’t import: '+err.message)}};
 /* ---------- Edit layout / Inventory modes ---------- */
 let MODE='edit',useSrc='';
-function setMode(m){MODE=m;try{localStorage.setItem('lablayout-mode',m)}catch(e){}$('mEdit').classList.toggle('on',m==='edit');$('mUse').classList.toggle('on',m==='use');
- $('editv').style.display=m==='edit'?'':'none';$('usev').hidden=m!=='use';document.querySelectorAll('.editonly').forEach(e=>e.style.display=m==='edit'?'':'none');
+function setMode(m){MODE=m;try{localStorage.setItem('lablayout-mode',m)}catch(e){}$('mEdit').classList.toggle('on',m==='edit');$('mEv').classList.toggle('on',m==='event');document.body.classList.toggle('evm',m==='event');$('mUse').classList.toggle('on',m==='use');
+ $('editv').style.display=m==='edit'||m==='event'?'':'none';$('usev').hidden=m!=='use';document.querySelectorAll('.editonly').forEach(e=>e.style.display=m==='edit'?'':'none');if(m==='event'){select(null);renderEvents()}else if(m==='edit'){renderProps()}if(typeof draw==='function'&&m!=='use')draw();
  if(m==='use'){save();const h=buildTracker(true);if(!h){setMode('edit');return}if(h!==useSrc){useSrc=h;$('usef').srcdoc=h}}}
 document.addEventListener('click',e=>{document.querySelectorAll('details.menu[open]').forEach(m=>{if(!m.contains(e.target)||e.target.closest('.mlist button'))m.open=false})});
 $('mEdit').onclick=()=>setMode('edit');
-window.addEventListener('message',e=>{const d=e.data;if(!d||e.source!==$('usef').contentWindow||MODE!=='use')return;if(d.lablayout==='go'&&d.rid)goRid(d.rid);if(d.lablayout==='up'){const q=parentOf(P);if(q)goRid(q.rid)}});$('mUse').onclick=()=>setMode('use');
+window.addEventListener('message',e=>{const d=e.data;if(!d||e.source!==$('usef').contentWindow||MODE!=='use')return;if(d.lablayout==='go'&&d.rid)goRid(d.rid);if(d.lablayout==='up'){const q=parentOf(P);if(q)goRid(q.rid)}});$('mUse').onclick=()=>setMode('use');$('mEv').onclick=()=>setMode('event');
+/* ---------- Events: book furniture for calendar events ---------- */
+let EVSEL=null;
+const EVS=()=>P.events||(P.events=[]);
+const evById=id=>EVS().find(v=>v.id===id);
+const canBook=u=>u&&!['zone','wall','door'].includes(u.kind);
+const evT=v=>[Date.parse(v.start)||0,Date.parse(v.end)||Date.parse(v.start)||0];
+const evOverlap=(a,b)=>{const[x0,x1]=evT(a),[y0,y1]=evT(b);return x0<y1&&y0<x1};
+/* other events at the same time that use the same piece */
+const evClashes=(v,id)=>EVS().filter(o=>o!==v&&o.units.includes(id)&&evOverlap(o,v));
+function evWhen(v){const a=new Date(v.start),b=new Date(v.end);if(isNaN(a))return'No date set';
+ const d=x=>x.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}),t=x=>x.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+ return isNaN(b)?d(a)+' '+t(a):a.toDateString()===b.toDateString()?`${d(a)} · ${t(a)}–${t(b)}`:`${d(a)} ${t(a)} – ${d(b)} ${t(b)}`}
+const pad2=n=>String(n).padStart(2,'0'),localDT=x=>`${x.getFullYear()}-${pad2(x.getMonth()+1)}-${pad2(x.getDate())}T${pad2(x.getHours())}:${pad2(x.getMinutes())}`;
+function newEvent(){const a=new Date();a.setMinutes(0,0,0);a.setHours(a.getHours()+1);const b=new Date(a.getTime()+36e5);
+ const v={id:'ev'+Math.random().toString(36).slice(2,8),name:'New event',start:localDT(a),end:localDT(b),notes:'',units:[]};EVS().push(v);EVSEL=v.id;commit('Event added');renderEvents();draw()}
+let EVSHOW='upcoming';
+function renderEvents(){const L=$('evside'),R=$('props');if(!L||!R)return;const now=Date.now();
+ let list=EVS().slice().sort((a,b)=>evT(a)[0]-evT(b)[0]);if(EVSHOW==='upcoming')list=list.filter(v=>evT(v)[1]>=now||!evT(v)[0]);
+ L.innerHTML=`<h2>Events</h2><button id="evNew" style="width:100%;margin-bottom:8px">＋ New event</button>
+ <div class="row" style="margin-bottom:8px"><button class="ghost${EVSHOW==='upcoming'?' on':''}" data-evshow="upcoming">Upcoming</button><button class="ghost${EVSHOW==='all'?' on':''}" data-evshow="all">All</button></div>
+ <div class="evlist">${list.map(v=>{const cl=v.units.some(id=>evClashes(v,id).length);return `<button class="evitem${v.id===EVSEL?' on':''}" data-ev="${v.id}"><b>${esc(v.name||'Event')}</b><span>${esc(evWhen(v))}</span><span>${v.units.length} piece${v.units.length===1?'':'s'}${cl?' · <em>clash</em>':''}</span></button>`}).join('')||'<p class="hint">No events yet. Make one, then click furniture on the plan to book it.</p>'}</div>
+ <p class="hint">Pick an event, then click pieces on the plan to book or release them. Orange = booked for this event, red = also booked by another event at the same time.</p>`;
+ L.querySelector('#evNew').onclick=newEvent;
+ L.querySelectorAll('[data-evshow]').forEach(b=>b.onclick=()=>{EVSHOW=b.dataset.evshow;renderEvents()});
+ L.querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{EVSEL=EVSEL===b.dataset.ev?null:b.dataset.ev;renderEvents();draw()});
+ const v=evById(EVSEL);
+ if(!v){R.innerHTML=`<h2>Events</h2><p class="hint">Choose an event on the left, or make a new one. Furniture booked for an event shows highlighted on the plan.</p>`;return}
+ const rows=v.units.map(id=>{const u=U(id),c=evClashes(v,id);return `<li${c.length?' class="clash"':''}><span>${esc(u?(u.name||u.kind):'(removed piece)')}${c.length?`<small>also in ${c.map(o=>esc(o.name)).join(', ')}</small>`:''}</span><button class="ghost" data-evrm="${id}" title="Release">✕</button></li>`}).join('');
+ R.innerHTML=`<h2>Event</h2>
+ <label class="f">Name<input id="evName" value="${esc(v.name)}"></label>
+ <div class="row"><label class="f">Starts<input id="evStart" type="datetime-local" value="${esc(v.start)}"></label></div>
+ <div class="row"><label class="f">Ends<input id="evEnd" type="datetime-local" value="${esc(v.end)}"></label></div>
+ <label class="f">Notes<textarea id="evNotes" rows="3">${esc(v.notes||'')}</textarea></label>
+ <h2>Booked furniture (${v.units.length})</h2><ul class="evunits">${rows||'<li class="hint">Click pieces on the plan to book them.</li>'}</ul>
+ <div class="row" style="margin-top:8px"><button class="ghost" id="evIcs" title="Add to Google Calendar, Outlook or Apple Calendar">📅 Download .ics</button><button class="ghost" id="evClear"${v.units.length?'':' disabled'}>Release all</button></div>
+ <div class="row" style="margin-top:6px"><button class="ghost" id="evDup">⧉ Duplicate</button><button class="ghost danger" id="evDel">Delete event</button></div>`;
+ const upd=(k,el,soft)=>{v[k]=el.value;commit('Event changed');if(!soft)renderEvents();else{const b=L.querySelector(`[data-ev="${v.id}"] b`);if(b)b.textContent=v.name||'Event'}draw()};
+ R.querySelector('#evName').oninput=e=>{v.name=e.target.value;save();const b=L.querySelector(`[data-ev="${v.id}"] b`);if(b)b.textContent=v.name||'Event'};R.querySelector('#evName').onchange=()=>commit('');
+ R.querySelector('#evStart').onchange=e=>{const d=Date.parse(v.end)-Date.parse(v.start);v.start=e.target.value;if(d>0&&!isNaN(Date.parse(v.start)))v.end=localDT(new Date(Date.parse(v.start)+d));commit('Event changed');renderEvents();draw()};
+ R.querySelector('#evEnd').onchange=e=>{if(Date.parse(e.target.value)<=Date.parse(v.start)){toast('The event has to end after it starts');e.target.value=v.end;return}upd('end',e.target)};
+ R.querySelector('#evNotes').oninput=e=>{v.notes=e.target.value;save()};R.querySelector('#evNotes').onchange=()=>commit('');
+ R.querySelectorAll('[data-evrm]').forEach(b=>b.onclick=()=>{v.units=v.units.filter(i=>i!==b.dataset.evrm);commit('Released');renderEvents();draw()});
+ R.querySelector('#evClear').onclick=()=>{v.units=[];commit('Released all');renderEvents();draw()};
+ R.querySelector('#evDup').onclick=()=>{const c=JSON.parse(JSON.stringify(v));c.id='ev'+Math.random().toString(36).slice(2,8);c.name=v.name+' (copy)';EVS().push(c);EVSEL=c.id;commit('Event duplicated');renderEvents();draw()};
+ R.querySelector('#evDel').onclick=()=>{if(!confirmBtn(R.querySelector('#evDel')))return;P.events=EVS().filter(o=>o!==v);EVSEL=null;commit('Event deleted');renderEvents();draw()};
+ R.querySelector('#evIcs').onclick=()=>download((v.name||'event').replace(/[^\w-]+/g,'_')+'.ics',evIcs(v),'text/calendar')}
+function evIcs(v){const f=x=>{const d=new Date(x);return isNaN(d)?'':d.toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'')},e=t=>String(t).replace(/[\\;,]/g,m=>'\\'+m).replace(/\n/g,'\\n');
+ const items=v.units.map(id=>{const u=U(id);return u?(u.name||u.kind):''}).filter(Boolean);
+ return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//LabLayout//Events//EN','BEGIN:VEVENT','UID:'+v.id+'@lablayout','DTSTAMP:'+f(Date.now()),'DTSTART:'+f(v.start),'DTEND:'+f(v.end||v.start),'SUMMARY:'+e(v.name||'Event'),'LOCATION:'+e(P.title||''),'DESCRIPTION:'+e((v.notes?v.notes+'\n\n':'')+(items.length?'Booked: '+items.join(', '):'')),'END:VEVENT','END:VCALENDAR'].join('\r\n')}
+/* clicking a piece in event mode books or releases it for the chosen event */
+svg.addEventListener('pointerdown',e=>{if(MODE!=='event')return;e.stopImmediatePropagation();e.preventDefault();const g=e.target.closest('.u'),u=g&&U(g.dataset.id);
+ if(!u||!canBook(u))return;let v=evById(EVSEL);if(!v){toast('Pick or make an event first');return}
+ const i=v.units.indexOf(u.id);if(i>=0)v.units.splice(i,1);else{v.units.push(u.id);const c=evClashes(v,u.id);if(c.length)toast(`${u.name||'That piece'} is also booked for ${c.map(o=>o.name).join(', ')} at the same time`)}
+ commit(i>=0?'Released':'Booked');renderEvents();draw()},true);
+function evOverlay(){if(MODE!=='event')return;const v=evById(EVSEL);
+ svg.querySelectorAll('.u').forEach(g=>{const u=U(g.dataset.id);if(!canBook(u))return;const on=v&&v.units.includes(u.id),cl=on&&evClashes(v,u.id).length,busy=!on&&v&&EVS().some(o=>o!==v&&o.units.includes(u.id)&&evOverlap(o,v));
+  g.classList.add('evu');g.classList.toggle('evon',!!on);g.classList.toggle('evclash',!!cl);g.classList.toggle('evbusy',!!busy);
+  if(on||busy){let b;try{b=g.getBBox()}catch(e){return}if(!b.width)return;g.insertAdjacentHTML('beforeend',`<rect class="evhl${cl?' c':busy?' b':''}" x="${b.x}" y="${b.y}" width="${b.width}" height="${b.height}" rx="${Math.min(b.width,b.height)*.08}"/>`)}})}
+{const d0=draw;draw=function(){d0.apply(this,arguments);evOverlay()}}
+{const r0=renderProps;renderProps=function(){if(MODE==='event'){renderEvents();return}return r0.apply(this,arguments)}}
+
 $('bEx').onclick=()=>{const c=exampleConfig();if(!c){toast('Example unavailable');return}if(P.units.length&&!confirmBtn($('bEx')))return;P={v:1,title:c.title,room:c.room,units:c.units,sample:true,exampleKey:c.storageKey};init();toast('Loaded HatchBridge example')};
 $('title').oninput=e=>{P.title=e.target.value;save();const b=$('rooms').querySelector('.on');if(b)b.textContent=P.title||'Room'};
 ['syu','syk'].forEach(k=>$(k).oninput=()=>{P.sync={url:$('syu').value.trim(),key:$('syk').value.trim()};if(!P.sync.url&&!P.sync.key)delete P.sync;save()});
