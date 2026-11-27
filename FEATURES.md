@@ -30,8 +30,8 @@ LabLayout is one HTML file (`site/builder.html`) that lays out labs and tool cri
 - **Fit rooms to walls** pulls room edges onto the walls' inner faces.
 - **Room corners**: rooms show their corners when clicked, and you can edit them by typing. Rooms have a corners list and square up like walls do.
 - **Room edges snap** to other rooms.
-- **Room labels**: rooms show just their name (plus ↗ or › when they open another room); colour shows who a room belongs to. Labels shrink to fit their room and are hidden when they can't fit.
-- **One room per piece**: each piece belongs to the room its centre is in. A piece that hangs over into another room is nudged fully inside its own. Anchored pieces are left alone.
+- **Room labels**: rooms show just their name (plus ↗ or › when they open another room); colour shows who a room belongs to. Labels shrink to fit their room and are hidden when they can't fit. In a layout that contains a room, that room's furniture labels are hidden (hover or select a piece to see its name) and show normally inside the room itself.
+- **One room per piece**: each piece belongs to the room its centre is in. A piece that hangs over into another room is nudged fully inside its own. Anchored pieces are left alone. A piece still in two rooms (anchored, or too big to fit) is listed in the checks with both room names, and a message appears when you drop it there.
 
 ## Doors
 
@@ -62,7 +62,9 @@ LabLayout is one HTML file (`site/builder.html`) that lays out labs and tool cri
 
 - **Creating events**: give each event a name, a start, an end and notes. Events are saved with the room.
 - **Booking furniture**: pick an event, then click pieces on the plan to book or release them.
-- **Event layouts**: each event can have its own furniture arrangement. In Events mode, drag unanchored pieces to set them up for that event. The room's own layout doesn't change, and **Reset to room layout** puts the event back.
+- **Any date and time**: events run on any date, from any start time to any end time, including ones that span several days.
+- **Import a calendar**: **📥 Import calendar (.ics)** brings in events from Google Calendar, Outlook, Apple Calendar or any .ics file. Time zones and durations are read. Importing the same file again updates those events instead of duplicating them. For repeating events, only the first occurrence comes in, and its notes say so.
+- **Event layouts**: each event can have its own furniture arrangement. In Events mode, drag unanchored pieces to set them up for that event. Anchored pieces can be booked with a click but never moved. The room's own layout doesn't change, and **Reset to room layout** puts the event back.
 - **Layout presets per room**: save an event's arrangement as a named preset (for example Class or Party). Other events in the same room can start from it with **Start from**, and changes made for one event don't alter the preset. Each room keeps its own presets, listed in the Events panel.
 - **Upcoming events on each piece**: in Edit layout, selecting a piece lists the upcoming events it's booked for, with a button to open each one in Events mode.
 - **Colours on the plan**:
@@ -76,6 +78,7 @@ LabLayout is one HTML file (`site/builder.html`) that lays out labs and tool cri
 ## Inventory (tracker)
 
 - **Tracking**: check items in and out, track consumables, keep a reorder list and an activity log.
+- **Movable storage**: any single item, such as a footlocker, tool chest, toolbox or camera bag, can be made a container with **🧰 Make container**. Containers hold items, and they can also go inside other containers. A container counts as an item itself. Checking it out takes everything inside with it, and returning it brings it back with its contents. The search and the checked-out list show where things are, for example "🧰 Camera bag in Workbench 1 › Worktop" or "🧰 Camera bag (checked out)".
 - **Layout changes keep inventory**: when the layout changes, drawers you keep keep their items, and items from deleted drawers move to *Unsorted*.
 - **Exporting**: export a standalone tracker HTML file for any room.
 - **Shared inventory** (optional): a Supabase connection lets several devices share one inventory.
